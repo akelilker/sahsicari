@@ -260,13 +260,13 @@ function queueSave() {
         try {
             if (Object.keys(allData).length > 0 && navigator.onLine && hasLoadedServerData) {
                 await saveDataToServer(allData, false);
-                safeStorage.removeItem('sahsiHesapTakibiData');
+                await advancedStorage.removeItem('sahsiHesapTakibiData');
             } else {
-                safeStorage.setItem('sahsiHesapTakibiData', JSON.stringify(allData));
+                await advancedStorage.setItem('sahsiHesapTakibiData', JSON.stringify(allData));
             }
-            safeStorage.setItem('sahsiHesapTakibiNotifications', JSON.stringify(notificationHistory));
+            await advancedStorage.setItem('sahsiHesapTakibiNotifications', JSON.stringify(notificationHistory));
         } catch (error) {
-            safeStorage.setItem('sahsiHesapTakibiData', JSON.stringify(allData));
+            await advancedStorage.setItem('sahsiHesapTakibiData', JSON.stringify(allData));
         }
         saveTimer = null;
     }, 1000);
@@ -283,16 +283,16 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     navigator.serviceWorker.register('service_worker.js?v=' + APP_VERSION).catch(console.error);
 }
 
-window.addEventListener('load', function() {
+window.addEventListener('load', async function() {
     initDOMCache();
     updateVersionDisplay();
-    loadGlowTheme(); 
+    await loadGlowTheme();
     updateServerStatus('', '📡 Veriler yükleniyor...');
-    
-    loadData().then(() => {
-        const savedNotifications = safeStorage.getItem('sahsiHesapTakibiNotifications');
+
+    loadData().then(async () => {
+        const savedNotifications = await advancedStorage.getItem('sahsiHesapTakibiNotifications');
         if (savedNotifications) notificationHistory = JSON.parse(savedNotifications);
-        
+
         migrateOldDataSafely();
         updateMainDisplay();
         setCurrentDate();
@@ -405,15 +405,16 @@ function loadDataFromServer() {
     });
 }
 
-function loadData() {
-    return loadDataFromServer().then(serverData => {
+async function loadData() {
+    try {
+        const serverData = await loadDataFromServer();
         if (serverData && Object.keys(serverData).length > 0) {
             allData = serverData;
             hasLoadedServerData = true;
             updateServerStatus('success', '✅ Sunucudan yüklendi');
             return true;
         } else {
-            const savedData = safeStorage.getItem('sahsiHesapTakibiData');
+            const savedData = await advancedStorage.getItem('sahsiHesapTakibiData');
             if (savedData) {
                 allData = JSON.parse(savedData);
                 hasLoadedServerData = false;
@@ -424,12 +425,12 @@ function loadData() {
             }
             return true;
         }
-    }).catch(error => {
+    } catch (error) {
         updateServerStatus('error', '❌ Bağlantı hatası');
-        const savedData = safeStorage.getItem('sahsiHesapTakibiData');
+        const savedData = await advancedStorage.getItem('sahsiHesapTakibiData');
         if (savedData) allData = JSON.parse(savedData);
         return false;
-    });
+    }
 }
 
 function migrateOldDataSafely() {
@@ -738,23 +739,23 @@ function reorderFavorites(fromIndex, toIndex) {
     setTimeout(() => { justDragged = false; }, 100);
 }
 
-function showNotification(message, type = 'info') {
+async function showNotification(message, type = 'info') {
     const notification = DOM.notification || document.getElementById('notification');
     if (!notification) return;
-    
+
     notification.textContent = message;
     notification.className = 'notification show';
     notification.classList.add(type);
-    
+
     notificationHistory.push({
         message: message,
         type: type,
         date: new Date().toISOString()
     });
-    
+
     if (notificationHistory.length > 20) notificationHistory.shift();
-    safeStorage.setItem('sahsiHesapTakibiNotifications', JSON.stringify(notificationHistory));
-    
+    await advancedStorage.setItem('sahsiHesapTakibiNotifications', JSON.stringify(notificationHistory));
+
     setTimeout(() => {
         notification.classList.remove('show');
     }, 3000);
@@ -1883,7 +1884,7 @@ document.addEventListener('click', function(e) {
     }
 });
 
-function changeGlowTheme(themeName, silent = false) {
+async function changeGlowTheme(themeName, silent = false) {
     const container = DOM.mainAppContainer;
     if (!container) return;
 
@@ -1893,16 +1894,16 @@ function changeGlowTheme(themeName, silent = false) {
 
     container.classList.add(`theme-${themeName}-glow`);
 
-    safeStorage.setItem('sahsiHesapTakibiGlowTheme', themeName); 
+    await advancedStorage.setItem('sahsiHesapTakibiGlowTheme', themeName);
 
     if(!silent) {
-        showNotification(`${themeName === 'none' ? 'Işıklar kapatıldı.' : themeName.toUpperCase() + ' ışık seçildi.'}`, 'success');
+        await showNotification(`${themeName === 'none' ? 'Işıklar kapatıldı.' : themeName.toUpperCase() + ' ışık seçildi.'}`, 'success');
     }
 }
 
-function loadGlowTheme() {
-    const savedTheme = safeStorage.getItem('sahsiHesapTakibiGlowTheme') || 'blue'; 
-    changeGlowTheme(savedTheme, true);
+async function loadGlowTheme() {
+    const savedTheme = await advancedStorage.getItem('sahsiHesapTakibiGlowTheme') || 'blue';
+    await changeGlowTheme(savedTheme, true);
 }
 
 function toggleNotificationMenu() {
@@ -2197,9 +2198,9 @@ function renderNotificationMenu() {
     }
 }
 
-function deleteNotification(index) {
+async function deleteNotification(index) {
     notificationHistory.splice(index, 1);
-    safeStorage.setItem('sahsiHesapTakibiNotifications', JSON.stringify(notificationHistory));
+    await advancedStorage.setItem('sahsiHesapTakibiNotifications', JSON.stringify(notificationHistory));
     renderNotificationMenu();
 }
 
@@ -3086,8 +3087,8 @@ async function attemptBackupAndClear() {
     alertMessage.innerHTML = "Sunucuya veri yedekleniyor, lütfen bekleyin...";
 
     try {
-        const data = safeStorage.getItem('sahsiHesapTakibiData');
-        
+        const data = await advancedStorage.getItem('sahsiHesapTakibiData');
+
         if(data) {
             await saveDataToServer(JSON.parse(data), true);
             
