@@ -1,0 +1,685 @@
+/* =================================================================
+KASA DEFTERİ CSS - v1.10 (DÜZELTILMIŞ)
+✅ Footer Tema Gösterim Eklendi
+✅ Kategori Dropdown Mobil Düzeltmesi
+================================================================= */
+
+/* Kasa Modal Wrapper */
+.kasa-modal-wrapper {
+position: fixed;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+display: flex;
+justify-content: center;
+align-items: flex-start;
+padding-top: calc(env(safe-area-inset-top) + 10px);
+padding-bottom: calc(45px + env(safe-area-inset-bottom));
+z-index: 4100 !important;
+text-rendering: auto;
+-webkit-font-smoothing: antialiased;
+}
+
+.kasa-modal-content {
+width: 100%;
+max-width: 450px;
+height: calc(100dvh - env(safe-area-inset-top) - 60px);
+max-height: calc(100dvh - 70px);
+margin: 0 auto;
+box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+background: #0e1525;
+border: none;
+text-rendering: auto;
+-webkit-font-smoothing: antialiased;
+
+```
+display: flex;
+flex-direction: column;
+overflow: hidden;
+position: relative;
+z-index: 4101;
+```
+
+}
+
+/* Modal Body - Scroll alanı */
+.modal-body {
+flex: 1;
+overflow-y: auto;
+min-height: 0;
+-webkit-overflow-scrolling: touch;
+padding: 10px;
+padding-bottom: 50px !important; /* Footer ile arasında boşluk */
+scrollbar-width: thin;
+scrollbar-color: rgba(255,255,255,0.1) transparent;
+}
+
+/* Dönüş kapısı */
+.kasa-donus {
+position: absolute !important;
+top: calc(env(safe-area-inset-top) + 15px);
+left: 10px;
+bottom: auto !important;
+right: auto !important;
+z-index: 4200;
+}
+
+/* ==================== ANA TEMA IŞIKLARINI KAPATMA (SADECE YANLAR) ==================== */
+
+.container::before,
+.container::after {
+display: none !important;
+opacity: 0 !important;
+}
+
+/* ==================== YENİ HEADER DÜZENİ (Sıkı) ==================== */
+.kasa-header-container {
+display: flex;
+flex-direction: column;
+gap: 2px;
+padding: 1px 0;
+width: 100%;
+margin-bottom: 2px;
+flex-shrink: 0;
+}
+
+.kasa-header-row {
+display: flex;
+justify-content: space-between;
+align-items: center;
+width: 100%;
+}
+
+.k-group {
+display: flex;
+align-items: center;
+gap: 4px;
+}
+
+.k-group .info-label {
+color: #b0bec5;
+font-size: 0.7rem;
+}
+
+.k-group .info-amount {
+font-weight: 700;
+font-size: clamp(0.7rem, 3vw, 0.95rem);
+text-shadow: 0 1px 2px rgba(0,0,0,0.9) !important;
+filter: none !important;
+-webkit-font-smoothing: antialiased;
+}
+
+.kasa-header-row .text-income,
+.kasa-header-row .text-expense {
+text-shadow: 0 1px 2px rgba(0,0,0,0.9) !important;
+filter: none !important;
+}
+
+.k-group.right-align {
+text-align: right;
+justify-content: flex-end;
+}
+
+/* ==================== FORM ELEMANLARI (Compact/Sıkı) ==================== */
+.kasa-modal-content .form-group {
+margin-bottom: 5px !important;
+}
+
+.kasa-modal-content .form-group label {
+display: block;
+margin-bottom: 2px !important;
+color: #b0bec5;
+font-size: 0.7rem;
+}
+
+.kasa-modal-content input[type=“text”],
+.kasa-modal-content input[type=“number”],
+.kasa-modal-content select {
+width: 100%;
+padding: 7px 10px !important;
+background: rgba(255,255,255,0.05);
+border: 1px solid rgba(255,255,255,0.1);
+border-radius: 8px;
+color: #fff;
+font-size: 0.95em;
+outline: none;
+transition: border-color 0.2s;
+}
+
+.kasa-modal-content input:focus,
+.kasa-modal-content select:focus {
+border-color: #00e676;
+background: rgba(255,255,255,0.08);
+}
+
+/* === TARİH ALANI (Takvim İkonlu) === */
+.date-row-transparent {
+display: flex;
+align-items: center;
+position: relative;
+padding: 2px 0 !important;
+}
+
+.transparent-date-input {
+width: 100%;
+padding: 7px 10px;
+background-color: transparent !important;
+background-image: url(“data:image/svg+xml,%3Csvg xmlns=‘http://www.w3.org/2000/svg’ viewBox=‘0 0 24 24’ fill=’%2342A5F5’%3E%3Cpath d=‘M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z’/%3E%3C/svg%3E”) !important;
+background-repeat: no-repeat !important;
+background-position: right 4px center !important;
+background-size: 20px !important;
+border: none !important;
+border-radius: 0;
+box-shadow: none !important;
+color: #fff;
+font-size: 0.95em;
+outline: none;
+-webkit-appearance: none;
+appearance: none;
+cursor: pointer;
+}
+
+.transparent-date-input:focus {
+border: none !important;
+background-color: transparent !important;
+box-shadow: none !important;
+}
+
+.transparent-date-input::-webkit-calendar-picker-indicator {
+opacity: 0;
+position: absolute;
+right: 0;
+top: 0;
+bottom: 0;
+width: 40px;
+cursor: pointer;
+}
+
+/* Tarih span'ı mobilde görünsün (style.css touch kurallarıyla uyumlu) */
+
+/* === BUTONLAR (Orijinal Tasarım) === */
+.transaction-type-buttons {
+display: flex;
+gap: 10px;
+margin-bottom: 2px;
+}
+
+.type-btn {
+flex: 1;
+padding: 8px;
+border: none;
+border-radius: 10px;
+font-size: 13px;
+font-weight: 700;
+cursor: pointer;
+color: #cfd8dc;
+opacity: 0.7;
+display: flex;
+justify-content: center;
+align-items: center;
+background: rgba(255,255,255,0.1) !important;
+min-height: 26px;
+transition: all 0.2s ease;
+text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+}
+
+.type-btn:hover {
+transform: scale(1.02);
+filter: brightness(1.1);
+}
+
+.type-btn.active.gelen {
+opacity: 1;
+background: rgba(0, 230, 118, 0.25) !important;
+border: 1px solid rgba(0, 230, 118, 0.8) !important;
+color: #e0e0e0;
+box-shadow: 0 0 8px rgba(0, 230, 118, 0.3);
+text-shadow: 0 0 8px rgba(0, 230, 118, 0.4);
+}
+
+.type-btn.active.giden {
+opacity: 1;
+background: rgba(180, 40, 40, 0.75) !important;
+border: 1px solid rgba(180, 40, 40, 0.9) !important;
+color: #ffffff;
+box-shadow: 0 0 8px rgba(255, 23, 68, 0.3);
+text-shadow: 0 0 8px rgba(255, 23, 68, 0.4);
+}
+
+#addTransactionBtn {
+margin-top: 6px !important;
+padding: 10px;
+font-weight: 600;
+}
+
+/* ==================== KATEGORİ GRID (SLIM/İNCE) ==================== */
+#kategoriGrid {
+display: grid;
+grid-template-columns: repeat(4, 1fr);
+gap: 8px;
+}
+
+.kategori-card {
+background: rgba(255,255,255,0.03);
+border: 1px solid rgba(255,255,255,0.1);
+border-radius: 10px;
+padding: 5px 2px;
+text-align: center;
+cursor: pointer;
+transition: all 0.2s ease;
+}
+
+.kategori-card:hover {
+background: rgba(255,255,255,0.06);
+transform: translateY(-2px);
+}
+
+.kategori-card .kat-icon {
+font-size: 0.72em;
+margin-bottom: 2px;
+}
+
+.kategori-card .kat-ad {
+font-size: 0.7em;
+color: #b0bec5;
+margin-bottom: 1px;
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+}
+
+.kategori-card .kat-tutar {
+font-size: 0.8em;
+font-weight: 600;
+color: #ff1744;
+}
+
+/* Kategori Yönetim Listesi */
+.kategori-yonetim-list {
+max-height: 150px;
+overflow-y: auto;
+margin-top: 10px;
+}
+
+.kategori-yonetim-item {
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 8px 10px;
+background: rgba(255,255,255,0.02);
+border: 1px solid rgba(255,255,255,0.05);
+border-radius: 6px;
+margin-bottom: 5px;
+font-size: 0.7rem;
+color: #e0e0e0;
+}
+
+.kategori-yonetim-item button {
+background: transparent;
+border: none;
+color: #ff1744;
+cursor: pointer;
+padding: 2px 6px;
+font-size: 0.9em;
+}
+
+/* ==================== YENİ HISTORY TASARIMI (ORİJİNAL) ==================== */
+#transactionHistory {
+background: rgba(17, 20, 30, 0.86) !important;
+border: 1px solid rgba(149, 117, 205, 0.18) !important;
+border-radius: 12px;
+padding: 10px 12px !important;
+margin-top: 6px !important;
+margin-bottom: 20px !important; /* Footer boşluğu */
+box-shadow: none !important;
+filter: none !important;
+backdrop-filter: none !important;
+display: flex;
+flex-direction: column;
+}
+
+.history-item {
+display: flex;
+justify-content: space-between;
+align-items: flex-start;
+padding: 6px 10px !important;
+border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+gap: 4px;
+position: relative;
+cursor: pointer;
+background: transparent;
+}
+
+.history-item:last-child { border-bottom: none; }
+.history-item:hover { background: rgba(255,255,255,0.02); }
+
+.history-left {
+display: flex;
+flex-direction: column;
+gap: 2px;
+flex: 1;
+min-width: 0;
+}
+
+.history-top-row {
+display: flex;
+align-items: baseline;
+gap: 8px;
+flex-wrap: wrap;
+}
+
+.history-type {
+font-weight: 800;
+font-size: 14px !important;
+letter-spacing: 0.5px;
+line-height: 1.1 !important;
+text-shadow: none !important;
+filter: none !important;
+-webkit-font-smoothing: antialiased;
+}
+
+.history-type.giden {
+color: #e53935 !important;
+text-shadow: 0 0 8px rgba(255, 23, 68, 0.4) !important;
+}
+
+.history-type.gelen {
+color: #00e676 !important;
+text-shadow: 0 0 8px rgba(0, 230, 118, 0.4) !important;
+}
+
+.history-date {
+font-size: 0.75em;
+color: #90a4ae;
+}
+
+.history-category {
+color: #eef2f6;
+font-weight: 600;
+font-size: 12px;
+-webkit-font-smoothing: antialiased;
+}
+
+.history-meta {
+font-size: 12px;
+color: #c9d1d9;
+line-height: 1.35 !important;
+white-space: normal;
+overflow: visible;
+word-break: break-word;
+-webkit-font-smoothing: antialiased;
+}
+
+.history-right {
+display: flex;
+align-items: center;
+gap: 5px !important;
+position: relative;
+flex-shrink: 0;
+padding-right: 25px;
+}
+
+.history-amount {
+font-weight: 800;
+font-size: 14px !important;
+margin-left: auto;
+-webkit-font-smoothing: antialiased;
+}
+
+.history-amount.text-income,
+.history-amount.text-expense {
+text-shadow: 0 1px 2px rgba(0,0,0,0.9) !important;
+filter: none !important;
+}
+
+.history-item::after {
+content: ‘⋮’;
+position: absolute;
+right: 0;
+top: 50%;
+transform: translateY(-50%);
+font-size: 24px;
+color: #cfd8dc;
+font-weight: bold;
+cursor: pointer;
+padding: 5px;
+z-index: 10;
+line-height: 1;
+display: block;
+}
+
+/* Raporlar & Edit Modal (Compact) */
+.rd-container {
+display: flex;
+flex-direction: column;
+gap: 10px;
+}
+
+.rd-section {
+background: rgba(255,255,255,0.02);
+border: 1px solid rgba(255,255,255,0.08);
+border-radius: 10px;
+padding: 10px;
+}
+
+.rd-section h4 {
+color: #b0bec5;
+font-size: 0.7rem;
+margin-bottom: 8px;
+font-weight: 600;
+}
+
+.rd-date-row {
+display: flex;
+align-items: center;
+gap: 8px;
+}
+
+.rd-date-input {
+flex: 1;
+padding: 6px;
+background: rgba(255,255,255,0.05);
+border: 1px solid rgba(255,255,255,0.15);
+border-radius: 8px;
+color: #e0e0e0;
+font-size: 0.9em;
+}
+
+.rd-date-separator {
+color: #78909c;
+}
+
+.rd-toggle-row {
+display: flex;
+gap: 8px;
+margin-top: 8px;
+}
+
+.rd-toggle-btn {
+flex: 1;
+padding: 6px;
+background: rgba(255,255,255,0.05);
+border: 1px solid rgba(255,255,255,0.15);
+border-radius: 8px;
+color: #78909c;
+font-size: 0.8em;
+cursor: pointer;
+transition: all 0.2s;
+}
+
+.rd-toggle-btn.active {
+background: rgba(98,0,234,0.2);
+border-color: #6200ea;
+color: #e0e0e0;
+}
+
+/* Edit Modal Inputları */
+.edit-form-group {
+margin-bottom: 8px;
+}
+
+.edit-form-group label {
+display: block;
+color: #78909c;
+font-size: 0.8em;
+margin-bottom: 2px;
+}
+
+.edit-input {
+width: 100%;
+background: rgba(255,255,255,0.05);
+border: 1px solid rgba(255,255,255,0.1);
+color: #e0e0e0;
+padding: 8px;
+border-radius: 6px;
+font-size: 0.95em;
+}
+
+.edit-input:focus {
+border-color: #00e676;
+outline: none;
+background: rgba(255,255,255,0.08);
+}
+
+/* ÖZEL INPUT YÜKSEKLİK AYARLARI - ID SEÇİCİLER (EN GÜÇLÜ) */
+#islemTutar,
+#islemKategori,
+#islemAciklama {
+padding: 7px 10px !important;
+height: auto !important;
+min-height: unset !important;
+}
+
+/* ==================== ✅ KATEGORİ DROPDOWN MOBİL DÜZELTMESİ ==================== */
+#kategoriGroup {
+margin-bottom: 8px !important;
+}
+
+#kategoriGroup label {
+display: block !important;
+margin-bottom: 4px !important;
+color: #b0bec5;
+font-size: 0.75rem !important;
+font-weight: 500;
+text-transform: uppercase;
+letter-spacing: 0.5px;
+}
+
+#islemKategori {
+width: 100% !important;
+padding: 8px 12px !important;
+height: auto !important;
+min-height: 38px !important;
+background: rgba(255,255,255,0.05) !important;
+border: 1px solid rgba(255,255,255,0.12) !important;
+border-radius: 8px !important;
+color: #e0e0e0 !important;
+font-size: 0.95rem !important;
+-webkit-appearance: none !important;
+appearance: none !important;
+cursor: pointer !important;
+transition: all 0.2s ease !important;
+background-image: url(“data:image/svg+xml,%3Csvg xmlns=‘http://www.w3.org/2000/svg’ viewBox=‘0 0 24 24’ fill=’%2300e676’%3E%3Cpath d=‘M7 10l5 5 5-5z’/%3E%3C/svg%3E”) !important;
+background-repeat: no-repeat !important;
+background-position: right 8px center !important;
+background-size: 20px !important;
+padding-right: 32px !important;
+}
+
+#islemKategori:focus {
+border-color: #00e676 !important;
+background-color: rgba(255,255,255,0.08) !important;
+box-shadow: 0 0 6px rgba(0, 230, 118, 0.2) !important;
+}
+
+#islemKategori option {
+background: #0e1525;
+color: #e0e0e0;
+padding: 8px;
+}
+
+#islemKategori option:checked {
+background: rgba(0, 230, 118, 0.2);
+color: #00e676;
+}
+
+/* ==================== ✅ FOOTER VERSİYON BİLGİSİ FIX ==================== */
+
+/* iOS PWA'da sola kaymayı önlemek: left 50% + translateX ile ortalama */
+.global-status-bar {
+position: fixed !important;
+bottom: 0 !important;
+left: 50% !important;
+transform: translateX(-50%) !important;
+right: auto !important;
+width: 100% !important;
+max-width: 450px !important;
+box-sizing: border-box !important;
+z-index: 4000 !important;
+background: rgba(8, 12, 22, 0.97) !important;
+height: calc(36px + env(safe-area-inset-bottom)) !important;
+padding-bottom: env(safe-area-inset-bottom) !important;
+box-shadow: 0 -2px 4px rgba(0,0,0,0.2), 0 -12px 18px -6px rgba(0, 230, 118, 0.4) !important;
+border-top: 1px solid rgba(0, 230, 118, 0.2) !important;
+display: flex !important;
+align-items: center !important;
+justify-content: stretch !important;
+}
+
+.status-bar-inner {
+display: flex !important;
+align-items: center !important;
+justify-content: space-between !important;
+width: 100% !important;
+height: 36px !important;
+padding: 0 15px !important;
+}
+
+.version {
+color: #90a4ae !important;
+font-size: 0.75rem !important;
+font-weight: 600 !important;
+text-transform: uppercase !important;
+letter-spacing: 0.5px !important;
+font-family: ‘Courier New’, monospace !important;
+}
+
+.status {
+display: flex !important;
+align-items: center !important;
+gap: 6px !important;
+}
+
+.status-dot {
+width: 6px !important;
+height: 6px !important;
+border-radius: 50% !important;
+display: inline-block !important;
+}
+
+.status-dot.online {
+background: #00e676 !important;
+box-shadow: 0 0 6px rgba(0, 230, 118, 0.6) !important;
+}
+
+.status-dot.offline {
+background: #ff6b6b !important;
+box-shadow: 0 0 6px rgba(255, 107, 107, 0.6) !important;
+}
+
+.text-online {
+color: #00e676 !important;
+font-size: 0.75rem !important;
+font-weight: 600 !important;
+text-transform: none !important;
+letter-spacing: 0.3px !important;
+}
+
+.text-offline {
+color: #ff6b6b !important;
+font-size: 0.75rem !important;
+font-weight: 600 !important;
+text-transform: none !important;
+letter-spacing: 0.3px !important;
+}

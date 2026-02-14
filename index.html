@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8"/>
+<meta content="no-cache, no-store, must-revalidate" http-equiv="Cache-Control"/>
+<meta content="no-cache" http-equiv="Pragma"/>
+<meta content="0" http-equiv="Expires"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#0e1525">
+<meta name="apple-mobile-web-app-title" content="Şahsi Hesap">
+<meta name="description" content="Şahsi hesap takibi ve borç yönetimi uygulaması">
+
+<link rel="manifest" href="manifest.json?v=20260119">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="stylesheet" href="style.css?v=79.19">
+
+<title>ŞAHSİ HESAP TAKİBİ</title>
+</head>
+<body>
+
+<div class="container no-fog" id="mainAppContainer">
+    
+    <div class="notification" id="notification"></div>
+    
+    <div class="header">
+        <h1><span class="title-text">ŞAHSİ HESAP TAKİBİ</span></h1>
+        
+        <div id="menuBackdrop" class="menu-backdrop-overlay" onclick="closeAllMenus()"></div>
+        
+        <div class="top-controls">
+            <div class="pos-rel"><button id="settingsIcon" class="notification-icon-btn" onclick="toggleSettingsMenu()" title="Ayarlar"> ⚙️  </button>
+                <div class="dropdown-menu" id="settingsMenu">
+                    <button class="btn" onclick="showPersonManagementModal()">Kişi Yönetimi</button>
+                    <button class="btn" onclick="showCategoryManagementModal()">Kategori Yönetimi</button>
+                    <button class="btn" onclick="showColorSelectionMenu()">Neon Işık Rengi</button>
+                    <button class="btn btn-server-test" onclick="testServerConnection()">Sunucu Testi</button>
+                    <button class="btn" onclick="showSyncHelp()">Rehber</button>
+                    <button class="btn btn-memory-clear" onclick="initiateMemoryClear()">🧹 Bellek Temizle</button>
+                </div>
+            </div>
+
+            <div class="pos-rel"><button id="notificationIcon" class="notification-icon-btn" onclick="toggleNotificationMenu()" title="Bildirimler"> 🔔 </button>
+                <div class="dropdown-menu notification-menu" id="notificationMenu">
+                    <div style="padding:10px; text-align:center; color:#78909c;">Yükleniyor...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="content-scroll-wrapper">
+        
+        <div class="total-summary">
+            <div class="summary-card">
+                <h3 id="totalReceivable">₺0,00</h3>
+                <p>Toplam Alacağım</p>
+            </div>
+            <div class="summary-card debt">
+                <h3 id="totalPayable">₺0,00</h3>
+                <p>Toplam Borcum</p>
+            </div>
+            <div class="summary-card">
+                <h3 id="totalPeople">0</h3>
+                <p>Cari</p>
+            </div>
+        </div>
+
+        <div class="quick-access-section">
+            <h3 style="opacity: 0.6; font-size: 0.8em; margin-bottom: 5px;">SIK KULLANILANLAR</h3>
+            <div id="quickAccessGrid" class="quick-grid"></div>
+        </div>
+
+        <div class="debt-status-section">
+            <h3>CARİ KAYIT İŞLEMLERİ</h3>
+            <div class="debt-controls">
+                <select id="personSelect" onchange="selectPerson()" onclick="openSelectedPersonIfAny()">
+                    <option value=""> Kişi Seçiniz...</option>
+                </select>
+                <button class="add-person-btn" onclick="showAddPersonModal()">+</button>
+            </div>
+        </div>
+
+        <div class="quick-transaction-area">
+            <button class="quick-action-main-btn" onclick="showQuickTransactionOverlay()"> 
+                ⚡ Hızlı İşlem
+            </button>
+
+            <a href="kasa.html" class="kasa-kapi-btn" title="Kasa Defteri">
+                <img src="data:image/svg+xml,%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%20standalone%3D%22no%22%3F%3E%0A%3C%21--%20Created%20with%20Inkscape%20%28http%3A//www.inkscape.org/%29%20--%3E%0A%0A%3Csvg%0A%20%20%20version%3D%221.1%22%0A%20%20%20id%3D%22svg1%22%0A%20%20%20width%3D%22761.58594%22%0A%20%20%20height%3D%22544.25366%22%0A%20%20%20viewBox%3D%220%200%20761.58594%20544.25366%22%0A%20%20%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%0A%20%20%20xmlns%3Asvg%3D%22http%3A//www.w3.org/2000/svg%22%3E%0A%20%20%3Cdefs%0A%20%20%20%20%20id%3D%22defs1%22%20/%3E%0A%20%20%3Cg%0A%20%20%20%20%20id%3D%22g1%22%0A%20%20%20%20%20transform%3D%22translate%285.1866136%2C-21.802198%29%22%3E%0A%20%20%20%20%3Cpath%0A%20%20%20%20%20%20%20style%3D%22fill%3A%23d40000%3Bstroke-width%3A1%22%0A%20%20%20%20%20%20%20d%3D%22M%20320.62373%2C412.54844%20167.12676%2C264.82848%20291.29997%2C145.29148%20C%20402.31161%2C38.42463%20415.64917%2C25.89505%20417.13356%2C27.080756%20c%200.91321%2C0.729462%204.8839%2C5.46499%208.82375%2C10.52341%2014.40028%2C18.488638%2047.64706%2C48.834057%2073.16338%2C66.778594%2027.28692%2C19.18973%2055.84656%2C35.9777%2085%2C49.9648%2030.52541%2C14.64534%2058.65163%2C24.81114%2098%2C35.4206%2037.96405%2C10.23622%2051.97505%2C19.75334%2064.41389%2C43.75381%207.49369%2C14.45892%2011.38079%2C35.98223%209.31339%2C51.5691%20l%20-1.0523%2C7.93366%20-138.83615%2C133.62935%20c%20-76.35987%2C73.49614%20-139.51174%2C133.62596%20-140.33748%2C133.62183%20-0.82574%2C-0.004%20-70.57498%2C-66.4815%20-154.99831%2C-147.72747%20z%22%0A%20%20%20%20%20%20%20id%3D%22elmas%22%20/%3E%0A%20%20%20%20%3Cpath%0A%20%20%20%20%20%20%20style%3D%22fill%3A%23d40000%3Bstroke-width%3A1%22%0A%20%20%20%20%20%20%20d%3D%22M%20149.57655%2C415.421%20C%2064.625829%2C333.62921%20-5.0174014%2C266.31419%20-5.1861714%2C265.83207%20-5.5695514%2C264.73688%20243.52456%2C24.183042%20245.042%2C24.183042%20c%201.38196%2C0%2027.57869%2C25.174051%2027.57869%2C26.502059%200%2C0.533816%20-49.725%2C48.781523%20-110.5%2C107.217129%20-60.775%2C58.43561%20-110.500001%2C106.51479%20-110.500001%2C106.84263%200%2C0.53809%2040.966921%2C40.22543%20223.369341%2C216.39246%20l%2058.0671%2C56.08209%20-13.95483%2C13.45696%20c%20-7.67515%2C7.40134%20-14.20571%2C13.45697%20-14.51235%2C13.45697%20-0.30665%2C0%20-70.06268%2C-66.92055%20-155.0134%2C-148.71234%20z%22%0A%20%20%20%20%20%20%20id%3D%22solok%22%20/%3E%0A%20%20%20%20%3Cpath%0A%20%20%20%20%20%20%20style%3D%22fill%3A%23ffffff%3Bstroke-width%3A1%22%0A%20%20%20%20%20%20%20d%3D%22M%20232.63801%2C415.4379%2076.177018%2C264.81994%20188.71696%2C156.77309%20C%20250.61392%2C97.347323%20307.63885%2C42.668331%20315.43902%2C35.264217%20l%2014.18213%2C-13.462019%2014.49977%2C13.930814%20c%207.97487%2C7.661942%2014.49977%2C14.334727%2014.49977%2C14.828406%200%2C0.493679%20-49.95633%2C48.960962%20-111.01406%2C107.705072%20L%20136.59257%2C265.07397%20277.34743%2C400.62114%20c%2077.41517%2C74.55094%20140.8729%2C135.88804%20141.01718%2C136.30465%200.14428%2C0.41659%20-6.38145%2C7.14129%20-14.50164%2C14.94377%20l%20-14.76396%2C14.18631%20z%22%0A%20%20%20%20%20%20%20id%3D%22ortaok%22%20/%3E%0A%20%20%20%20%3Cpath%0A%20%20%20%20%20%20%20style%3D%22display%3Ainline%3Bfill%3A%23ffffff%3Bstroke-width%3A1%22%0A%20%20%20%20%20%20%20d%3D%22m%20519.62082%2C297.98054%20c%2026.08963%2C-2.20496%2035.11304%2C-3.15459%2050.49987%2C-5.31464%2015.64762%2C-2.19666%2046.8277%2C-8.04297%2050.5689%2C-9.48174%203.69617%2C-1.42144%20-9.57972%2C-1.29271%20-36.5689%2C0.3546%20-54.83712%2C3.34702%20-144.88569%2C3.70861%20-257.5%2C1.03399%20-18.08905%2C-0.42962%20-20.02859%2C-0.33417%20-16.49166%2C0.81154%205.64315%2C1.82799%2043.10555%2C7.18258%2068.49166%2C9.78968%2032.78276%2C3.36672%2045.7084%2C4.00316%2084.0458%2C4.13838%2028.30467%2C0.0998%2044.49428%2C-0.27874%2056.95433%2C-1.33181%20z%22%0A%20%20%20%20%20%20%20id%3D%22siluetorta%22%20/%3E%0A%20%20%20%20%3Cpath%0A%20%20%20%20%20%20%20style%3D%22display%3Ainline%3Bfill%3A%23ffffff%3Bstroke-width%3A1%22%0A%20%20%20%20%20%20%20d%3D%22m%20589.12069%2C337.89007%20c%201.65%2C-0.46242%208.64118%2C-2.15755%2015.53595%2C-3.76695%2016.52045%2C-3.85624%2035.41296%2C-9.78962%2043.65251%2C-13.7095%207.36445%2C-3.50356%2011.60268%2C-8.11635%2013.41755%2C-14.60336%200.97637%2C-3.48992%200.79974%2C-11.58236%20-0.2754%2C-12.61716%20-0.38059%2C-0.36631%20-11.98193%2C3.35987%20-16.33061%2C5.24515%20-14.50665%2C6.28907%20-22.63608%2C10.32415%20-30.89544%2C15.33506%20-10.54068%2C6.39498%20-25.51794%2C16.97376%20-32.10456%2C22.67616%20l%20-4%2C3.46303%204%2C-0.59083%20c%202.2%2C-0.32495%205.35%2C-0.96918%207%2C-1.4316%20z%22%0A%20%20%20%20%20%20%20id%3D%22sag_far%22%20/%3E%0A%20%20%20%20%3Cpath%0A%20%20%20%20%20%20%20style%3D%22display%3Ainline%3Bfill%3A%23ffffff%3Bstroke-width%3A1%22%0A%20%20%20%20%20%20%20d%3D%22m%20300.40053%2C272.43208%20c%201.81422%2C-0.60871%206.90581%2C-5.03091%2012.39922%2C-10.76911%2020.08835%2C-20.98348%2045.75481%2C-36.8117%2065.22201%2C-40.22167%2013.78798%2C-2.41518%2059.89461%2C-4.76181%2093.0215%2C-4.73442%2059.84759%2C0.0495%2077.68068%2C2.72662%20102.21765%2C15.34513%2013.51412%2C6.94984%2023.84609%2C14.7331%2038.56593%2C29.05246%2012.19248%2C11.86074%2012.87274%2C12.36044%2016.82692%2C12.36044%204.44687%2C0%207.43024%2C-2.25989%2011.46693%2C-8.68617%204.17834%2C-6.65177%205.91337%2C-7.19472%2022.99129%2C-7.19472%208.43317%2C0%2015.63074%2C-0.28458%2015.99461%2C-0.63241%200.36386%2C-0.34783%20-0.0246%2C-1.90957%20-0.86329%2C-3.47054%20-2.98044%2C-5.54728%20-17.89693%2C-9.50155%20-30.36139%2C-8.04862%20-7.28406%2C0.84907%20-10.36627%2C3.07498%20-12.13768%2C8.76556%20-1.37235%2C4.40863%20-5.27418%2C7.71716%20-9.10102%2C7.71716%20-2.17491%2C0%20-4.26386%2C-1.74351%20-10.61514%2C-8.85973%20-22.09774%2C-24.7592%20-49.43348%2C-40.49433%20-78.90738%2C-45.42107%20-4.95%2C-0.82743%20-14.625%2C-2.05447%20-21.5%2C-2.72676%20-16.42528%2C-1.60622%20-80.0792%2C-1.54776%20-97.5%2C0.0895%20-29.96275%2C2.81605%20-39.3845%2C4.04758%20-45.52078%2C5.95013%20-7.34573%2C2.27754%20-24.10227%2C10.23858%20-31.10769%2C14.77929%20-9.14644%2C5.92845%20-24.16841%2C18.48771%20-30.62148%2C25.60136%20-12.64852%2C13.94332%20-15.74%2C14.1551%20-23.44169%2C1.60589%20-1.4804%2C-2.41219%20-4.13592%2C-5.10464%20-5.90115%2C-5.98323%20-8.78639%2C-4.37312%20-34.25466%2C0.73717%20-36.4215%2C7.30811%20-1.63322%2C4.95274%205.73436%2C7.25845%2014.13856%2C4.42472%206.16514%2C-2.07876%2012.761%2C-2.72005%2015.96347%2C-1.55206%203.78096%2C1.37897%207.41226%2C4.68425%207.41226%2C6.74677%200%2C2.41959%203.90497%2C6.74772%207.41519%2C8.21873%203.79688%2C1.59113%206.37319%2C1.67446%2010.36465%2C0.33524%20z%22%0A%20%20%20%20%20%20%20id%3D%22siluetust%22%20/%3E%0A%20%20%3C/g%3E%0A%20%20%3Cpath%0A%20%20%20%20%20style%3D%22opacity%3A1%3Bfill%3A%23ffffff%3Bstroke-width%3A1%22%0A%20%20%20%20%20d%3D%22m%20354.2573%2C317.25645%20c%20-7.92836%2C-6.82052%20-30.48946%2C-23.24469%20-31.93014%2C-23.24469%20-0.25162%2C0%20-3.50903%2C-1.89203%20-7.23868%2C-4.2045%20-9.11118%2C-5.64916%20-13.42767%2C-7.68605%20-29.20028%2C-13.77918%20-14.89212%2C-5.75299%20-15.04347%2C-5.7367%20-15.06001%2C1.62155%20-0.0384%2C17.08093%2011.25781%2C23.70158%2060.62393%2C35.53136%2022.16652%2C5.31185%2024.78668%2C5.78009%2022.80518%2C4.07546%20z%22%0A%20%20%20%20%20id%3D%22sol_far%22%20/%3E%0A%3C/svg%3E%0A" alt="Kasa" class="kasa-kapi-logo">
+            </a>
+        </div>
+
+        <div class="control-panel">
+            <h3>VERİLER</h3>
+            
+            <button class="btn btn-cloud general-status-btn" onclick="showGeneralStatusReport()">Genel Durum</button>
+
+            <div class="control-panel-grid">
+                <button class="btn btn-success" onclick="exportSystemToJSON()">💾 Yedek Al</button>
+                <div class="file-upload">
+                    <input accept=".json" id="systemImportFile" onchange="importSystemFromJSON(event)" type="file"/>
+                    <label class="file-upload-btn" for="systemImportFile">📥 Yedekten Geri Yükle</label>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+<div class="global-status-bar">
+        <div class="status-bar-inner">
+            <span class="version">v78.34</span>
+            <span class="status">
+                <span id="statusDot" class="status-dot online"></span>
+                <span id="serverStatusText" class="text-online">Sistem Hazır</span>
+            </span>
+        </div>
+    </div>
+
+</div> 
+
+<div id="quickOverlayContainer" class="quick-overlay" style="display:none;">
+    <div class="quick-overlay-backdrop" onclick="closeQuickTransactionOverlay()"></div>
+    
+    <div class="quick-panel-content">
+        <div class="quick-panel-header">
+            <h3>⚡ Hızlı İşlem</h3>
+            <button class="close-overlay-btn" onclick="closeQuickTransactionOverlay()" type="button">✕</button>
+        </div>
+
+        <div class="quick-search-wrapper">
+            <div class="search-box">
+                <span class="search-icon">🔍 </span>
+                <input type="text" id="quickSearchInput" placeholder="Kişi Ara..." oninput="filterQuickPersonList()" autocomplete="off">
+            </div>
+        </div>
+
+        <div id="quickPersonList" class="quick-person-list"></div>
+
+        <div id="quickTransactionForm" style="display:none;">
+            <div class="form-group" style="text-align:center; margin-bottom:15px !important;">
+                <div id="selectedPersonNameDisplay" class="selected-person-badge"></div>
+            </div>
+
+            <div class="form-group">
+                <label>İşlem Tipi</label>
+                <div class="transaction-type-buttons">
+                    <button class="type-btn giden active" id="quickGidenBtn" onclick="setQuickTransactionType('giden')" type="button">Giden TL</button>
+                    <button class="type-btn gelen" id="quickGelenBtn" onclick="setQuickTransactionType('gelen')" type="button">Gelen TL</button>
+                </div>
+                <input id="quickTransactionType" type="hidden" value="giden"/>
+            </div>
+            
+            <div class="form-group">
+                <label for="quickAmount">Tutar (₺)</label>
+                <input id="quickAmount" type="text" inputmode="decimal" oninput="formatCurrency(this)" placeholder="150,00" />
+            </div>
+            
+            <div class="form-group">
+                <label for="quickCategory">Kategori</label>
+                <select id="quickCategory">
+                    <option value="">Kategori Seçin...</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="quickDescription">Açıklama</label>
+                <input id="quickDescription" placeholder="Açıklama (opsiyonel)" type="text"/>
+            </div>
+            
+            <div class="quick-actions-row">
+                <button class="btn btn-success" onclick="processQuickTransaction()"> ✅ İşlemi Kaydet</button>
+                <button class="btn btn-danger" onclick="resetQuickPanel()">↩️ Listeye Dön</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="allocationOverlay" class="quick-overlay" style="display:none;">
+    <div class="quick-overlay-backdrop" onclick="closeAllocationOverlay()"></div>
+    <div class="quick-panel-content allocation-panel">
+        <div class="quick-panel-header" style="justify-content: center; position: relative; margin-bottom: 20px;">
+            <h3 style="margin:0 auto; font-size: 1.1em; color: #e0e0e0;">Gelen Para Dağıtımı</h3>
+            <button class="close-overlay-btn" onclick="closeAllocationOverlay()" style="position:absolute; right:0; top: -5px;">✕</button>
+        </div>
+        
+        <div id="allocationDynamicContent">
+            </div>
+
+        <button class="btn btn-success" onclick="confirmAllocation()" style="width:100%; margin-top:20px; padding: 12px; font-weight:700; font-size: 1.05em;">DAĞITIMI ONAYLA</button>
+    </div>
+</div>
+
+<div class="modal" id="personModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="header-top-row">
+                <h2 id="modalPersonName"> 👤 Kişi Detayı</h2>
+                <button class="close-modal-btn" onclick="closeCurrentModal(this)" title="Kapat" type="button">✖</button>
+            </div>
+            <div class="person-total-info" id="personTotalInfo">
+                <div class="balance-breakdown">
+                    </div>
+            </div>
+            
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="openTab(event, 'yeniIslem')">Yeni İşlem</button>
+                <button class="tab-btn" onclick="openTab(event, 'islemGecmisi')">İşlem Geçmişi</button>
+                <button class="tab-btn" onclick="openTab(event, 'kategoriDurumu')">Kategori Durumu</button>
+                <button class="tab-btn" onclick="openTab(event, 'raporlar')">Raporlar</button>
+            </div>
+            
+        </div> <div class="modal-body">
+            <div class="tab-content" id="yeniIslem" style="display: block;">
+                <div class="form-group">
+                    <label>İşlem Tipi</label>
+                    <div class="transaction-type-buttons">
+                        <button class="type-btn giden active" id="gidenBtn" onclick="setTransactionType('giden')" type="button">Giden TL</button>
+                        <button class="type-btn gelen" id="gelenBtn" onclick="setTransactionType('gelen')" type="button">Gelen TL</button>
+                    </div>
+                    <input id="transactionType" type="hidden" value="giden"/>
+                </div>
+                
+                <div class="form-group">
+                    <label for="amount">Tutar (₺)</label>
+                    <input id="amount" type="text" inputmode="decimal" 
+                           oninput="formatCurrency(this)" 
+                           placeholder="150,00" />
+                </div>
+                
+                <div class="form-group">
+                    <label for="category">Kategori</label>
+                    <select id="category" style="width: 100%;"><option value="">Seçin</option></select>
+                </div>
+                <div class="form-group">
+                    <label for="description">Açıklama</label>
+                    <input id="description" placeholder="Açıklama" type="text"/>
+                </div>
+                
+                <div class="form-group">
+                    <label style="color:#aaa; font-size:0.8em; margin-bottom:0;">Tarih</label>
+                    <div class="date-row-transparent">
+                        <span class="current-date-display mobile-date-display" aria-hidden="true"></span>
+                        <input id="dateInput" class="transparent-date-input" onchange="handleDateChange(event)" type="date"/>
+                    </div>
+                </div>
+                
+                <button class="btn btn-success" id="addTransactionBtn" onclick="processSingleTransaction()"> ✅ İşlemi Kaydet</button>
+            </div>
+            <div class="tab-content" id="islemGecmisi">
+                <div class="history-container">
+                    <div id="transactionHistory">
+                        <div style="text-align:center;color:#78909c;padding:8px;">Henüz İşlem Yok</div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-content" id="kategoriDurumu">
+                <div class="category-balance-section" id="categoryBalanceSection">
+                    <div style="display: flex; align-items: center; justify-content: flex-end; margin-bottom: 10px; font-size: 0.8em;">
+                        <label for="showZeroBalanceToggle" style="margin-right: 8px; cursor: pointer;">Sıfır Bakiyeleri Göster</label>
+                        <input type="checkbox" id="showZeroBalanceToggle" onchange="updateCategoryBalanceDisplay(currentPerson)">
+                    </div>
+                    <div class="category-balance-grid" id="categoryBalanceGrid"></div>
+                    
+                    <button class="btn share-btn" onclick="toggleShareOptions()" style="width:100%; margin-top: 12px;">📋 Özeti Paylaş</button>
+                    <div id="shareOptions" style="display: none; justify-content: center; gap: 30px; margin-top: 15px;">
+                        <span onclick="exportSummaryExcel()" style="cursor: pointer; color: #66bb6a; font-weight: 700; font-size: 0.95em;">Excel</span>
+                        <span onclick="copySummaryText()" style="cursor: pointer; color: #cfd8dc; font-weight: 700; font-size: 0.95em;">Kopyala</span>
+                    </div>
+
+                </div>
+            </div>
+            
+            <div class="tab-content" id="raporlar">
+                <div class="reports-dashboard">
+                    <div class="rd-col left-col">
+                        <h4 class="rd-header white">Filtreleme</h4>
+                        
+                        <div class="rd-date-group">
+                            <label class="rd-date-label">Başlangıç</label>
+                            <span class="rd-mobile-date-display" id="startDateDisplay" aria-hidden="true"></span>
+                            <input class="rd-date-input" id="startDate" type="date">
+                        </div>
+                        
+                        <div class="rd-date-group">
+                            <label class="rd-date-label">Bitiş</label>
+                            <span class="rd-mobile-date-display" id="endDateDisplay" aria-hidden="true"></span>
+                            <input class="rd-date-input" id="endDate" type="date">
+                        </div>
+                    </div>
+
+                    <div class="rd-col right-col">
+                        <h4 class="rd-header orange">Gelişmiş</h4>
+                        
+                        <div class="rd-toggles">
+                            <span class="rd-toggle-btn active" id="filterBtn-all" onclick="setReportFilterType('all')">Tümü</span>
+                            <span class="rd-toggle-btn" id="filterBtn-gelen" onclick="setReportFilterType('gelen')">Gelen</span>
+                            <span class="rd-toggle-btn" id="filterBtn-giden" onclick="setReportFilterType('giden')">Giden</span>
+                        </div>
+                        
+                        <div class="rd-search">
+                            <span class="rd-search-icon">🔍</span>
+                            <input type="text" id="reportSearchInput" placeholder="İsim Veya Kelime Giriniz" autocomplete="off">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="rd-buttons-row">
+                    <button class="rd-btn orange-line" id="monthlyReportButton" onclick="showMonthlySummaryModal()">Aylık Rapor</button>
+                    <button class="rd-btn green-line" id="excelReportButton" onclick="exportToExcel()">Excel Raporu</button>
+                </div>
+
+                <div id="reportPreviewContainer" class="report-preview-container">
+                    <div id="reportPreviewSummary" class="report-preview-summary">
+                        Listeleniyor...
+                    </div>
+                    <div id="reportPreviewList" class="report-preview-list">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="addPersonModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="header-top-row">
+                <h2> 🆕 Yeni Kişi Ekle</h2>
+                <button class="close-modal-btn" onclick="closeCurrentModal(this)" title="Kapat" type="button">✖</button>
+            </div>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="newPersonName">Kişi Adı</label>
+                <input id="newPersonName" onkeypress="handlePersonNameEnter(event)" placeholder="Örn: Ahmet, Ayşe..." type="text"/>
+            </div>
+            <button class="btn btn-success" onclick="addNewPerson()">➕ Kişi Ekle</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="generalStatusModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="header-top-row">
+                <h2>Genel Durum</h2>
+                <button class="close-modal-btn" onclick="closeCurrentModal(this)" title="Kapat" type="button">✖</button>
+            </div>
+        </div>
+        <div class="modal-body">
+            <div id="reportContent"></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="personManagementModal">
+    <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-header">
+            <div class="header-top-row">
+                <h2> 👥 Kişi Yönetimi</h2>
+                <button class="close-modal-btn" onclick="closeCurrentModal(this)" title="Kapat" type="button">✖</button>
+            </div>
+        </div>
+        <div class="modal-body">
+            <button class="btn btn-success" onclick="showAddPersonModal()" style="width:100%; margin-bottom: 12px;">+ Yeni Kişi Ekle</button>
+            <div id="personManagementList"></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="categoryManagementModal">
+    <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-header">
+            <div class="header-top-row">
+                <h2> 🏷️ Kategori Yönetimi</h2>
+                <button class="close-modal-btn" onclick="closeCurrentModal(this)" title="Kapat" type="button">✖</button>
+            </div>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="categoryManagementPersonSelect">Kişi Seçiniz:</label>
+                <select id="categoryManagementPersonSelect" onchange="populateCategoryEditor(this.value)" style="width: 100%; padding: 8px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #e0e0e0; font-size: 13px;">
+                    <option value="">Kişi Seçin...</option>
+                </select>
+            </div>
+            <div id="categoryEditor" style="display:none; margin-top: 15px;">
+                <h4 style="color: #ff9800; text-align: center; margin-bottom: 8px;">Mevcut Kategoriler</h4>
+                <div id="categoryManagementList" style="max-height: 40dvh; overflow-y: auto; margin-bottom: 12px;"></div>
+                <div style="display: flex; gap: 8px;">
+                    <input id="newManagedCategoryInput" onkeypress="handleCategoryInputEnter(event)" placeholder="Yeni kategori adı..." style="flex: 1; padding: 8px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #e0e0e0; font-size: 13px;" type="text"/>
+                    <button class="btn btn-success" onclick="addCategoryFromManager()">Ekle</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="monthlySummaryModal">
+    <div class="modal-content" style="max-width:400px;">
+        <div class="modal-header">
+            <div class="header-top-row">
+                <h2> 🗓️ Aylık Rapor</h2>
+                <button class="close-modal-btn" onclick="closeCurrentModal(this)" title="Kapat" type="button">✖</button>
+            </div>
+        </div>
+        <div class="modal-body">
+            <p style="text-align:center; margin-bottom:12px;">Lütfen Rapor Oluşturmak İçin Yıl ve Ay Seçin:</p>
+            <div class="form-group" style="margin-bottom:20px;">
+                <label for="summaryYearSelect">Yıl</label>
+                <select id="summaryYearSelect"></select>
+            </div>
+            <div class="form-group">
+                <label for="summaryMonthSelect">Ay</label>
+                <select id="summaryMonthSelect"></select>
+            </div>
+            <button class="btn btn-success" id="generateReportBtn" onclick="exportMonthlySummary()" style="margin-top:20px;">Rapor Oluştur</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="syncHelpModal">
+    <div class="modal-content" style="max-width:500px;">
+        <div class="modal-header">
+            <div class="header-top-row">
+                <h2> ℹ️ Uygulama Rehberi</h2>
+                <button class="close-modal-btn" onclick="closeCurrentModal(this)" title="Kapat" type="button">✖</button>
+            </div>
+        </div>
+        <div class="modal-body">
+            <h4 style="color:#42a5f5;margin-bottom:12px;"> 📱 Online Kullanım:</h4>
+            <ol style="margin-bottom:18px;line-height:1.5;">
+                <li>Bu Sayfayı iPhone'da <strong>Safari</strong>'de açın.</li>
+                <li><strong>Paylaş</strong> butonu ➡️  <strong>"Ana Ekrana Ekle"</strong> seçeneğini kullanın.</li>
+                <li>Artık Uygulama Gibi Tam Ekran Kullanabilirsiniz! 🎉</li>
+            </ol>
+            <h4 style="color:#42a5f5;margin-bottom:12px;"> ⚙️ Veri Yönetimi:</h4>
+            <ol style="margin-bottom:18px;line-height:1.5;">
+                <li>Tüm verileriniz anında sunucuya kaydedilir.</li>
+                <li><strong>"Yedekleme"</strong> ile Verilerinizin Bir Kopyasını İndirebilirsiniz.</li>
+                <li><strong>"Yedekten Geri Yükle"</strong> ile indirdiğiniz yedeği sunucuya geri yükleyebilirsiniz.</li>
+            </ol>
+            <h4 style="color:#42a5f5;margin-bottom:12px;"> 🎤 Sesli / URL ile Hızlı Kayıt:</h4>
+            <p style="margin-bottom:18px;line-height:1.5;font-size:0.95em;">Sayfayı <code>?siri=1&amp;person=KişiAdı&amp;amount=100&amp;type=gelen</code> parametreleriyle açarak işlem onay ekranını açabilirsiniz (type: gelen veya giden).</p>
+            <div style="text-align:center;margin-top:18px;">
+                <button class="btn btn-cloud" onclick="closeCurrentModal(this)">Anladım ✅ </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="editTransactionModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="header-top-row">
+                <h2> ✏️ İşlem Düzenle</h2>
+                <button class="close-modal-btn" onclick="closeCurrentModal(this)" title="Kapat" type="button">✖</button>
+            </div>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>İşlem Tipi</label>
+                <div class="transaction-type-buttons">
+                    <button class="type-btn giden active" id="editGidenBtn" onclick="setEditTransactionType('giden')" type="button">Giden TL</button>
+                    <button class="type-btn gelen" id="editGelenBtn" onclick="setEditTransactionType('gelen')" type="button">Gelen TL</button>
+                </div>
+                <input id="editTransactionType" type="hidden" value="giden"/>
+            </div>
+            <div class="form-group">
+                <label for="editAmount">Tutar (₺)</label>
+                <input id="editAmount" type="text" inputmode="decimal" oninput="formatCurrency(this)" placeholder="150,00" />
+            </div>
+            <div class="form-group">
+                <label for="editCategory">Kategori</label>
+                <select id="editCategory" style="width: 100%;"><option value="">Seçin</option></select>
+            </div>
+            <div class="form-group">
+                <label for="editDescription">Açıklama</label>
+                <input id="editDescription" placeholder="Açıklama" type="text"/>
+            </div>
+            <div class="form-group">
+                <div class="date-section-inline">
+                    <label for="editDateInput">Tarih</label>
+                    <span class="edit-mobile-date-display" id="editMobileDateDisplay" aria-hidden="true"></span>
+                    <input class="date-picker-simple" id="editDateInput" type="date"/>
+                </div>
+            </div>
+            <button class="btn btn-success" onclick="saveEditedTransaction()"> ✅ Değişiklikleri Kaydet</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="categoryDetailModal">
+    <div class="modal-content">
+        <div class="modal-header"> 
+            <div class="header-top-row">
+                <h2 id="categoryDetailTitle">Kategori Detayı</h2>
+                <button class="close-modal-btn" onclick="closeCurrentModal(this)" title="Kapat" type="button">✖</button>
+            </div>
+        </div>
+        <div class="modal-body">
+            <div id="categoryDetailContent"></div>
+            <div style="margin-top: 12px;">
+                <button id="exportCategoryExcelBtn" class="btn btn-success" style="width:100%;">Excel Raporu Al</button>
+                <p class="mobile-hint">* Gözükmeyen Detay Varsa Telefonu Yan Çevirin</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="customMemoryOverlay" class="custom-alert-overlay">
+    <div class="alert-content">
+        <div class='alert-icon' id='memAlertIcon'>⚠️</div>
+        <h3 id="memAlertTitle" class="alert-title">Durum Kontrol Ediliyor...</h3>
+        <p id="memAlertMessage" class="alert-message">Lütfen Bekleyin...</p>
+        
+        <div class="alert-buttons">
+<button class="alert-btn btn-yes">EVET</button>
+            <button class="alert-btn btn-no" onclick="closeMemoryOverlay()">HAYIR</button>
+        </div>
+    </div>
+</div>
+  
+<div id="colorSelectionMenu" onclick="if(event.target === this) this.style.display='none';" style="
+    display: none; 
+    position: fixed;
+    top: 0;
+    left: 0; 
+    right: 0;
+    bottom: 0;
+    background: transparent;
+    z-index: 999999;
+    justify-content: center;
+    align-items: center;
+">
+    <div id="colorBubbles" style="
+        display: flex; 
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    ">
+        <button type="button" class="neon-btn neon-btn-white" onclick="changeGlowTheme('white')"></button>
+        <button type="button" class="neon-btn neon-btn-blue" onclick="changeGlowTheme('blue')"></button>
+        <button type="button" class="neon-btn neon-btn-lila" onclick="changeGlowTheme('lila')"></button>
+        <button type="button" class="neon-btn neon-btn-green" onclick="changeGlowTheme('green')"></button>
+        <button type="button" class="neon-btn neon-btn-red" onclick="changeGlowTheme('red')"></button>
+        <button type="button" class="neon-btn neon-btn-gold" onclick="changeGlowTheme('gold')"></button>
+        <button type="button" class="neon-btn neon-btn-cyan" onclick="changeGlowTheme('cyan')"></button>
+        <button type="button" class="neon-btn-off" onclick="changeGlowTheme('none')">Kapalı</button>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+<script src="app.js?v=79.19"></script>
+</body>
+</html>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+
+<html lang="tr">
+<head>
+<meta charset="utf-8"/>
+<meta content="no-cache, no-store, must-revalidate" http-equiv="Cache-Control"/>
+<meta content="no-cache" http-equiv="Pragma"/>
+<meta content="0" http-equiv="Expires"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#0e1525">
+<meta name="apple-mobile-web-app-title" content="Kasa Defteri">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230e1525'/><text x='50' y='68' font-size='50' text-anchor='middle' fill='%2300e676'>₺</text></svg>">
+<link rel="stylesheet" href="style.css?v=79.19">
+<link rel="stylesheet" href="kasa.css?v=1.11">
+<title>KASA DEFTERİ</title>
+</head>
+<body>
+
+<div class="container" id="kasaAppContainer">
+    <div class="notification" id="notification"></div>
+
+<div class="kasa-modal-wrapper">
+    <div class="modal-content kasa-modal-content">
+        
+        <div class="modal-header">
+            <div class="header-top-row">
+                <h2>💰 KASA DEFTERİ</h2>
+                <button class="close-modal-btn" onclick="window.location.href='index.html'" title="Kapat" type="button">✖</button>
+            </div>
+            
+            <div class="person-total-info" id="kasaTotalInfo">
+                <div class="kasa-header-container">
+                    <div class="kasa-header-row">
+                        <div class="k-group">
+                            <span class="info-label">Toplam Giriş:</span>
+                            <span class="info-amount text-income" id="toplamGiris">₺0,00</span>
+                        </div>
+                        <div class="k-group right-align">
+                            <span class="info-label">Anlık Bakiye:</span>
+                            <span class="info-amount text-income" id="anlikBakiye">₺0,00</span>
+                        </div>
+                    </div>
+                    
+                    <div class="kasa-header-row">
+                        <div class="k-group">
+                            <span class="info-label">Toplam Çıkış:</span>
+                            <span class="info-amount text-expense" id="toplamCikis">₺0,00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="openKasaTab(event, 'yeniIslem')">Yeni İşlem</button>
+                <button class="tab-btn" onclick="openKasaTab(event, 'islemGecmisi')">İşlem Geçmişi</button>
+                <button class="tab-btn" onclick="openKasaTab(event, 'kategoriDurumu')">Kategori Durumu</button>
+                <button class="tab-btn" onclick="openKasaTab(event, 'raporlar')">Raporlar</button>
+            </div>
+        </div>
+        
+        <div class="modal-body">
+            
+            <div class="tab-content" id="yeniIslem" style="display: block;">
+                <div class="form-group">
+                    <label>İşlem Tipi</label>
+                    <div class="transaction-type-buttons">
+                        <button class="type-btn gelen active" id="girisBtn" onclick="setIslemType('giris')" type="button">Para Girişi</button>
+                        <button class="type-btn giden" id="cikisBtn" onclick="setIslemType('cikis')" type="button">Para Çıkışı</button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="islemTutar">Tutar (₺)</label>
+                    <input id="islemTutar" type="text" inputmode="decimal" oninput="formatCurrency(this)" placeholder="0,00">
+                </div>
+                
+                <div class="form-group" id="kategoriGroup">
+                    <label for="islemKategori">Kategori</label>
+                    <select id="islemKategori"><option value="Kasa">Kasa</option></select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="islemAciklama">Açıklama</label>
+                    <input id="islemAciklama" type="text" placeholder="Açıklama">
+                </div>
+                
+                <div class="form-group">
+                    <label style="color:#aaa; font-size:0.8em;">Tarih</label>
+                    <div class="date-row-transparent">
+                        <span class="current-date-display mobile-date-display" id="tarihDisplay"></span>
+                        <input id="islemTarih" class="transparent-date-input" type="date" onchange="updateDateDisplay()">
+                    </div>
+                </div>
+                
+                <button class="btn btn-success" id="addTransactionBtn" onclick="islemKaydet()">✅ İşlemi Kaydet</button>
+            </div>
+            
+            <div class="tab-content" id="islemGecmisi" style="display: none;">
+                <div class="history-container" id="historyContainer">
+                    <p class="empty-state">Henüz işlem yok</p>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="kategoriDurumu" style="display: none;">
+                <div id="categoryBalanceSection" class="category-balance-section">
+                    <div class="category-balance-grid" id="kategoriGrid"></div>
+                    
+                    <div style="margin-top:20px; padding-top:15px; border-top:1px solid rgba(255,255,255,0.1);">
+                        <h4 style="color:#b0bec5; margin-bottom:10px; font-size:0.9em;">Kategori Yönetimi</h4>
+                        <div style="display:flex; gap:10px; margin-bottom:10px;">
+                            <input id="yeniKategoriAdi" type="text" placeholder="Yeni kategori adı" style="flex:1;">
+                            <button class="btn btn-success" onclick="kategoriEkle()" style="padding:8px 15px;">+ Ekle</button>
+                        </div>
+                        <div id="kategoriListesi" class="kategori-yonetim-list"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="raporlar" style="display: none;">
+                <div class="rd-container">
+                    <div class="rd-section">
+                        <h4>Tarih Aralığı</h4>
+                        <div class="rd-date-row">
+                            <input type="date" id="raporBaslangic" class="rd-date-input">
+                            <span class="rd-date-separator">-</span>
+                            <input type="date" id="raporBitis" class="rd-date-input">
+                        </div>
+                        <div class="rd-toggle-row">
+                            <button class="rd-toggle-btn active" data-period="all" onclick="setPeriod('all')">Tümü</button>
+                            <button class="rd-toggle-btn" data-period="month" onclick="setPeriod('month')">Bu Ay</button>
+                            <button class="rd-toggle-btn" data-period="week" onclick="setPeriod('week')">Bu Hafta</button>
+                        </div>
+                    </div>
+                    
+                    <div class="rd-section">
+                        <h4>Başlangıç Bakiyesi</h4>
+                        <div style="display:flex; gap:10px;">
+                            <input id="baslangicBakiyeInput" type="text" inputmode="decimal" oninput="formatCurrency(this)" placeholder="0,00" style="flex:1;">
+                            <button class="btn btn-success" onclick="bakiyeKaydet()" style="padding:8px 15px;">Kaydet</button>
+                        </div>
+                        <p style="color:#78909c; font-size:0.8em; margin-top:5px;">Mevcut: <span id="mevcutBakiye">₺0,00</span></p>
+                    </div>
+                    
+                    <div class="rd-section">
+                        <h4>Rapor Özeti</h4>
+                        <div id="raporOzet" class="report-preview-summary"></div>
+                    </div>
+                    
+                    <div class="rd-section">
+                        <button class="btn btn-success" onclick="excelExport()" style="width:100%;">
+                            📊 Excel İndir
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<div class="global-status-bar">
+    <div class="status-bar-inner">
+        <span class="version">v1.10</span>
+        <span class="status">
+            <span id="statusDot" class="status-dot online"></span>
+            <span id="serverStatusText" class="text-online">Sistem Hazır</span>
+        </span>
+    </div>
+</div>
+
+</div>
+
+<div id="editModal" class="modal">
+    <div class="modal-content" style="height:auto; max-height:60vh;">
+        <div class="modal-header">
+            <div class="header-top-row">
+                <h2>📝 İşlem Detayı</h2>
+                <button class="close-modal-btn" onclick="closeEditModal()" type="button">✖</button>
+            </div>
+        </div>
+        <div class="modal-body">
+            <div id="editModalContent"></div>
+            <div style="display:flex; gap:10px; margin-top:15px;">
+                <button class="btn" style="flex:1; border-color:#ff1744; color:#ff1744;" onclick="islemSil()">🗑️ Sil</button>
+                <button class="btn" style="flex:1;" onclick="closeEditModal()">Kapat</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="kasaCategoryDetailModal" class="modal">
+    <div class="modal-content" style="height:auto; max-height:85vh; display:flex; flex-direction:column;">
+        <div class="modal-header">
+            <div class="header-top-row">
+                <h2 id="kasaCategoryTitle">📂 Kategori Detayı</h2>
+                <button class="close-modal-btn" onclick="closeKasaCategoryModal()" type="button">✖</button>
+            </div>
+        </div>
+        <div class="modal-body" style="padding:0;">
+            <div id="kasaCategoryDetailContent" style="padding:10px;"></div>
+        </div>
+        <div style="padding:10px; border-top:1px solid rgba(255,255,255,0.1); background:rgba(0,0,0,0.2);">
+            <button id="btnKasaCategoryExcel" class="btn btn-success" style="width:100%;">📊 Excel Raporu Al</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+<script src="kasa.js?v=1.11"></script>
+
+</body>
+</html>
