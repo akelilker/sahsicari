@@ -1275,19 +1275,13 @@ overflow: hidden;
 }
 
 #addPersonModal,
-#guideModal {
-    justify-content: flex-start;
-    align-items: center;
-    padding-top: calc(var(--sa-top) + 10px);
-    padding-bottom: 45px;
-}
-
 #personManagementModal,
 #categoryManagementModal,
 #syncHelpModal,
 #generalStatusModal,
 #categoryDetailModal,
-#monthlySummaryModal {
+#monthlySummaryModal,
+#editTransactionModal {
     justify-content: flex-start;
     align-items: center;
     padding-top: calc(var(--sa-top) + 10px);
@@ -1295,21 +1289,13 @@ overflow: hidden;
 }
 
 #addPersonModal .modal-content,
-#guideModal .modal-content {
-    height: calc(100vh - 100px);
-    max-height: calc(100vh - 100px);
-    width: 95%;
-    max-width: 450px;
-    margin: 0 auto;
-    border-radius: 15px;
-}
-
 #personManagementModal .modal-content,
 #categoryManagementModal .modal-content,
 #syncHelpModal .modal-content,
 #generalStatusModal .modal-content,
 #categoryDetailModal .modal-content,
-#monthlySummaryModal .modal-content {
+#monthlySummaryModal .modal-content,
+#editTransactionModal .modal-content {
     height: 90vh;
     max-height: 90vh;
     width: 100%;
