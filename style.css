@@ -337,7 +337,7 @@ body.ios-pwa .history-item .description {
     z-index: 2001;
     width: 100%;
     position: relative;
-    padding: 5px 0 1px 0;
+    padding: 5px 0 4px 0; /* dikeyde header çerçeve +3px */
 }
 
 .header h1 {
@@ -382,7 +382,7 @@ body.ios-pwa .history-item .description {
     position: absolute;
     bottom: -8px;
     left: 50%;
-    transform: translateX(-50%) scaleY(0.5);
+    transform: translateX(-50%) scaleY(0.75);
     transform-origin: center bottom;
     width: 0%;
     opacity: 1;
@@ -3443,9 +3443,9 @@ label[for="editDateInput"] {
     .header {
         background: rgba(12, 18, 32, 0.92);
     }
-    /* Ana başlık alanı iç dikey yükseklik +4px */
+    /* Ana başlık alanı iç dikey yükseklik +4px, yatay çizgi altına 3px boşluk */
     .header h1 {
-        padding: 4px 0 12px 0;
+        padding: 4px 0 15px 0;
     }
     /* Ayarlar/zil ile bilgi kutuları arası = üst çerçeve (5px) */
     .total-summary {
