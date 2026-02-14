@@ -1,6 +1,6 @@
-// Service Worker with Smart Caching - v78.34
+// Service Worker with Smart Caching - v79.19
 const DEBUG = false; // Set to true for development
-const CACHE_NAME = 'sahsi-hesap-v78.34';
+const CACHE_NAME = 'sahsi-hesap-v79.19';
 const urlsToCache = [
     '/',
     '/index.html',
@@ -13,12 +13,18 @@ const urlsToCache = [
     '/kasa.js?v=1.11',
     '/manifest.json',
     '/favicon.ico',
-    '/apple-touch-icon.png'
+    '/apple-touch-icon.png',
+    // PWA Icons (referenced in manifest.json)
+    '/icons/android-chrome-192x192.png',
+    '/icons/android-chrome-512x512.png',
+    '/icons/maskable-512x512.png',
+    '/icons/favicon-16x16.png',
+    '/icons/favicon-32x32.png'
 ];
 
 // Install Event: Pre-cache critical assets
 self.addEventListener('install', (event) => {
-    DEBUG && console.log('[SW] Installing... v78.34');
+    DEBUG && console.log('[SW] Installing... v79.19');
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then((cache) => {
@@ -31,7 +37,7 @@ self.addEventListener('install', (event) => {
 
 // Activate Event: Clean up old caches
 self.addEventListener('activate', (event) => {
-    DEBUG && console.log('[SW] Activating... v78.34');
+    DEBUG && console.log('[SW] Activating... v79.19');
     event.waitUntil(
         caches.keys().then((cacheNames) => {
             return Promise.all(
