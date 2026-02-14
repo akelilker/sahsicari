@@ -3625,7 +3625,7 @@ function selectQuickPersonFromOverlay(person) {
     populateCategorySelect(document.getElementById('quickCategory'), person);
     document.getElementById('quickAmount').value = '';
     document.getElementById('quickDescription').value = '';
-    setQuickTransactionType('giden');
+    setQuickTransactionType('');
 }
 
 function resetQuickPanel() {
@@ -3738,6 +3738,7 @@ async function processQuickTransaction() {
     if (!person) return showNotification('Kişi seçiniz!', 'error');
     if (amount === 0) return showNotification('Tutar giriniz!', 'error');
     if (!category) return showNotification('Kategori seçiniz!', 'error');
+    if (!type) return showNotification('İşlem tipi seçiniz!', 'error');
 
     let desc = document.getElementById('quickDescription').value.trim();
     desc = formatTitleCase(desc); 
