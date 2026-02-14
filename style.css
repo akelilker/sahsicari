@@ -350,7 +350,7 @@ body.ios-pwa .history-item .description {
     border-radius: 12px;
     background: rgba(10, 16, 30, 0.92);
     box-shadow: none;
-    padding: 2px 0 10px 0;
+    padding: 2px 0 13px 0;
     position: relative;
     color: #ffffff;
     z-index: 2003;
@@ -382,8 +382,7 @@ body.ios-pwa .history-item .description {
     position: absolute;
     bottom: -8px;
     left: 50%;
-    transform: translateX(-50%) scaleY(0.75);
-    transform-origin: center bottom;
+    transform: translateX(-50%);
     width: 0%;
     opacity: 1;
     animation: lineIntro 4s cubic-bezier(0.4, 0.0, 0.2, 1) forwards, lineBreath 3s ease-in-out 4s infinite alternate;
@@ -3445,7 +3444,7 @@ label[for="editDateInput"] {
     }
     /* Ana başlık alanı iç dikey yükseklik +4px, yatay çizgi altına 3px boşluk */
     .header h1 {
-        padding: 4px 0 15px 0;
+        padding: 4px 0 18px 0;
     }
     /* Ayarlar/zil ile bilgi kutuları arası = üst çerçeve (5px) */
     .total-summary {
