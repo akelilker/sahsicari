@@ -1,4 +1,5 @@
 // Service Worker with Smart Caching - v78.34
+const DEBUG = false; // Set to true for development
 const CACHE_NAME = 'sahsi-hesap-v78.34';
 const urlsToCache = [
     '/',
@@ -15,11 +16,11 @@ const urlsToCache = [
 
 // Install Event: Pre-cache critical assets
 self.addEventListener('install', (event) => {
-    console.log('[SW] Installing... v78.34');
+    DEBUG && console.log('[SW] Installing... v78.34');
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then((cache) => {
-                console.log('[SW] Pre-caching assets');
+                DEBUG && console.log('[SW] Pre-caching assets');
                 return cache.addAll(urlsToCache);
             })
             .then(() => self.skipWaiting())
@@ -28,13 +29,13 @@ self.addEventListener('install', (event) => {
 
 // Activate Event: Clean up old caches
 self.addEventListener('activate', (event) => {
-    console.log('[SW] Activating... v78.34');
+    DEBUG && console.log('[SW] Activating... v78.34');
     event.waitUntil(
         caches.keys().then((cacheNames) => {
             return Promise.all(
                 cacheNames.map((cacheName) => {
                     if (cacheName !== CACHE_NAME) {
-                        console.log('[SW] Deleting old cache:', cacheName);
+                        DEBUG && console.log('[SW] Deleting old cache:', cacheName);
                         return caches.delete(cacheName);
                     }
                 })
