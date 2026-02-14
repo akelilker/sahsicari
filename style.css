@@ -1275,22 +1275,26 @@ overflow: hidden;
 }
 
 #addPersonModal,
-#personManagementModal,
-#categoryManagementModal,
-#guideModal,
-#generalStatusModal {
+#guideModal {
     justify-content: flex-start;
     align-items: center;
     padding-top: calc(var(--sa-top) + 10px);
     padding-bottom: 45px;
 }
 
+#personManagementModal,
+#categoryManagementModal,
+#syncHelpModal,
+#generalStatusModal,
+#categoryDetailModal {
+    justify-content: flex-start;
+    align-items: center;
+    padding-top: calc(var(--sa-top) + 10px);
+    padding-bottom: calc(40px + env(safe-area-inset-bottom) + 10px);
+}
+
 #addPersonModal .modal-content,
-#personManagementModal .modal-content,
-#categoryManagementModal .modal-content,
-#generalStatusModal .modal-content,
-#guideModal .modal-content,
-#syncHelpModal .modal-content {
+#guideModal .modal-content {
     height: calc(100vh - 100px);
     max-height: calc(100vh - 100px);
     width: 95%;
@@ -1299,16 +1303,22 @@ overflow: hidden;
     border-radius: 15px;
 }
 
+#personManagementModal .modal-content,
+#categoryManagementModal .modal-content,
+#syncHelpModal .modal-content,
+#generalStatusModal .modal-content,
+#categoryDetailModal .modal-content {
+    height: 90vh;
+    max-height: 90vh;
+    width: 100%;
+    max-width: 450px;
+    margin: 0 auto;
+    border-radius: 15px;
+}
+
 #categoryManagementModal .form-group label {
     margin-bottom: 10px;
     display: block;
-}
-
-#syncHelpModal {
-    justify-content: flex-start;
-    align-items: center;
-    padding-top: calc(var(--sa-top) + 10px);
-    padding-bottom: 45px;
 }
 
 #addPersonModal .modal-body {
