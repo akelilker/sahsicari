@@ -4465,3 +4465,126 @@ input[type="date"]::-webkit-datetime-edit-year-field {
 #allocationOverlay .quick-panel-content {
     pointer-events: auto !important;
 }
+
+/* PWA Install Banner */
+.pwa-install-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 16px;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+    z-index: 10000;
+    animation: slideUp 0.4s ease-out;
+    backdrop-filter: blur(10px);
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+}
+
+.pwa-install-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.pwa-install-icon {
+    font-size: 32px;
+    flex-shrink: 0;
+}
+
+.pwa-install-text {
+    flex: 1;
+}
+
+.pwa-install-text strong {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 4px;
+}
+
+.pwa-install-text p {
+    font-size: 13px;
+    opacity: 0.9;
+    margin: 0;
+}
+
+.pwa-install-btn {
+    background: white;
+    color: #667eea;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 14px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.pwa-install-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+}
+
+.pwa-install-close {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0 8px;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.pwa-install-close:hover {
+    opacity: 1;
+}
+
+@media (max-width: 600px) {
+    .pwa-install-content {
+        flex-wrap: wrap;
+    }
+
+    .pwa-install-text {
+        order: 1;
+        flex: 1 0 calc(100% - 56px);
+    }
+
+    .pwa-install-icon {
+        order: 0;
+    }
+
+    .pwa-install-close {
+        order: 2;
+    }
+
+    .pwa-install-btn {
+        order: 3;
+        flex: 1 0 100%;
+        margin-top: 8px;
+    }
+}

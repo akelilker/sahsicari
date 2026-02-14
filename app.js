@@ -3165,10 +3165,189 @@ async function finalizeClear() {
 }
 
 let deferredPrompt;
+let pwaInstallBannerDismissed = false;
+
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
+
+    // Check if user previously dismissed
+    const dismissed = localStorage.getItem('pwaInstallDismissed');
+    if (!dismissed && !pwaInstallBannerDismissed) {
+        showPWAInstallBanner();
+    }
 });
+
+function showPWAInstallBanner() {
+    const banner = document.getElementById('pwaInstallBanner');
+    if (!banner) return;
+
+    banner.style.display = 'block';
+
+    // Install button
+    const installBtn = document.getElementById('pwaInstallBtn');
+    if (installBtn) {
+        installBtn.onclick = async () => {
+            if (!deferredPrompt) return;
+
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+
+            if (outcome === 'accepted') {
+                console.log('PWA installed successfully');
+            }
+
+            deferredPrompt = null;
+            hidePWAInstallBanner();
+        };
+    }
+
+    // Close button
+    const closeBtn = document.getElementById('pwaInstallClose');
+    if (closeBtn) {
+        closeBtn.onclick = () => {
+            localStorage.setItem('pwaInstallDismissed', 'true');
+            pwaInstallBannerDismissed = true;
+            hidePWAInstallBanner();
+        };
+    }
+}
+
+function hidePWAInstallBanner() {
+    const banner = document.getElementById('pwaInstallBanner');
+    if (banner) {
+        banner.style.animation = 'slideDown 0.3s ease-out';
+        setTimeout(() => {
+            banner.style.display = 'none';
+        }, 300);
+    }
+}
+
+// Listen for successful installation
+window.addEventListener('appinstalled', () => {
+    console.log('PWA successfully installed');
+    hidePWAInstallBanner();
+    showNotification('Uygulama başarıyla yüklendi!', 'success');
+});
+
+// Background Sync: Online/Offline Detection
+let isOnline = navigator.onLine;
+
+window.addEventListener('online', async () => {
+    isOnline = true;
+    updateServerStatus('success', '🌐 Bağlantı kuruldu');
+    await showNotification('İnternet bağlantısı geri geldi', 'success');
+
+    // Trigger background sync if supported
+    if ('serviceWorker' in navigator && 'sync' in ServiceWorkerRegistration.prototype) {
+        try {
+            const registration = await navigator.serviceWorker.ready;
+            await registration.sync.register('sync-data');
+            console.log('Background sync registered');
+        } catch (error) {
+            console.error('Background sync registration failed:', error);
+            // Fallback: manual sync
+            await manualSync();
+        }
+    } else {
+        // Browser doesn't support background sync, do manual sync
+        await manualSync();
+    }
+});
+
+window.addEventListener('offline', async () => {
+    isOnline = false;
+    updateServerStatus('error', '📡 Çevrimdışı mod');
+    await showNotification('İnternet bağlantısı kesildi. Veriler cihazda saklanıyor.', 'warning');
+});
+
+// Manual sync fallback
+async function manualSync() {
+    try {
+        const db = await openIndexedDB();
+        const syncQueue = await getSyncQueue(db);
+
+        if (syncQueue.length > 0) {
+            console.log('Manual sync: processing', syncQueue.length, 'items');
+
+            for (const item of syncQueue) {
+                try {
+                    const response = await fetch(item.url, {
+                        method: item.method,
+                        headers: item.headers,
+                        body: item.body
+                    });
+
+                    if (response.ok) {
+                        await removeSyncQueueItem(db, item.id);
+                        console.log('Synced item:', item.id);
+                    }
+                } catch (error) {
+                    console.error('Sync failed for item:', item.id, error);
+                }
+            }
+
+            await showNotification(`${syncQueue.length} değişiklik senkronize edildi`, 'success');
+        }
+    } catch (error) {
+        console.error('Manual sync error:', error);
+    }
+}
+
+// Helper functions for sync queue
+function openIndexedDB() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open('SahsiHesapDB', 1);
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+    });
+}
+
+function getSyncQueue(db) {
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction('syncQueue', 'readonly');
+        const store = transaction.objectStore('syncQueue');
+        const request = store.getAll();
+        request.onsuccess = () => resolve(request.result || []);
+        request.onerror = () => reject(request.error);
+    });
+}
+
+function addToSyncQueue(db, item) {
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction('syncQueue', 'readwrite');
+        const store = transaction.objectStore('syncQueue');
+        const request = store.add({
+            ...item,
+            timestamp: Date.now()
+        });
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+    });
+}
+
+function removeSyncQueueItem(db, itemId) {
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction('syncQueue', 'readwrite');
+        const store = transaction.objectStore('syncQueue');
+        const request = store.delete(itemId);
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+    });
+}
+
+// Listen for sync complete message from service worker
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('message', async (event) => {
+        if (event.data.type === 'SYNC_COMPLETE') {
+            console.log('Background sync completed:', event.data.syncedCount, 'items');
+            await showNotification(`${event.data.syncedCount} değişiklik senkronize edildi`, 'success');
+            // Reload data to show synced changes
+            await loadData();
+            updateMainDisplay();
+        }
+    });
+}
 
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
