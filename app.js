@@ -260,13 +260,13 @@ function queueSave() {
         try {
             if (Object.keys(allData).length > 0 && navigator.onLine && hasLoadedServerData) {
                 await saveDataToServer(allData, false);
-                safeStorage.removeItem('sahsiHesapTakibiData');
+                await advancedStorage.removeItem('sahsiHesapTakibiData');
             } else {
-                safeStorage.setItem('sahsiHesapTakibiData', JSON.stringify(allData));
+                await advancedStorage.setItem('sahsiHesapTakibiData', JSON.stringify(allData));
             }
-            safeStorage.setItem('sahsiHesapTakibiNotifications', JSON.stringify(notificationHistory));
+            await advancedStorage.setItem('sahsiHesapTakibiNotifications', JSON.stringify(notificationHistory));
         } catch (error) {
-            safeStorage.setItem('sahsiHesapTakibiData', JSON.stringify(allData));
+            await advancedStorage.setItem('sahsiHesapTakibiData', JSON.stringify(allData));
         }
         saveTimer = null;
     }, 1000);
@@ -283,16 +283,16 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     navigator.serviceWorker.register('service_worker.js?v=' + APP_VERSION).catch(console.error);
 }
 
-window.addEventListener('load', function() {
+window.addEventListener('load', async function() {
     initDOMCache();
     updateVersionDisplay();
-    loadGlowTheme(); 
+    await loadGlowTheme();
     updateServerStatus('', '📡 Veriler yükleniyor...');
-    
-    loadData().then(() => {
-        const savedNotifications = safeStorage.getItem('sahsiHesapTakibiNotifications');
+
+    loadData().then(async () => {
+        const savedNotifications = await advancedStorage.getItem('sahsiHesapTakibiNotifications');
         if (savedNotifications) notificationHistory = JSON.parse(savedNotifications);
-        
+
         migrateOldDataSafely();
         updateMainDisplay();
         setCurrentDate();
@@ -405,15 +405,16 @@ function loadDataFromServer() {
     });
 }
 
-function loadData() {
-    return loadDataFromServer().then(serverData => {
+async function loadData() {
+    try {
+        const serverData = await loadDataFromServer();
         if (serverData && Object.keys(serverData).length > 0) {
             allData = serverData;
             hasLoadedServerData = true;
             updateServerStatus('success', '✅ Sunucudan yüklendi');
             return true;
         } else {
-            const savedData = safeStorage.getItem('sahsiHesapTakibiData');
+            const savedData = await advancedStorage.getItem('sahsiHesapTakibiData');
             if (savedData) {
                 allData = JSON.parse(savedData);
                 hasLoadedServerData = false;
@@ -424,12 +425,12 @@ function loadData() {
             }
             return true;
         }
-    }).catch(error => {
+    } catch (error) {
         updateServerStatus('error', '❌ Bağlantı hatası');
-        const savedData = safeStorage.getItem('sahsiHesapTakibiData');
+        const savedData = await advancedStorage.getItem('sahsiHesapTakibiData');
         if (savedData) allData = JSON.parse(savedData);
         return false;
-    });
+    }
 }
 
 function migrateOldDataSafely() {
@@ -738,23 +739,23 @@ function reorderFavorites(fromIndex, toIndex) {
     setTimeout(() => { justDragged = false; }, 100);
 }
 
-function showNotification(message, type = 'info') {
+async function showNotification(message, type = 'info') {
     const notification = DOM.notification || document.getElementById('notification');
     if (!notification) return;
-    
+
     notification.textContent = message;
     notification.className = 'notification show';
     notification.classList.add(type);
-    
+
     notificationHistory.push({
         message: message,
         type: type,
         date: new Date().toISOString()
     });
-    
+
     if (notificationHistory.length > 20) notificationHistory.shift();
-    safeStorage.setItem('sahsiHesapTakibiNotifications', JSON.stringify(notificationHistory));
-    
+    await advancedStorage.setItem('sahsiHesapTakibiNotifications', JSON.stringify(notificationHistory));
+
     setTimeout(() => {
         notification.classList.remove('show');
     }, 3000);
@@ -1883,7 +1884,7 @@ document.addEventListener('click', function(e) {
     }
 });
 
-function changeGlowTheme(themeName, silent = false) {
+async function changeGlowTheme(themeName, silent = false) {
     const container = DOM.mainAppContainer;
     if (!container) return;
 
@@ -1893,16 +1894,16 @@ function changeGlowTheme(themeName, silent = false) {
 
     container.classList.add(`theme-${themeName}-glow`);
 
-    safeStorage.setItem('sahsiHesapTakibiGlowTheme', themeName); 
+    await advancedStorage.setItem('sahsiHesapTakibiGlowTheme', themeName);
 
     if(!silent) {
-        showNotification(`${themeName === 'none' ? 'Işıklar kapatıldı.' : themeName.toUpperCase() + ' ışık seçildi.'}`, 'success');
+        await showNotification(`${themeName === 'none' ? 'Işıklar kapatıldı.' : themeName.toUpperCase() + ' ışık seçildi.'}`, 'success');
     }
 }
 
-function loadGlowTheme() {
-    const savedTheme = safeStorage.getItem('sahsiHesapTakibiGlowTheme') || 'blue'; 
-    changeGlowTheme(savedTheme, true);
+async function loadGlowTheme() {
+    const savedTheme = await advancedStorage.getItem('sahsiHesapTakibiGlowTheme') || 'blue';
+    await changeGlowTheme(savedTheme, true);
 }
 
 function toggleNotificationMenu() {
@@ -2197,9 +2198,9 @@ function renderNotificationMenu() {
     }
 }
 
-function deleteNotification(index) {
+async function deleteNotification(index) {
     notificationHistory.splice(index, 1);
-    safeStorage.setItem('sahsiHesapTakibiNotifications', JSON.stringify(notificationHistory));
+    await advancedStorage.setItem('sahsiHesapTakibiNotifications', JSON.stringify(notificationHistory));
     renderNotificationMenu();
 }
 
@@ -3086,8 +3087,8 @@ async function attemptBackupAndClear() {
     alertMessage.innerHTML = "Sunucuya veri yedekleniyor, lütfen bekleyin...";
 
     try {
-        const data = safeStorage.getItem('sahsiHesapTakibiData');
-        
+        const data = await advancedStorage.getItem('sahsiHesapTakibiData');
+
         if(data) {
             await saveDataToServer(JSON.parse(data), true);
             
@@ -3164,10 +3165,189 @@ async function finalizeClear() {
 }
 
 let deferredPrompt;
+let pwaInstallBannerDismissed = false;
+
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
+
+    // Check if user previously dismissed
+    const dismissed = localStorage.getItem('pwaInstallDismissed');
+    if (!dismissed && !pwaInstallBannerDismissed) {
+        showPWAInstallBanner();
+    }
 });
+
+function showPWAInstallBanner() {
+    const banner = document.getElementById('pwaInstallBanner');
+    if (!banner) return;
+
+    banner.style.display = 'block';
+
+    // Install button
+    const installBtn = document.getElementById('pwaInstallBtn');
+    if (installBtn) {
+        installBtn.onclick = async () => {
+            if (!deferredPrompt) return;
+
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+
+            if (outcome === 'accepted') {
+                console.log('PWA installed successfully');
+            }
+
+            deferredPrompt = null;
+            hidePWAInstallBanner();
+        };
+    }
+
+    // Close button
+    const closeBtn = document.getElementById('pwaInstallClose');
+    if (closeBtn) {
+        closeBtn.onclick = () => {
+            localStorage.setItem('pwaInstallDismissed', 'true');
+            pwaInstallBannerDismissed = true;
+            hidePWAInstallBanner();
+        };
+    }
+}
+
+function hidePWAInstallBanner() {
+    const banner = document.getElementById('pwaInstallBanner');
+    if (banner) {
+        banner.style.animation = 'slideDown 0.3s ease-out';
+        setTimeout(() => {
+            banner.style.display = 'none';
+        }, 300);
+    }
+}
+
+// Listen for successful installation
+window.addEventListener('appinstalled', () => {
+    console.log('PWA successfully installed');
+    hidePWAInstallBanner();
+    showNotification('Uygulama başarıyla yüklendi!', 'success');
+});
+
+// Background Sync: Online/Offline Detection
+let isOnline = navigator.onLine;
+
+window.addEventListener('online', async () => {
+    isOnline = true;
+    updateServerStatus('success', '🌐 Bağlantı kuruldu');
+    await showNotification('İnternet bağlantısı geri geldi', 'success');
+
+    // Trigger background sync if supported
+    if ('serviceWorker' in navigator && 'sync' in ServiceWorkerRegistration.prototype) {
+        try {
+            const registration = await navigator.serviceWorker.ready;
+            await registration.sync.register('sync-data');
+            console.log('Background sync registered');
+        } catch (error) {
+            console.error('Background sync registration failed:', error);
+            // Fallback: manual sync
+            await manualSync();
+        }
+    } else {
+        // Browser doesn't support background sync, do manual sync
+        await manualSync();
+    }
+});
+
+window.addEventListener('offline', async () => {
+    isOnline = false;
+    updateServerStatus('error', '📡 Çevrimdışı mod');
+    await showNotification('İnternet bağlantısı kesildi. Veriler cihazda saklanıyor.', 'warning');
+});
+
+// Manual sync fallback
+async function manualSync() {
+    try {
+        const db = await openIndexedDB();
+        const syncQueue = await getSyncQueue(db);
+
+        if (syncQueue.length > 0) {
+            console.log('Manual sync: processing', syncQueue.length, 'items');
+
+            for (const item of syncQueue) {
+                try {
+                    const response = await fetch(item.url, {
+                        method: item.method,
+                        headers: item.headers,
+                        body: item.body
+                    });
+
+                    if (response.ok) {
+                        await removeSyncQueueItem(db, item.id);
+                        console.log('Synced item:', item.id);
+                    }
+                } catch (error) {
+                    console.error('Sync failed for item:', item.id, error);
+                }
+            }
+
+            await showNotification(`${syncQueue.length} değişiklik senkronize edildi`, 'success');
+        }
+    } catch (error) {
+        console.error('Manual sync error:', error);
+    }
+}
+
+// Helper functions for sync queue
+function openIndexedDB() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open('SahsiHesapDB', 1);
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+    });
+}
+
+function getSyncQueue(db) {
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction('syncQueue', 'readonly');
+        const store = transaction.objectStore('syncQueue');
+        const request = store.getAll();
+        request.onsuccess = () => resolve(request.result || []);
+        request.onerror = () => reject(request.error);
+    });
+}
+
+function addToSyncQueue(db, item) {
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction('syncQueue', 'readwrite');
+        const store = transaction.objectStore('syncQueue');
+        const request = store.add({
+            ...item,
+            timestamp: Date.now()
+        });
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+    });
+}
+
+function removeSyncQueueItem(db, itemId) {
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction('syncQueue', 'readwrite');
+        const store = transaction.objectStore('syncQueue');
+        const request = store.delete(itemId);
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+    });
+}
+
+// Listen for sync complete message from service worker
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('message', async (event) => {
+        if (event.data.type === 'SYNC_COMPLETE') {
+            console.log('Background sync completed:', event.data.syncedCount, 'items');
+            await showNotification(`${event.data.syncedCount} değişiklik senkronize edildi`, 'success');
+            // Reload data to show synced changes
+            await loadData();
+            updateMainDisplay();
+        }
+    });
+}
 
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {

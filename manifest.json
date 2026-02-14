@@ -2,11 +2,16 @@
   "name": "Şahsi Hesap Takibi",
   "short_name": "Hesap Takibi",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#0e1525",
   "theme_color": "#0e1525",
-  "description": "Şahsi Hesap Takibi Uygulaması",
-  "orientation": "portrait",
+  "description": "Şahsi Hesap Takibi Uygulaması - Offline çalışır, güvenli ve hızlı",
+  "orientation": "portrait-primary",
+  "categories": ["finance", "productivity", "utilities"],
+  "lang": "tr-TR",
+  "dir": "ltr",
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "icons/android-chrome-192x192.png",
@@ -26,5 +31,42 @@
       "type": "image/png",
       "purpose": "maskable"
     }
-  ]
+  ],
+  "shortcuts": [
+    {
+      "name": "Yeni Kayıt",
+      "short_name": "Yeni",
+      "description": "Hızlı yeni kayıt ekle",
+      "url": "./index.html?action=new",
+      "icons": [
+        {
+          "src": "icons/android-chrome-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Kasa",
+      "short_name": "Kasa",
+      "description": "Kasa sayfasını aç",
+      "url": "./kasa.html",
+      "icons": [
+        {
+          "src": "icons/android-chrome-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "share_target": {
+    "action": "./index.html",
+    "method": "GET",
+    "enctype": "application/x-www-form-urlencoded",
+    "params": {
+      "title": "title",
+      "text": "text"
+    }
+  }
 }

@@ -42,6 +42,12 @@ class IndexedDBStorage {
                         db.createObjectStore(this.storeName);
                         logger.log('Object store created:', this.storeName);
                     }
+                    // Create syncQueue for background sync
+                    if (!db.objectStoreNames.contains('syncQueue')) {
+                        const syncStore = db.createObjectStore('syncQueue', { keyPath: 'id', autoIncrement: true });
+                        syncStore.createIndex('timestamp', 'timestamp', { unique: false });
+                        logger.log('Sync queue object store created');
+                    }
                 };
             });
         } catch (error) {
