@@ -1286,7 +1286,8 @@ overflow: hidden;
 #categoryManagementModal,
 #syncHelpModal,
 #generalStatusModal,
-#categoryDetailModal {
+#categoryDetailModal,
+#monthlySummaryModal {
     justify-content: flex-start;
     align-items: center;
     padding-top: calc(var(--sa-top) + 10px);
@@ -1307,7 +1308,8 @@ overflow: hidden;
 #categoryManagementModal .modal-content,
 #syncHelpModal .modal-content,
 #generalStatusModal .modal-content,
-#categoryDetailModal .modal-content {
+#categoryDetailModal .modal-content,
+#monthlySummaryModal .modal-content {
     height: 90vh;
     max-height: 90vh;
     width: 100%;
