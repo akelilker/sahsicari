@@ -1559,8 +1559,8 @@ select option {
 }
 
 .type-btn.active.giden {
-    background: rgba(180, 40, 40, 0.75);
-    border: 1px solid rgba(180, 40, 40, 0.9);
+    background: rgba(255, 23, 68, 0.25);
+    border: 1px solid rgba(255, 23, 68, 0.8);
     text-shadow: 0 0 8px rgba(255, 23, 68, 0.4);
 }
 .type-btn.active.gelen {
