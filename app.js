@@ -6,7 +6,7 @@ function formatDateTR(dateObj) {
     return `${d}.${m}.${y}`;
 }
 const API_SECRET_KEY = "Karmotor_Guvenlik_Sifresi_2025";
-const APP_VERSION = '78.34';
+const APP_VERSION = '79.19';
 
 const safeStorage = {
     getItem: function(key) {
