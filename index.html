@@ -294,34 +294,34 @@
                 <div class="reports-dashboard">
                     <div class="rd-col left-col">
                         <h4 class="rd-header white">Filtreleme</h4>
-                        
+
                         <div class="rd-date-group">
                             <label class="rd-date-label">Başlangıç</label>
                             <span class="rd-mobile-date-display" id="startDateDisplay" aria-hidden="true"></span>
                             <input class="rd-date-input" id="startDate" type="date">
                         </div>
-                        
+
                         <div class="rd-date-group">
                             <label class="rd-date-label">Bitiş</label>
                             <span class="rd-mobile-date-display" id="endDateDisplay" aria-hidden="true"></span>
                             <input class="rd-date-input" id="endDate" type="date">
                         </div>
+
+                        <div class="rd-search">
+                            <span class="rd-search-icon">🔍</span>
+                            <input type="text" id="reportSearchInput" placeholder="İsim Veya Kelime Giriniz" autocomplete="off">
+                        </div>
                     </div>
 
                     <div class="rd-col right-col">
                         <h4 class="rd-header orange">Gelişmiş</h4>
-                        
+
                         <div class="rd-toggles">
                             <span class="rd-toggle-btn active" id="filterBtn-all" onclick="setReportFilterType('all')">Tümü</span>
                             <span class="rd-toggle-btn" id="filterBtn-gelen" onclick="setReportFilterType('gelen')">Gelen</span>
                             <span class="rd-toggle-btn" id="filterBtn-giden" onclick="setReportFilterType('giden')">Giden</span>
                         </div>
-                        
-                        <div class="rd-search">
-                            <span class="rd-search-icon">🔍</span>
-                            <input type="text" id="reportSearchInput" placeholder="İsim Veya Kelime Giriniz" autocomplete="off">
-                        </div>
-                        
+
                         <div class="rd-buttons-row">
                             <button class="rd-btn orange-line" id="monthlyReportButton" onclick="showMonthlySummaryModal()">Aylık Rapor</button>
                             <button class="rd-btn green-line" id="excelReportButton" onclick="exportToExcel()">Excel Raporu</button>
