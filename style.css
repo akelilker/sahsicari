@@ -65,6 +65,7 @@
   --blue-20: rgba(66, 165, 245, 0.2);
   --red-30: rgba(255, 23, 68, 0.3);
   --green-30: rgba(0, 230, 118, 0.3);
+  --tab-purple: rgba(98, 0, 234, 0.6);
   --dark-bg: rgba(20, 30, 60, 0.95);
   --black-30: rgba(0, 0, 0, 0.3);
   --black-50: rgba(0, 0, 0, 0.5);
@@ -1466,7 +1467,7 @@ height: 100%;
     padding: 3px 5px;
     height: 30px;
     background-color: rgba(255, 255, 255, 0.12);
-    border: 1px solid var(--white-15);
+    border: 1px solid var(--tab-purple);
     border-radius: 10px;
     color: #ffffff;
     -webkit-text-fill-color: #ffffff;
@@ -1479,6 +1480,12 @@ height: 100%;
     -webkit-appearance: none;
     appearance: none;
     text-shadow: 0 1px 1px rgba(0,0,0,0.55);
+}
+
+.form-group input:not(.date-picker-simple):not(.transparent-date-input):focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #42a5f5;
 }
 
 .form-group select {
@@ -1538,6 +1545,10 @@ select option {
     min-height: 26px;
     transition: all 0.2s ease;
     text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+}
+
+.transaction-type-buttons .type-btn:not(.active) {
+    border: 1px solid var(--tab-purple);
 }
 
 .type-btn.active {
