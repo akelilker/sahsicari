@@ -3049,12 +3049,17 @@ label[for="editDateInput"] {
     }
 
     /* Mobil - İşlem Geçmişi SCROLL DÜZELTME */
-   #transactionHistory {
+    #personModal .modal-body .tab-content {
+        min-height: 0;
+    }
+
+    #transactionHistory {
         padding: 5px 10px;
         margin-top: 3px;
         margin-bottom: 0;
         max-height: none;
         flex: 1;
+        min-height: 0;
         overflow-y: auto !important;
         -webkit-overflow-scrolling: touch !important;
     }
@@ -3074,6 +3079,8 @@ label[for="editDateInput"] {
     }
 
     #islemGecmisi {
+        flex: 1 1 auto;
+        min-height: 0;
         padding-bottom: 0;
         margin-bottom: 0;
         overflow: hidden !important;
@@ -3081,6 +3088,7 @@ label[for="editDateInput"] {
 
     #islemGecmisi .history-container {
         flex: 1;
+        min-height: 0;
         overflow-y: auto !important;
         overflow-x: hidden !important;
     }
@@ -3306,11 +3314,12 @@ label[for="editDateInput"] {
         display: grid;
         grid-template-areas:
             "filter-header  advanced-header"
-            "filter-start   toggles"
-            "filter-end     search"
+            "filter-start   ."
+            "filter-end     ."
+            "search         toggles"
             "buttons        buttons";
         grid-template-columns: 1fr 1fr;
-        grid-template-rows: auto auto auto auto;
+        grid-template-rows: auto auto auto auto auto;
         row-gap: 0;
         column-gap: 8px;
         align-items: flex-start;
@@ -3329,7 +3338,7 @@ label[for="editDateInput"] {
     .rd-col.left-col .rd-date-group:nth-child(2) {
         grid-area: filter-start;
         width: 100%;
-        margin-bottom: 4px;
+        margin-bottom: 6px;
     }
 
     .rd-col.left-col .rd-date-group:nth-child(3) {
