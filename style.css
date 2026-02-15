@@ -3470,7 +3470,7 @@ label[for="editDateInput"] {
     /* Yeni İşlem: Tutar, Kategori, Açıklama inputları masaüstünde 2px daraltılmış */
     #yeniIslem .form-group input:not(.date-picker-simple):not(.transparent-date-input),
     #yeniIslem .form-group select {
-        height: 33px;
+        height: 31px;
         padding: 2px 8px;
     }
     /* Veriler kutusu: aynı yeşil ton, sadece parlak */
