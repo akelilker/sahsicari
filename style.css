@@ -3462,6 +3462,10 @@ label[for="editDateInput"] {
     .header {
         background: rgba(12, 18, 32, 0.92);
     }
+    /* Ayarlar ve bildirim ikonları üst/alt boşluk 1er px azaltıldı */
+    .notification-icon-btn {
+        padding: 1px 0;
+    }
     /* Ana başlık alanı iç dikey yükseklik +4px, yatay çizgi altına 3px boşluk */
     .header h1 {
         padding: 4px 0 18px 0;
