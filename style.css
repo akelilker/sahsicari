@@ -3337,7 +3337,7 @@ label[for="editDateInput"] {
     .rd-col.left-col .rd-date-group:nth-child(2) {
         grid-area: filter-start;
         width: 100%;
-        margin-bottom: 6px;
+        margin-bottom: 4px;
     }
 
     .rd-col.left-col .rd-date-group:nth-child(3) {
