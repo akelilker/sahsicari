@@ -2730,20 +2730,45 @@ select option {
 }
 
 .reports-dashboard {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
+    display: grid;
+    grid-template-areas:
+        "filter-header  advanced-header"
+        "filter-start   toggles"
+        "filter-end     search"
+        ".              buttons";
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto auto auto;
     gap: 10px;
+    align-items: flex-start;
     width: 100%;
 }
 .rd-col {
-    flex: 1;
-    min-width: 45%;
-    max-width: 48%;
-    display: flex;
-    flex-direction: column;
+    min-width: 0;
+    display: contents;
     border-right: none;
     padding: 0;
+}
+.rd-col.left-col .rd-header {
+    grid-area: filter-header;
+}
+.rd-col.left-col .rd-date-group:nth-child(2) {
+    grid-area: filter-start;
+}
+.rd-col.left-col .rd-date-group:nth-child(3) {
+    grid-area: filter-end;
+}
+.rd-col.right-col .rd-header {
+    grid-area: advanced-header;
+}
+.rd-col.right-col .rd-toggles {
+    grid-area: toggles;
+}
+.rd-col.right-col .rd-search {
+    grid-area: search;
+}
+.rd-col.right-col .rd-buttons-row {
+    grid-area: buttons;
+    grid-column: 1 / -1;
 }
 
 #personModal .modal-body{
@@ -3244,12 +3269,11 @@ label[for="editDateInput"] {
         display: grid;
         grid-template-areas:
             "filter-header  advanced-header"
-            "filter-start   ."
-            "filter-end     ."
-            "search         toggles"
-            ".              buttons";
+            "filter-start   toggles"
+            "filter-end     search"
+            "buttons        buttons";
         grid-template-columns: 1fr 1fr;
-        grid-template-rows: auto auto auto auto auto;
+        grid-template-rows: auto auto auto auto;
         gap: 8px;
         align-items: flex-start;
     }
@@ -3286,15 +3310,13 @@ label[for="editDateInput"] {
     }
 
     .rd-col.right-col .rd-search {
-        grid-row: 4;
-        grid-column: 1;
+        grid-area: search;
         width: 100%;
-        margin-top: 6px;
+        margin-top: 0;
     }
 
     .rd-col.right-col .rd-buttons-row {
-        grid-row: 5;
-        grid-column: 2;
+        grid-area: buttons;
         margin-top: 6px;
     }
 
