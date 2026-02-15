@@ -2788,7 +2788,7 @@ select option {
 }
 .rd-col.left-col .rd-date-group:nth-child(2) {
     grid-area: filter-start;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
 }
 .rd-col.left-col .rd-date-group:nth-child(3) {
     grid-area: filter-end;
@@ -3762,7 +3762,7 @@ label[for="editDateInput"] {
 .rd-date-label {
     font-size: 0.75em;
     color: #546e7a;
-    margin-bottom: 0px;
+    margin-bottom: 1px;
     font-weight: 600;
     text-shadow: none;
 }
