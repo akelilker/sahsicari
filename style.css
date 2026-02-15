@@ -3228,22 +3228,45 @@ label[for="editDateInput"] {
     }
 
     .reports-dashboard {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto;
         gap: 8px;
         align-items: flex-start;
     }
 
-    .rd-col {
-        flex: 1;
-        min-width: 45%;
-        max-width: 48%;
-    }
-
     .rd-col.left-col {
+        grid-column: 1;
+        grid-row: 1;
         justify-content: flex-start;
         gap: 6px;
+        width: 100%;
+        max-width: none;
+    }
+
+    .rd-col.right-col {
+        display: contents;
+    }
+
+    .rd-col.right-col .rd-header {
+        grid-column: 2;
+        grid-row: 1;
+    }
+
+    .rd-col.right-col .rd-toggles {
+        grid-column: 2;
+        grid-row: 2;
+    }
+
+    .rd-col.right-col .rd-search {
+        grid-column: 1;
+        grid-row: 2;
+        width: 100%;
+        margin-top: 6px;
+    }
+
+    .rd-col {
+        min-width: 0;
     }
 
     .rd-header {
