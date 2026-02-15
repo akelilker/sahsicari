@@ -3208,7 +3208,7 @@ label[for="editDateInput"] {
     .reports-dashboard {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        grid-template-rows: auto auto;
+        grid-template-rows: auto auto auto;
         gap: 8px;
         align-items: flex-start;
     }
@@ -3240,6 +3240,12 @@ label[for="editDateInput"] {
         grid-column: 1;
         grid-row: 2;
         width: 100%;
+        margin-top: 6px;
+    }
+
+    .rd-col.right-col .rd-buttons-row {
+        grid-column: 2;
+        grid-row: 3;
         margin-top: 6px;
     }
 
@@ -3967,6 +3973,7 @@ label[for="editDateInput"] {
     #settingsMenu .btn,
     #notificationMenu .btn {
         text-align: right;
+        justify-content: flex-end;
     }
 
     .rd-toggles {
