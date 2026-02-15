@@ -2430,6 +2430,13 @@ select option {
     right: 10px;
 }
 
+#quickOverlayContainer .close-overlay-btn {
+    background: rgba(255, 255, 255, 0.4);
+    color: #ffffff;
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
 .quick-search-wrapper {
     margin-bottom: 15px;
     position: relative;
@@ -3135,12 +3142,6 @@ label[for="editDateInput"] {
         border-radius: 16px;
     }
 
-    #quickOverlayContainer .close-overlay-btn {
-        background: rgba(255, 255, 255, 0.25);
-        color: #eceff1;
-        border: 1px solid rgba(255, 255, 255, 0.35);
-    }
-
     #quickOverlayContainer .quick-search-wrapper {
         margin: 0;
         margin-bottom: 12px;
@@ -3206,42 +3207,21 @@ label[for="editDateInput"] {
 
     .reports-dashboard {
         display: flex;
-        flex-direction: column;
-        gap: 10px;
-        align-items: stretch;
-        width: 100%;
-    }
-
-    .rd-col.left-col {
-        order: 1;
-        justify-content: flex-start;
-        gap: 6px;
-        width: 100%;
-        max-width: none;
-    }
-
-    .rd-col.right-col {
-        display: contents;
-    }
-
-    .rd-col.right-col .rd-header {
-        order: 2;
-        width: 100%;
-    }
-
-    .rd-col.right-col .rd-toggles {
-        order: 3;
-        width: 100%;
-    }
-
-    .rd-col.right-col .rd-search {
-        order: 4;
-        width: 100%;
-        margin-top: 4px;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: flex-start;
     }
 
     .rd-col {
-        min-width: 0;
+        flex: 1;
+        min-width: 45%;
+        max-width: 48%;
+    }
+
+    .rd-col.left-col {
+        justify-content: flex-start;
+        gap: 6px;
     }
 
     .rd-header {
