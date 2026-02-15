@@ -2999,7 +2999,7 @@ label[for="editDateInput"] {
 
     .history-container {
         padding-top: 0;
-        padding-bottom: 50px;
+        padding-bottom: 70px;
         margin-bottom: 0;
         overflow-y: auto !important;
         overflow-x: hidden !important;
@@ -3256,11 +3256,13 @@ label[for="editDateInput"] {
         grid-area: search;
         width: 100%;
         margin-top: 6px;
+        grid-column: unset;
     }
 
     .rd-col.right-col .rd-buttons-row {
         grid-area: buttons;
         margin-top: 6px;
+        grid-column: unset;
     }
 
     .rd-col {
