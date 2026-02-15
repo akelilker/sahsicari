@@ -2999,9 +2999,10 @@ label[for="editDateInput"] {
 
     .history-container {
         padding-top: 0;
-        padding-bottom: 0;
+        padding-bottom: 70px;
         margin-bottom: 0;
-        overflow: hidden !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
         max-height: none;
     }
 
@@ -3018,7 +3019,12 @@ label[for="editDateInput"] {
 
     #islemGecmisi .history-container {
         flex: 1;
-        overflow: hidden !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+    }
+
+    #personModal #reportPreviewList {
+        padding-bottom: 70px;
     }
 
     #yeniIslem {
@@ -3122,6 +3128,35 @@ label[for="editDateInput"] {
         margin-bottom: 0;
     }
 
+    #categoryDetailContent {
+        padding-bottom: 70px;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    #categoryDetailModal .modal-body {
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .detail-table tbody td:last-child {
+        -webkit-line-clamp: 5;
+        line-clamp: 5;
+    }
+
+    .detail-table {
+        font-size: 10px;
+    }
+
+    .detail-table thead th {
+        font-size: 9px;
+    }
+
+    .detail-table tbody td {
+        padding: 5px 3px;
+        font-size: 10px;
+    }
+
     .quick-panel-content {
         position: relative;
         width: 100%;
@@ -3208,21 +3243,34 @@ label[for="editDateInput"] {
     .reports-dashboard {
         display: grid;
         grid-template-areas:
-            "filter header"
-            "filter toggles"
-            "search buttons";
+            "filter-header  advanced-header"
+            "filter-start   ."
+            "filter-end     ."
+            "search         toggles"
+            ".              buttons";
         grid-template-columns: 1fr 1fr;
-        grid-template-rows: auto auto auto;
+        grid-template-rows: auto auto auto auto auto;
         gap: 8px;
         align-items: flex-start;
     }
 
     .rd-col.left-col {
-        grid-area: filter;
-        justify-content: flex-start;
-        gap: 6px;
+        display: contents;
+    }
+
+    .rd-col.left-col .rd-header {
+        grid-area: filter-header;
         width: 100%;
-        max-width: none;
+    }
+
+    .rd-col.left-col .rd-date-group:nth-child(2) {
+        grid-area: filter-start;
+        width: 100%;
+    }
+
+    .rd-col.left-col .rd-date-group:nth-child(3) {
+        grid-area: filter-end;
+        width: 100%;
     }
 
     .rd-col.right-col {
@@ -3230,7 +3278,7 @@ label[for="editDateInput"] {
     }
 
     .rd-col.right-col .rd-header {
-        grid-area: header;
+        grid-area: advanced-header;
     }
 
     .rd-col.right-col .rd-toggles {
@@ -3238,13 +3286,15 @@ label[for="editDateInput"] {
     }
 
     .rd-col.right-col .rd-search {
-        grid-area: search;
+        grid-row: 4;
+        grid-column: 1;
         width: 100%;
         margin-top: 6px;
     }
 
     .rd-col.right-col .rd-buttons-row {
-        grid-area: buttons;
+        grid-row: 5;
+        grid-column: 2;
         margin-top: 6px;
     }
 
