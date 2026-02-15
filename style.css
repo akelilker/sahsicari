@@ -3292,12 +3292,11 @@ label[for="editDateInput"] {
         display: grid;
         grid-template-areas:
             "filter-header  advanced-header"
-            "filter-start   ."
-            "filter-end     ."
-            "search         toggles"
+            "filter-start   toggles"
+            "filter-end     search"
             "buttons        buttons";
         grid-template-columns: 1fr 1fr;
-        grid-template-rows: auto auto auto auto auto;
+        grid-template-rows: auto auto auto auto;
         row-gap: 0;
         column-gap: 8px;
         align-items: flex-start;
