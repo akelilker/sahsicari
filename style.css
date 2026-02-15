@@ -3230,21 +3230,34 @@ label[for="editDateInput"] {
     .reports-dashboard {
         display: grid;
         grid-template-areas:
-            "filter header"
-            "filter toggles"
-            "search buttons";
+            "filter-header  advanced-header"
+            "filter-start   ."
+            "filter-end     ."
+            "search         toggles"
+            ".              buttons";
         grid-template-columns: 1fr 1fr;
-        grid-template-rows: auto auto auto;
+        grid-template-rows: auto auto auto auto auto;
         gap: 8px;
         align-items: flex-start;
     }
 
     .rd-col.left-col {
-        grid-area: filter;
-        justify-content: flex-start;
-        gap: 6px;
+        display: contents;
+    }
+
+    .rd-col.left-col .rd-header {
+        grid-area: filter-header;
         width: 100%;
-        max-width: none;
+    }
+
+    .rd-col.left-col .rd-date-group:nth-child(2) {
+        grid-area: filter-start;
+        width: 100%;
+    }
+
+    .rd-col.left-col .rd-date-group:nth-child(3) {
+        grid-area: filter-end;
+        width: 100%;
     }
 
     .rd-col.right-col {
@@ -3252,7 +3265,7 @@ label[for="editDateInput"] {
     }
 
     .rd-col.right-col .rd-header {
-        grid-area: header;
+        grid-area: advanced-header;
     }
 
     .rd-col.right-col .rd-toggles {
