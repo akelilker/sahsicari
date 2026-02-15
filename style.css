@@ -3128,6 +3128,35 @@ label[for="editDateInput"] {
         margin-bottom: 0;
     }
 
+    #categoryDetailContent {
+        padding-bottom: 70px;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    #categoryDetailModal .modal-body {
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .detail-table tbody td:last-child {
+        -webkit-line-clamp: 5;
+        line-clamp: 5;
+    }
+
+    .detail-table {
+        font-size: 10px;
+    }
+
+    .detail-table thead th {
+        font-size: 9px;
+    }
+
+    .detail-table tbody td {
+        padding: 5px 3px;
+        font-size: 10px;
+    }
+
     .quick-panel-content {
         position: relative;
         width: 100%;
