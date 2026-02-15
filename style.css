@@ -3023,6 +3023,10 @@ label[for="editDateInput"] {
         overflow-x: hidden !important;
     }
 
+    #personModal #reportPreviewList {
+        padding-bottom: 70px;
+    }
+
     #yeniIslem {
         padding-top: 22px;
     }
@@ -3253,16 +3257,16 @@ label[for="editDateInput"] {
     }
 
     .rd-col.right-col .rd-search {
-        grid-area: search;
+        grid-row: 4;
+        grid-column: 1;
         width: 100%;
         margin-top: 6px;
-        grid-column: unset;
     }
 
     .rd-col.right-col .rd-buttons-row {
-        grid-area: buttons;
+        grid-row: 5;
+        grid-column: 2;
         margin-top: 6px;
-        grid-column: unset;
     }
 
     .rd-col {
