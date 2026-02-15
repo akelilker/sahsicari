@@ -3478,6 +3478,13 @@ label[for="editDateInput"] {
     .quick-transaction-area {
         margin-bottom: 2px;
     }
+    /* Kişi modalı masaüstü boşluk düzenlemeleri */
+    #personModal .modal-header .header-top-row {
+        margin-bottom: 9px; /* MURAT başlığı ile Murat Borcu/Net Alacağınız arası 3px azaltıldı (12→9) */
+    }
+    #personModal .tab-buttons .tab-btn {
+        padding: 12px 8px 3px 8px; /* Sekme başlıkları ile yatay çizgi arası toplam 3px */
+    }
     /* Yeni İşlem: Tutar, Kategori, Açıklama inputları masaüstünde 2px daraltılmış */
     #yeniIslem .form-group input:not(.date-picker-simple):not(.transparent-date-input),
     #yeniIslem .form-group select {
