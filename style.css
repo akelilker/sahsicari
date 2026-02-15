@@ -3229,6 +3229,10 @@ label[for="editDateInput"] {
 
     .reports-dashboard {
         display: grid;
+        grid-template-areas:
+            "filter header"
+            "filter toggles"
+            "search buttons";
         grid-template-columns: 1fr 1fr;
         grid-template-rows: auto auto auto;
         gap: 8px;
@@ -3236,8 +3240,7 @@ label[for="editDateInput"] {
     }
 
     .rd-col.left-col {
-        grid-column: 1;
-        grid-row: 1;
+        grid-area: filter;
         justify-content: flex-start;
         gap: 6px;
         width: 100%;
@@ -3249,25 +3252,21 @@ label[for="editDateInput"] {
     }
 
     .rd-col.right-col .rd-header {
-        grid-column: 2;
-        grid-row: 1;
+        grid-area: header;
     }
 
     .rd-col.right-col .rd-toggles {
-        grid-column: 2;
-        grid-row: 2;
+        grid-area: toggles;
     }
 
     .rd-col.right-col .rd-search {
-        grid-column: 1;
-        grid-row: 2;
+        grid-area: search;
         width: 100%;
         margin-top: 6px;
     }
 
     .rd-col.right-col .rd-buttons-row {
-        grid-column: 2;
-        grid-row: 3;
+        grid-area: buttons;
         margin-top: 6px;
     }
 
