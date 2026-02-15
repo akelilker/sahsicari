@@ -337,7 +337,7 @@ body.ios-pwa .history-item .description {
     z-index: 2001;
     width: 100%;
     position: relative;
-    padding: 5px 0 1px 0;
+    padding: 5px 0 4px 0; /* dikeyde header çerçeve +3px */
 }
 
 .header h1 {
@@ -350,7 +350,7 @@ body.ios-pwa .history-item .description {
     border-radius: 12px;
     background: rgba(10, 16, 30, 0.92);
     box-shadow: none;
-    padding: 2px 0 10px 0;
+    padding: 2px 0 13px 0;
     position: relative;
     color: #ffffff;
     z-index: 2003;
@@ -417,7 +417,7 @@ body.ios-pwa .history-item .description {
     background: transparent;
     border: none;
     color: #b0bec5;
-    font-size: 20.5px;
+    font-size: 20px;
     cursor: pointer;
     opacity: 0.8;
     padding: 2px 0;
@@ -1277,23 +1277,28 @@ overflow: hidden;
 #addPersonModal,
 #personManagementModal,
 #categoryManagementModal,
-#guideModal,
-#generalStatusModal {
+#syncHelpModal,
+#generalStatusModal,
+#categoryDetailModal,
+#monthlySummaryModal,
+#editTransactionModal {
     justify-content: flex-start;
     align-items: center;
     padding-top: calc(var(--sa-top) + 10px);
-    padding-bottom: 45px;
+    padding-bottom: calc(40px + env(safe-area-inset-bottom) + 10px);
 }
 
 #addPersonModal .modal-content,
 #personManagementModal .modal-content,
 #categoryManagementModal .modal-content,
+#syncHelpModal .modal-content,
 #generalStatusModal .modal-content,
-#guideModal .modal-content,
-#syncHelpModal .modal-content {
-    height: calc(100vh - 100px);
-    max-height: calc(100vh - 100px);
-    width: 95%;
+#categoryDetailModal .modal-content,
+#monthlySummaryModal .modal-content,
+#editTransactionModal .modal-content {
+    height: 90vh;
+    max-height: 90vh;
+    width: 100%;
     max-width: 450px;
     margin: 0 auto;
     border-radius: 15px;
@@ -1302,13 +1307,6 @@ overflow: hidden;
 #categoryManagementModal .form-group label {
     margin-bottom: 10px;
     display: block;
-}
-
-#syncHelpModal {
-    justify-content: flex-start;
-    align-items: center;
-    padding-top: calc(var(--sa-top) + 10px);
-    padding-bottom: 45px;
 }
 
 #addPersonModal .modal-body {
@@ -1526,7 +1524,7 @@ select option {
 .transaction-type-buttons .type-btn {
     flex: 1;
     padding: 2px 0;
-    border: none;
+    border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 10px;
     font-size: 12.5px;
     font-weight: 700;
@@ -1549,8 +1547,8 @@ select option {
 }
 
 .type-btn.active.giden {
-    background: rgba(180, 40, 40, 0.75);
-    border: 1px solid rgba(180, 40, 40, 0.9);
+    background: rgba(255, 23, 68, 0.25);
+    border: 1px solid rgba(255, 23, 68, 0.8);
     text-shadow: 0 0 8px rgba(255, 23, 68, 0.4);
 }
 .type-btn.active.gelen {
@@ -1834,7 +1832,7 @@ select option {
 }
 
 .history-type.giden {
-    color: #e53935;
+    color: #ff1744;
     text-shadow: 0 0 8px rgba(255, 23, 68, 0.4);
 }
 
@@ -2432,6 +2430,13 @@ select option {
     right: 10px;
 }
 
+#quickOverlayContainer .close-overlay-btn {
+    background: rgba(255, 255, 255, 0.4);
+    color: #ffffff;
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
 .quick-search-wrapper {
     margin-bottom: 15px;
     position: relative;
@@ -2800,9 +2805,9 @@ label[for="editDateInput"] {
 
     .header h1 {
         font-size: 1.6em;
-        padding: 13px 0 19px 0;
+        padding: 15px 0 21px 0;
         margin-top: 8px;
-        min-height: 71px;
+        min-height: 75px;
         margin-bottom: 0;
         width: 100%;
         margin-left: auto;
@@ -2841,6 +2846,11 @@ label[for="editDateInput"] {
         padding-right: 8px;
     }
 
+    .quick-transaction-area {
+        margin-top: 2px;
+        margin-bottom: 2px;
+    }
+
    .total-summary {
         margin-top: 2px;
     }
@@ -2877,6 +2887,18 @@ label[for="editDateInput"] {
     }
 
     .person-total-info { gap: 4px !important; }
+
+    #personModal .category-item {
+        min-height: 73px;
+        height: 73px;
+        padding: 9px 7px;
+    }
+
+    .category-item .category-balance,
+    .category-item.negative-balance .category-balance,
+    .text-expense {
+        font-weight: 700;
+    }
 
     .debt-status-section {
         padding: 14px 12px;
@@ -2977,9 +2999,10 @@ label[for="editDateInput"] {
 
     .history-container {
         padding-top: 0;
-        padding-bottom: 0;
+        padding-bottom: 70px;
         margin-bottom: 0;
-        overflow: hidden !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
         max-height: none;
     }
 
@@ -2996,11 +3019,16 @@ label[for="editDateInput"] {
 
     #islemGecmisi .history-container {
         flex: 1;
-        overflow: hidden !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+    }
+
+    #personModal #reportPreviewList {
+        padding-bottom: 70px;
     }
 
     #yeniIslem {
-        padding-top: 25px;
+        padding-top: 22px;
     }
 
     #yeniIslem .form-group {
@@ -3009,6 +3037,14 @@ label[for="editDateInput"] {
     }
     #yeniIslem .form-group label {
         margin-bottom: 2px;
+    }
+    #personModal #yeniIslem .transaction-type-buttons .type-btn {
+        min-height: 26px;
+        padding: 5px 0;
+    }
+    #personModal #yeniIslem .form-group input:not(.date-picker-simple):not(.transparent-date-input),
+    #personModal #yeniIslem .form-group select {
+        height: 38px;
     }
 
     .date-row-transparent {
@@ -3092,6 +3128,35 @@ label[for="editDateInput"] {
         margin-bottom: 0;
     }
 
+    #categoryDetailContent {
+        padding-bottom: 70px;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    #categoryDetailModal .modal-body {
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .detail-table tbody td:last-child {
+        -webkit-line-clamp: 5;
+        line-clamp: 5;
+    }
+
+    .detail-table {
+        font-size: 10px;
+    }
+
+    .detail-table thead th {
+        font-size: 9px;
+    }
+
+    .detail-table tbody td {
+        padding: 5px 3px;
+        font-size: 10px;
+    }
+
     .quick-panel-content {
         position: relative;
         width: 100%;
@@ -3110,6 +3175,16 @@ label[for="editDateInput"] {
         border: 1px solid rgba(176, 190, 197, 0.6);
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
         border-radius: 16px;
+    }
+
+    #quickOverlayContainer .quick-search-wrapper {
+        margin: 0;
+        margin-bottom: 12px;
+    }
+
+    #quickOverlayContainer .search-box {
+        margin: 0;
+        padding: 0 12px;
     }
 
     .notification-icon-btn {
@@ -3166,17 +3241,65 @@ label[for="editDateInput"] {
     }
 
     .reports-dashboard {
-        flex-direction: row;
-        flex-wrap: nowrap;
+        display: grid;
+        grid-template-areas:
+            "filter-header  advanced-header"
+            "filter-start   ."
+            "filter-end     ."
+            "search         toggles"
+            ".              buttons";
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto auto auto auto;
         gap: 8px;
         align-items: flex-start;
     }
 
+    .rd-col.left-col {
+        display: contents;
+    }
+
+    .rd-col.left-col .rd-header {
+        grid-area: filter-header;
+        width: 100%;
+    }
+
+    .rd-col.left-col .rd-date-group:nth-child(2) {
+        grid-area: filter-start;
+        width: 100%;
+    }
+
+    .rd-col.left-col .rd-date-group:nth-child(3) {
+        grid-area: filter-end;
+        width: 100%;
+    }
+
+    .rd-col.right-col {
+        display: contents;
+    }
+
+    .rd-col.right-col .rd-header {
+        grid-area: advanced-header;
+    }
+
+    .rd-col.right-col .rd-toggles {
+        grid-area: toggles;
+    }
+
+    .rd-col.right-col .rd-search {
+        grid-row: 4;
+        grid-column: 1;
+        width: 100%;
+        margin-top: 6px;
+    }
+
+    .rd-col.right-col .rd-buttons-row {
+        grid-row: 5;
+        grid-column: 2;
+        margin-top: 6px;
+    }
+
     .rd-col {
-        width: 50%;
-        max-width: 50%;
         min-width: 0;
-        flex: 1;
     }
 
     .rd-header {
@@ -3240,11 +3363,6 @@ label[for="editDateInput"] {
         margin-bottom: 0;
         position: relative;
         min-height: 25px;
-    }
-
-    .rd-col.left-col {
-        justify-content: flex-start;
-        gap: 10px;
     }
 
     /* Rapor span - tarih görünür */
@@ -3442,8 +3560,38 @@ label[for="editDateInput"] {
     .header {
         background: rgba(12, 18, 32, 0.92);
     }
+    /* Ayarlar ve bildirim ikonları üst/alt boşluk 1er px azaltıldı */
+    .notification-icon-btn {
+        padding: 1px 0;
+    }
+    /* Ana başlık alanı iç dikey yükseklik +4px, yatay çizgi altına 3px boşluk */
+    .header h1 {
+        padding: 4px 0 18px 0;
+    }
+    /* Ayarlar/zil ile bilgi kutuları arası = üst çerçeve (5px) */
+    .total-summary {
+        margin-top: 5px;
+    }
     .quick-access-section {
         background: transparent;
+        margin-bottom: 3px; /* Favori kişiler ile Cari Kayıt arası 3px */
+    }
+    /* Kasa geçiş butonu altına 2px boşluk */
+    .quick-transaction-area {
+        margin-bottom: 2px;
+    }
+    /* Kişi modalı masaüstü boşluk düzenlemeleri */
+    #personModal .modal-header .header-top-row {
+        margin-bottom: 9px; /* MURAT başlığı ile Murat Borcu/Net Alacağınız arası 3px azaltıldı (12→9) */
+    }
+    #personModal .tab-buttons .tab-btn {
+        padding: 12px 8px 3px 8px; /* Sekme başlıkları ile yatay çizgi arası toplam 3px */
+    }
+    /* Yeni İşlem: Tutar, Kategori, Açıklama inputları masaüstünde 2px daraltılmış */
+    #yeniIslem .form-group input:not(.date-picker-simple):not(.transparent-date-input),
+    #yeniIslem .form-group select {
+        height: 31px;
+        padding: 2px 8px;
     }
     /* Veriler kutusu: aynı yeşil ton, sadece parlak */
     .control-panel {
@@ -3861,14 +4009,20 @@ label[for="editDateInput"] {
     /* Mobil menü boyutları */
     #settingsMenu {
         z-index: 2010;
-        width: 75vw;
+        width: 88%;
         max-width: calc(100vw - 20px);
     }
 
     #notificationMenu {
         z-index: 2010;
-        width: 80vw;
+        width: 88%;
         max-width: calc(100vw - 20px);
+    }
+
+    #settingsMenu .btn,
+    #notificationMenu .btn {
+        text-align: right;
+        justify-content: flex-end;
     }
 
     .rd-toggles {
@@ -4123,7 +4277,7 @@ input[type="date"]::-webkit-datetime-edit-year-field {
     }
 
     .tab-btn {
-        font-size: 13px;
+        font-size: 13.5px;
     }
 
     /* ========== YENİ İŞLEM TARİHİ ========== */

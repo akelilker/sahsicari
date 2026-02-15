@@ -22,14 +22,21 @@ const urlsToCache = [
     '/icons/favicon-32x32.png'
 ];
 
-// Install Event: Pre-cache critical assets
+// Install Event: Pre-cache critical assets (tek bir URL hatası tüm install'ı bozmasın)
 self.addEventListener('install', (event) => {
     DEBUG && console.log('[SW] Installing... v79.19');
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then((cache) => {
                 DEBUG && console.log('[SW] Pre-caching assets');
-                return cache.addAll(urlsToCache);
+                return Promise.allSettled(
+                    urlsToCache.map((url) =>
+                        cache.add(url).catch((err) => {
+                            if (DEBUG) console.warn('[SW] Cache skip:', url, err);
+                            return null;
+                        })
+                    )
+                );
             })
             .then(() => self.skipWaiting())
     );
