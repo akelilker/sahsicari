@@ -2811,6 +2811,8 @@ select option {
 }
 
 #personModal .modal-body{
+    display: flex;
+    flex-direction: column;
     overflow-y: hidden !important;
 }
 #personModal #raporlar{
