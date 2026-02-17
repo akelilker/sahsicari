@@ -1373,6 +1373,8 @@ overflow: hidden;
     height: 0;
     min-height: 0;
     flex: 1;
+    overscroll-behavior-y: contain;
+    -webkit-overscroll-behavior-y: contain;
 }
 .modal-body .tab-content[style*="display: block"] {
     display: flex !important;
@@ -1388,26 +1390,47 @@ overflow: hidden;
     overflow-x: hidden !important;
     padding-bottom: 0;
     flex-grow: 1;
+    overscroll-behavior-y: contain;
+    -webkit-overscroll-behavior-y: contain;
+    touch-action: pan-y;
 }
 
 /* Mobile-specific overflow handling for small viewports */
-@media (max-height: 700px) {
-    .history-container {
-        max-height: calc(100dvh - 250px);
+@media (max-height: 850px) {
+    .modal-body {
+        max-height: calc(100dvh - 160px);
     }
+}
 
+@media (max-height: 800px) {
+    .modal-body {
+        max-height: calc(100dvh - 155px);
+    }
+}
+
+@media (max-height: 750px) {
     .modal-body {
         max-height: calc(100dvh - 150px);
     }
 }
 
-@media (max-height: 600px) {
-    .history-container {
-        max-height: calc(100dvh - 220px);
+@media (max-height: 700px) {
+    .modal-body {
+        max-height: calc(100dvh - 140px);
     }
 
+    .history-container {
+        max-height: calc(100dvh - 240px);
+    }
+}
+
+@media (max-height: 600px) {
     .modal-body {
-        max-height: calc(100dvh - 130px);
+        max-height: calc(100dvh - 120px);
+    }
+
+    .history-container {
+        max-height: calc(100dvh - 210px);
     }
 }
 
@@ -2832,6 +2855,9 @@ select option {
     max-height: none;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+    -webkit-overscroll-behavior-y: contain;
+    touch-action: pan-y;
 }
 
 /* Rapor Özet Satırı (15 İşlem | ₺xxx Borç/Alacak) */
