@@ -1584,8 +1584,10 @@ async function processSingleTransaction() {
     
     const amount = deformatCurrency(DOM.amount?.value || '0');
     const category = DOM.category?.value || '';
+    const transType = DOM.transactionType?.value || '';
     if (amount === 0) return showNotification('Tutar giriniz!', 'error');
     if (!category) return showNotification('Kategori seçiniz!', 'error');
+    if (!transType) return showNotification('İşlem tipi seçiniz!', 'error');
 
     let desc = DOM.description?.value?.trim() || '';
     desc = formatTitleCase(desc); 
@@ -1597,7 +1599,6 @@ async function processSingleTransaction() {
     }
 
     try {
-        const transType = DOM.transactionType?.value || 'giden';
         addTransaction(currentPerson, transType, amount, category, desc);
         
         queueSave();
@@ -1735,6 +1736,7 @@ function clearTransactionForm() {
     if(DOM.amount) DOM.amount.value = '';
     if(DOM.description) DOM.description.value = '';
     if(DOM.category) DOM.category.value = '';
+    setTransactionType('');
     setCurrentDate();
 }
 
@@ -3623,7 +3625,7 @@ function selectQuickPersonFromOverlay(person) {
     populateCategorySelect(document.getElementById('quickCategory'), person);
     document.getElementById('quickAmount').value = '';
     document.getElementById('quickDescription').value = '';
-    setQuickTransactionType('giden');
+    setQuickTransactionType('');
 }
 
 function resetQuickPanel() {
@@ -3736,6 +3738,7 @@ async function processQuickTransaction() {
     if (!person) return showNotification('Kişi seçiniz!', 'error');
     if (amount === 0) return showNotification('Tutar giriniz!', 'error');
     if (!category) return showNotification('Kategori seçiniz!', 'error');
+    if (!type) return showNotification('İşlem tipi seçiniz!', 'error');
 
     let desc = document.getElementById('quickDescription').value.trim();
     desc = formatTitleCase(desc); 
