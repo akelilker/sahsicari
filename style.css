@@ -1370,8 +1370,8 @@ overflow: hidden;
 .modal-body .tab-content {
     display: flex;
     flex-direction: column;
-    height: 0;
-    min-height: 0;
+    height: auto;
+    min-height: min-content;
     flex: 1;
 }
 .modal-body .tab-content[style*="display: block"] {
@@ -2811,6 +2811,8 @@ select option {
 }
 
 #personModal .modal-body{
+    display: flex;
+    flex-direction: column;
     overflow-y: hidden !important;
 }
 #personModal #raporlar{
@@ -3433,16 +3435,6 @@ label[for="editDateInput"] {
         margin-bottom: 0;
         position: relative;
         min-height: 25px;
-    }
-
-    .rd-col.left-col {
-        justify-content: flex-start;
-        gap: 10px;
-    }
-
-    /* Mobil raporlar - padding sıfırlama */
-    #personModal #raporlar {
-        padding: 8px 2px 0;
     }
 
     /* Rapor span - tarih görünür */
