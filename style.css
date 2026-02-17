@@ -3442,7 +3442,7 @@ label[for="editDateInput"] {
         position: relative;
         left: 0;
         color: #90a4ae;
-        font-size: 14px;
+        font-size: 11px;
         font-weight: 600;
         display: inline-flex !important;
         align-items: center;
@@ -3733,7 +3733,7 @@ label[for="editDateInput"] {
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: -0.3px;
-    margin-bottom: 6px;
+    margin-bottom: 2px;
     padding-bottom: 0;
     border-bottom: none;
     display: block;
