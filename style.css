@@ -1371,8 +1371,9 @@ overflow: hidden;
 .modal-body .tab-content {
     display: flex;
     flex-direction: column;
-    height: 100%;
-    min-height: 100%;
+    height: auto;
+    min-height: min-content;
+    flex: 1;
 }
 .modal-body .tab-content[style*="display: block"] {
     display: flex !important;
@@ -1383,11 +1384,32 @@ overflow: hidden;
     display: flex;
     flex-direction: column;
     min-height: 0;
-    max-height: 450px;
+    max-height: calc(100dvh - 280px);
     overflow-y: auto !important;
     overflow-x: hidden !important;
     padding-bottom: 0;
     flex-grow: 1;
+}
+
+/* Mobile-specific overflow handling for small viewports */
+@media (max-height: 700px) {
+    .history-container {
+        max-height: calc(100dvh - 250px);
+    }
+
+    .modal-body {
+        max-height: calc(100dvh - 150px);
+    }
+}
+
+@media (max-height: 600px) {
+    .history-container {
+        max-height: calc(100dvh - 220px);
+    }
+
+    .modal-body {
+        max-height: calc(100dvh - 130px);
+    }
 }
 
 #transactionHistory h3,
