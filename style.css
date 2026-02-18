@@ -3315,50 +3315,56 @@ label[for="editDateInput"] {
 /* --- MOBİL LAYOUT --- */
 @media screen and (max-width: 768px) {
 
-    /* Mobilde col'lar alt alta */
     .reports-dashboard {
-        flex-direction: row;   /* yan yana kalmaya devam — ama içerik değişir */
-        align-items: stretch;
-        gap: 8px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px 8px;
+        align-items: start;
     }
 
-    /* Sol kolon: Filtreleme (başlık + 2 tarih) */
+    /* left-col sol grid kolonu — içindeki flex sütun */
     .rd-col.left-col {
-        flex: 1;
+        grid-column: 1;
+        grid-row: 1;
         display: flex;
         flex-direction: column;
         gap: 4px;
     }
 
-    /* Sağ kolon: 3 toggle ALT ALTA + search + butonlar */
+    /* right-col: display:contents → child'lar grid'e doğrudan katılır */
     .rd-col.right-col {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
+        display: contents;
     }
 
-    /* 3 toggle butonu ALT ALTA */
+    /* rd-header: sağ kolon 1. satır */
+    .rd-col.right-col .rd-header {
+        grid-column: 2;
+        grid-row: 1;
+        align-self: start;
+    }
+
+    /* rd-toggles: sağ kolon, header altında, birden fazla satır */
     .rd-col.right-col .rd-toggles {
+        grid-column: 2;
+        grid-row: 2;
         display: flex !important;
         flex-direction: column !important;
         gap: 6px;
         width: 100%;
-        margin-bottom: 0;
     }
 
-    /* Arama kutusu — sağ kolonda, toggles'ın altında */
+    /* rd-search: sol kolon 2. satır — bitiş tarihinin altında */
     .rd-col.right-col .rd-search {
+        grid-column: 1;
+        grid-row: 2;
         width: 100%;
         margin: 0;
-        order: 3; /* toggles sonrası */
     }
 
     .rd-toggle-btn {
         width: 100%;
         padding: 8px 0;
     }
-
 
 }
     .rd-date-input {
@@ -3688,16 +3694,25 @@ label[for="editDateInput"] {
     }
 
     /* === RAPORLAR DASHBOARD - MASAÜSTÜ LAYOUT === */
+    /* Masaüstünde col'lar normal flex item — display:contents override */
+    .rd-col.left-col {
+        display: flex;
+        flex-direction: column;
+    }
+    .rd-col.right-col {
+        display: flex;
+        flex-direction: column;
+    }
     .rd-col.right-col .rd-toggles {
         display: flex !important;
-        flex-direction: row !important; /* Masaüstü: 3 buton YAN YANA */
+        flex-direction: row !important; /* 3 buton YAN YANA */
         flex-wrap: nowrap;
         gap: 4px;
         margin-bottom: 4px;
     }
     .rd-col.right-col .rd-search {
         width: 100%;
-        margin-top: auto; /* search'ü alta it */
+        margin-top: auto;
     }
 }
 
