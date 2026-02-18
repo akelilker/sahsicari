@@ -2785,25 +2785,33 @@ select option {
     font-size: 0.95em;
 }
 
-/* === RAPORLAR DASHBOARD — GLOBAL TEMEL === */
+/* === RAPORLAR DASHBOARD — GLOBAL (MASAÜSTÜ) ===
+   Grid: 2 kolon. left-col sol, right-col sağ üstte, rd-search sağ altta */
 .reports-dashboard {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 10px;
-    align-items: flex-start;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    grid-template-areas:
+        "left  right"
+        "left  search";
+    gap: 6px 10px;
+    align-items: start;
     width: 100%;
 }
-.rd-col {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-}
+.rd-col.left-col  { grid-area: left;   display: flex; flex-direction: column; gap: 4px; }
+.rd-col.right-col { grid-area: right;  display: flex; flex-direction: column; gap: 6px; }
+.rd-search        { grid-area: search; }
+
 .rd-col.left-col .rd-header  { margin-bottom: 6px; }
 .rd-col.left-col .rd-date-group:nth-child(2) { margin-bottom: 2px; }
 
-/* Buton satırı: right-col'dan kopar, reports-dashboard'a tam genişlik satır olarak ekle */
+/* Masaüstü: rd-toggles yan yana */
+.rd-col.right-col .rd-toggles {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 4px;
+}
 #personModal .modal-body{
     display: flex;
     flex-direction: column;
@@ -3312,66 +3320,60 @@ label[for="editDateInput"] {
         width: 100%;
     }
 
-/* --- MOBİL LAYOUT --- */
-@media screen and (max-width: 768px) {
+    /* --- MOBİL RAPORLAR DASHBOARD --- */
 
+    /* Grid: 2 kolon. Sol=filtreleme, Sağ=gelişmiş toggles. Arama sol 2.satır */
     .reports-dashboard {
         display: grid;
         grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto;
+        grid-template-areas:
+            "left   right"
+            "search right";
         gap: 6px 8px;
         align-items: start;
     }
 
-    /* left-col: sol kolon, sadece 1. satır (header + 2 tarih) */
+    /* left-col: sol kolon (grid-area:left) */
     .rd-col.left-col {
-        grid-column: 1;
-        grid-row: 1;
+        grid-area: left;
         display: flex;
         flex-direction: column;
         gap: 4px;
     }
 
-    /* right-col: display:contents → child'lar grid'e doğrudan katılır */
+    /* right-col: sağ kolon (grid-area:right), toggles alt alta */
     .rd-col.right-col {
-        display: contents;
-    }
-
-    /* rd-header: sağ kolon 1. satır */
-    .rd-col.right-col .rd-header {
-        grid-column: 2;
-        grid-row: 1;
+        grid-area: right;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
         align-self: start;
     }
 
-    /* rd-toggles: sağ kolon 2. satır, alt alta */
+    /* rd-toggles: sağ kolonda alt alta */
     .rd-col.right-col .rd-toggles {
-        grid-column: 2;
-        grid-row: 2;
         display: flex !important;
         flex-direction: column !important;
         gap: 6px;
         width: 100%;
-        align-self: start;
     }
 
-    /* rd-search: sol kolon 2. satır — büyüteç ikonu görünür, input gizli */
-    .rd-col.right-col .rd-search {
-        grid-column: 1;
-        grid-row: 2;
+    /* rd-search: sol 2. satır (bitiş tarihinin altında) */
+    .rd-search {
+        grid-area: search;
         margin: 0;
         align-self: start;
-        /* Sadece ikon genişliği kadar, sola yasla */
         width: auto;
         display: flex;
         align-items: center;
         position: relative;
         overflow: hidden;
-        /* Geçiş animasyonu */
         transition: width 0.3s ease;
     }
 
-    /* Input normalde görünmez, genişlik 0 */
-    .rd-col.right-col .rd-search #reportSearchInput {
+    /* Input normalde görünmez */
+    .rd-search #reportSearchInput {
         width: 0;
         padding: 0;
         border: none;
@@ -3384,7 +3386,7 @@ label[for="editDateInput"] {
     }
 
     /* Büyüteç ikonu — çerçevesiz, arka plansız, sola yaslanmış */
-    .rd-col.right-col .rd-search .rd-search-icon {
+    .rd-search .rd-search-icon {
         position: relative;
         left: 0;
         font-size: 18px;
@@ -3395,15 +3397,15 @@ label[for="editDateInput"] {
         padding: 4px 2px;
     }
 
-    /* Tıklanınca (focus-within) input sağa doğru açılır */
-    .rd-col.right-col .rd-search:focus-within {
+    /* Tıklanınca sağa doğru açılır */
+    .rd-search:focus-within {
         width: 140px;
         background: rgba(255,255,255,0.05);
         border-radius: 8px;
         border: 1px solid rgba(255,255,255,0.2);
     }
 
-    .rd-col.right-col .rd-search:focus-within #reportSearchInput {
+    .rd-search:focus-within #reportSearchInput {
         width: 110px;
         padding: 0 8px 0 6px;
         opacity: 1;
@@ -3414,17 +3416,15 @@ label[for="editDateInput"] {
         font-size: 0.85em;
     }
 
-    /* 3 toggle butonu — büyüteçle aynı yükseklikte, daha uzun */
+    /* 3 toggle butonu — büyüteçle aynı yükseklikte */
     .rd-toggle-btn {
         width: 100%;
         padding: 0;
-        height: 32px;          /* büyüteç ile aynı yükseklik */
+        height: 32px;
         display: flex;
         align-items: center;
         justify-content: center;
     }
-
-}
     .rd-date-input {
         opacity: 0 !important;
         position: absolute;
