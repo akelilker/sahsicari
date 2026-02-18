@@ -2786,13 +2786,13 @@ select option {
 }
 
 .reports-dashboard {
-    display: grid;
-    grid-template-areas:
-        "filter-header  advanced-header"
-        "filter-start   toggles"
-        "filter-end     ."
-        "search         ."
-        "buttons        buttons";
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto auto auto; /* Satır sayısını 5'ten 4'e düşürdük */
+    row-gap: 0;
+    column-gap: 10px;
+    align-items: flex-start;
+    width: 100%;
+}
     grid-template-columns: 1fr 1fr;
     grid-template-rows: auto auto auto auto auto;
     row-gap: 0;
@@ -2800,6 +2800,7 @@ select option {
     align-items: flex-start;
     width: 100%;
 }
+
 .rd-col {
     min-width: 0;
     display: contents;
@@ -2817,10 +2818,13 @@ select option {
 .rd-col.left-col .rd-date-group:nth-child(3) {
     grid-area: filter-end;
 }
+/* style.css - Masaüstü Search Ayarı */
 .rd-col.right-col .rd-search {
     grid-area: search;
-    margin-top: 4px;
+    margin-top: 0; /* Masaüstünde boşluğa gerek yok, tarihle hizalı olsun */
     width: 100%;
+    align-self: end; /* <-- BU ÖNEMLİ: Kutuyu dibe iter, tarih inputu ile hizalar */
+    margin-bottom: 2px;
 }
 .rd-col.right-col .rd-header {
     grid-area: advanced-header;
@@ -2833,7 +2837,13 @@ select option {
     grid-area: buttons;
     grid-column: 1 / -1;
 }
-
+/* style.css - Mobil (@media max-width: 768px içi) */
+    .rd-col.right-col .rd-search {
+        grid-area: auto;
+        width: 100%;
+        margin-top: 4px;
+        align-self: auto; /* <-- BUNU EKLE: Mobilde masaüstü ayarını unut, normale dön */
+    }
 #personModal .modal-body{
     display: flex;
     flex-direction: column;
@@ -3341,19 +3351,21 @@ label[for="editDateInput"] {
         width: 100%;
     }
 
-    .reports-dashboard {
-        display: grid;
-        grid-template-areas:
-            "left  advanced-header"
-            "left  toggles"
-            "buttons buttons";
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: auto auto auto;
-        row-gap: 0;
-        column-gap: 8px;
-        align-items: flex-start;
-    }
-
+    /* style.css - Masaüstü Ana Ayar */
+.reports-dashboard {
+    display: grid;
+    grid-template-areas:
+        "filter-header  advanced-header"
+        "filter-start   toggles"
+        "filter-end     search"   /* <-- search burada sağa geldi */
+        "buttons        buttons";
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto auto auto;
+    row-gap: 0;
+    column-gap: 10px;
+    align-items: flex-start;
+    width: 100%;
+}
     .rd-col.left-col {
         display: flex;
         flex-direction: column;
