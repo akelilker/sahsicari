@@ -2817,9 +2817,10 @@ select option {
 .rd-col.left-col .rd-date-group:nth-child(3) {
     grid-area: filter-end;
 }
-.rd-col.left-col .rd-search {
+.rd-col.right-col .rd-search {
     grid-area: search;
     margin-top: 4px;
+    width: 100%;
 }
 .rd-col.right-col .rd-header {
     grid-area: advanced-header;
@@ -3386,7 +3387,8 @@ label[for="editDateInput"] {
         margin-bottom: 4px;
     }
 
-    .rd-col.left-col .rd-search {
+    .rd-col.right-col .rd-search {
+        grid-area: auto;
         width: 100%;
         margin-top: 4px;
     }
