@@ -3346,9 +3346,10 @@ label[for="editDateInput"] {
         grid-template-areas:
             "left  advanced-header"
             "left  toggles"
+            "left  search"
             "buttons buttons";
         grid-template-columns: 1fr 1fr;
-        grid-template-rows: auto auto auto;
+        grid-template-rows: auto auto auto auto;
         row-gap: 0;
         column-gap: 8px;
         align-items: flex-start;
@@ -3388,7 +3389,7 @@ label[for="editDateInput"] {
     }
 
     .rd-col.right-col .rd-search {
-        grid-area: auto;
+        grid-area: search;
         width: 100%;
         margin-top: 4px;
     }
