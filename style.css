@@ -2839,10 +2839,10 @@ select option {
 }
 /* style.css - Mobil (@media max-width: 768px içi) */
     .rd-col.right-col .rd-search {
-        grid-area: auto;
+        grid-area: search;
         width: 100%;
         margin-top: 4px;
-        align-self: auto; /* <-- BUNU EKLE: Mobilde masaüstü ayarını unut, normale dön */
+        align-self: auto;
     }
 #personModal .modal-body{
     display: flex;
@@ -3366,67 +3366,71 @@ label[for="editDateInput"] {
     align-items: flex-start;
     width: 100%;
 }
-    .rd-col.left-col {
-        display: flex;
-        flex-direction: column;
-        grid-area: left;
-    }
 
-    .rd-col.left-col .rd-header {
+/* --- MOBİL UI REFACTORING --- */
+@media screen and (max-width: 768px) {
+
+    /* Col wrapper'ları display:contents yap — içerik doğrudan grid'e katılsın */
+    .rd-col.left-col  { display: contents; }
+    .rd-col.right-col { display: contents; }
+
+    /* 1. Layout Container Düzeltmesi */
+    .reports-dashboard {
+        display: grid;
         width: 100%;
-        margin-bottom: 6px;
+        align-items: center;
+        row-gap: 5px;
+        column-gap: 10px;
+
+        /* Yeni Grid Haritası: Sağ taraf dikey blok, sol taraf inputlar */
+        grid-template-areas:
+            "filter-header  advanced-header"
+            "filter-start   toggles"    /* Sol: Başlangıç | Sağ: Butonlar */
+            "filter-end     toggles"    /* Sol: Bitiş     | Sağ: Butonlar (Devam) */
+            "search         toggles"    /* Sol: Arama     | Sağ: Butonlar (Bitiş) */
+            "buttons        buttons";   /* Alt: Aksiyon Butonları */
+
+        grid-template-columns: 1fr 1fr; /* Ekranı tam ortadan ikiye böl */
+        grid-template-rows: auto auto auto auto auto;
     }
 
-    .rd-col.left-col .rd-date-group:nth-child(2) {
-        width: 100%;
-        margin-bottom: 4px;
-    }
-
-    .rd-col.left-col .rd-date-group:nth-child(3) {
-        width: 100%;
-    }
-
-    .rd-col.right-col {
-        display: contents;
-    }
-
-    .rd-col.right-col .rd-header {
-        grid-area: advanced-header;
-    }
-
+    /* 2. Filtre Butonları (Sağ Kolon) */
     .rd-col.right-col .rd-toggles {
         grid-area: toggles;
-        margin-bottom: 4px;
+        display: flex !important;
+        flex-direction: column !important; /* Butonları alt alta diz */
+        gap: 8px;
+        height: 100%;                      /* Ayrılan dikey alanı tam doldur */
+        justify-content: center;
+        margin-bottom: 0;
     }
 
-    .rd-col.right-col .rd-search {
-        grid-area: auto;
+    .rd-toggle-btn {
         width: 100%;
-        margin-top: 4px;
+        padding: 8px 0; /* Dokunmatik hedef alanını büyüt */
     }
+
+    /* 3. Arama Kutusu (Sol Kolon En Alt) */
+    .rd-col.right-col .rd-search {
+        grid-area: search; /* Haritada sol alt köşeye otur */
+        width: 100%;
+        margin: 0;
+    }
+
+    /* 4. Grid Area Tanımlamaları (Mapping) */
+    .rd-col.left-col .rd-header { grid-area: filter-header; margin-bottom: 4px; }
+    .rd-col.left-col .rd-date-group:nth-child(2) { grid-area: filter-start; margin-bottom: 2px; }
+    .rd-col.left-col .rd-date-group:nth-child(3) { grid-area: filter-end; }
+    .rd-col.right-col .rd-header { grid-area: advanced-header; }
 
     .rd-col.right-col .rd-buttons-row {
         grid-area: buttons;
-        margin-top: 6px;
+        margin-top: 8px;
+        display: flex;
+        gap: 8px;
     }
 
-    .rd-col {
-        min-width: 0;
-    }
-
-    .rd-header {
-        font-size: 0.85em;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        text-align: center;
-    }
-
-    .rd-col.left-col .rd-header {
-        text-align: center;
-        width: 100%;
-    }
-
+}
     .rd-date-input {
         opacity: 0 !important;
         position: absolute;
@@ -3752,6 +3756,48 @@ label[for="editDateInput"] {
     .allocation-item-header {
         margin-bottom: 2px;
     }
+
+    /* === RAPORLAR DASHBOARD - MASAÜSTÜ LAYOUT === */
+    .rd-col {
+        min-width: 0;
+    }
+    .rd-col.left-col {
+        display: contents;
+    }
+    .rd-col.left-col .rd-header {
+        text-align: center;
+        width: 100%;
+        margin-bottom: 6px;
+    }
+    .rd-col.left-col .rd-date-group:nth-child(2) {
+        width: 100%;
+        margin-bottom: 4px;
+    }
+    .rd-col.left-col .rd-date-group:nth-child(3) {
+        width: 100%;
+    }
+    .rd-col.right-col {
+        display: contents;
+    }
+    .rd-col.right-col .rd-header {
+        grid-area: advanced-header;
+    }
+    .rd-col.right-col .rd-toggles {
+        grid-area: toggles;
+        display: flex !important;
+        flex-direction: row !important; /* Masaüstü: 3 buton YAN YANA */
+        margin-bottom: 4px;
+    }
+    .rd-col.right-col .rd-search {
+        grid-area: search;
+        width: 100%;
+        align-self: end;
+        margin-bottom: 2px;
+    }
+    .rd-col.right-col .rd-buttons-row {
+        grid-area: buttons;
+        margin-top: 6px;
+    }
 }
 
 #allocationOverlay .btn-success {
@@ -3844,6 +3890,7 @@ label[for="editDateInput"] {
 
 .rd-toggles {
     display: flex;
+    flex-direction: row; /* Masaüstü: 3 buton yan yana */
     background: rgba(0, 0, 0, 0.2);
     border-radius: 8px;
     padding: 2px;
