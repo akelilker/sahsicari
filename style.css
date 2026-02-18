@@ -3354,18 +3354,74 @@ label[for="editDateInput"] {
         align-self: start;
     }
 
-    /* rd-search: sol kolon — left-col'un en altında (flex order ile) */
+    /* rd-search: sol kolon 2. satır — büyüteç ikonu görünür, input gizli */
     .rd-col.right-col .rd-search {
         grid-column: 1;
         grid-row: 2;
-        width: 100%;
         margin: 0;
-        align-self: end;
+        align-self: start;
+        /* Sadece ikon genişliği kadar, sola yasla */
+        width: auto;
+        display: flex;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+        /* Geçiş animasyonu */
+        transition: width 0.3s ease;
     }
 
+    /* Input normalde görünmez, genişlik 0 */
+    .rd-col.right-col .rd-search #reportSearchInput {
+        width: 0;
+        padding: 0;
+        border: none;
+        background: transparent;
+        opacity: 0;
+        pointer-events: none;
+        transition: width 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
+        height: 32px;
+        white-space: nowrap;
+    }
+
+    /* Büyüteç ikonu — çerçevesiz, arka plansız, sola yaslanmış */
+    .rd-col.right-col .rd-search .rd-search-icon {
+        position: relative;
+        left: 0;
+        font-size: 18px;
+        opacity: 0.8;
+        cursor: pointer;
+        flex-shrink: 0;
+        z-index: 1;
+        padding: 4px 2px;
+    }
+
+    /* Tıklanınca (focus-within) input sağa doğru açılır */
+    .rd-col.right-col .rd-search:focus-within {
+        width: 140px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 8px;
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .rd-col.right-col .rd-search:focus-within #reportSearchInput {
+        width: 110px;
+        padding: 0 8px 0 6px;
+        opacity: 1;
+        pointer-events: auto;
+        border: none;
+        background: transparent;
+        color: #fff;
+        font-size: 0.85em;
+    }
+
+    /* 3 toggle butonu — büyüteçle aynı yükseklikte, daha uzun */
     .rd-toggle-btn {
         width: 100%;
-        padding: 8px 0;
+        padding: 0;
+        height: 32px;          /* büyüteç ile aynı yükseklik */
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
 }
@@ -4142,10 +4198,12 @@ label[for="editDateInput"] {
 
     #reportSearchInput{
         border: none;
-        background: rgba(255,255,255,.05);
-        height: 34px;
-        padding: 0 10px 0 35px;
-        line-height: 34px;
+        background: transparent;
+        height: 32px;
+        padding: 0;
+        line-height: 32px;
+        width: 0;
+        opacity: 0;
     }
     .rd-search-icon{
         font-size: 14px;
