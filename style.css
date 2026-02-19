@@ -3329,13 +3329,12 @@ label[for="editDateInput"] {
 
     /* --- MOBİL RAPORLAR DASHBOARD --- */
 
-    /* Sol: başlık+tarihler, Sağ: başlık+toggles (2 satıra span), Alt: arama */
+    /* Sol: başlık+tarihler, Sağ: başlık+toggles+arama */
     .reports-dashboard {
         grid-template-areas:
             "title-filter  title-adv"
             "date-start    toggles"
-            "date-end      toggles"
-            "search        search";
+            "date-end      search";
         gap: 6px 8px;
     }
 
@@ -3346,40 +3345,38 @@ label[for="editDateInput"] {
         align-self: stretch;
     }
 
-    /* Mobil: arama — büyüteç ikonu, tıklanınca açılır */
+    /* Mobil: arama — sağ sütunda, toggles altında, tam genişlik */
     .area-search {
-        width: auto;
+        width: 100%;
         align-self: start;
-        justify-self: start;
+        justify-self: stretch;
         overflow: hidden;
-        transition: width 0.3s ease;
     }
 
     /* rd-search: mobilde büyüteç stili */
     .rd-search {
         margin: 0;
-        width: auto;
+        width: 100%;
         display: flex;
         align-items: center;
         position: relative;
         overflow: hidden;
-        transition: width 0.3s ease;
+        transition: none;
     }
 
-    /* Input normalde görünmez */
+    /* Input her zaman görünür — sağ kolonu doldurur */
     .rd-search #reportSearchInput {
-        width: 0;
-        padding: 0;
-        border: none;
-        background: transparent;
-        opacity: 0;
-        pointer-events: none;
-        transition: width 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
+        flex: 1;
+        width: 100%;
+        padding: 0 8px 0 6px;
+        opacity: 1;
+        pointer-events: auto;
+        transition: none;
         height: 32px;
         white-space: nowrap;
     }
 
-    /* Büyüteç ikonu — çerçevesiz, arka plansız, sola yaslanmış */
+    /* Büyüteç ikonu */
     .rd-search .rd-search-icon {
         position: relative;
         left: 0;
@@ -3391,16 +3388,15 @@ label[for="editDateInput"] {
         padding: 4px 2px;
     }
 
-    /* Tıklanınca sağa doğru açılır */
+    /* focus durumu — hafif vurgu */
     .rd-search:focus-within {
-        width: 140px;
         background: rgba(255,255,255,0.05);
         border-radius: 8px;
         border: 1px solid rgba(255,255,255,0.2);
     }
 
     .rd-search:focus-within #reportSearchInput {
-        width: 110px;
+        width: 100%;
         padding: 0 8px 0 6px;
         opacity: 1;
         pointer-events: auto;
