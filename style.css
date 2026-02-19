@@ -3334,18 +3334,19 @@ label[for="editDateInput"] {
         grid-template-areas:
             "title-filter  title-adv"
             "date-start    toggles"
-            "date-end      search";
+            "date-end      toggles"
+            ".             search";
         gap: 6px 8px;
     }
 
-    /* Mobil: toggles dikey */
+    /* Mobil: toggles dikey, 2 satıra span */
     .area-toggles {
         flex-direction: column !important;
-        gap: 6px;
+        gap: 4px;
         align-self: stretch;
     }
 
-    /* Mobil: arama — sağ sütunda, toggles altında, tam genişlik */
+    /* Mobil: arama — sağ sütunda, toggles altında */
     .area-search {
         width: 100%;
         align-self: start;
