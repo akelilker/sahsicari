@@ -3364,46 +3364,26 @@ label[for="editDateInput"] {
         transition: none;
     }
 
-    /* Input her zaman görünür — sağ kolonu doldurur */
+    /* Input — global stili koru, sadece yüksekliği küçült */
     .rd-search #reportSearchInput {
         flex: 1;
         width: 100%;
-        padding: 0 8px 0 6px;
+        padding: 4px 8px 4px 28px;
         opacity: 1;
         pointer-events: auto;
         transition: none;
-        height: 32px;
-        white-space: nowrap;
+        height: 30px;
+        font-size: 0.82em;
     }
 
-    /* Büyüteç ikonu */
+    /* Büyüteç ikonu — absolute, input'un içinde solda */
     .rd-search .rd-search-icon {
-        position: relative;
-        left: 0;
-        font-size: 18px;
+        position: absolute;
+        left: 8px;
+        font-size: 14px;
         opacity: 0.8;
         cursor: pointer;
-        flex-shrink: 0;
         z-index: 1;
-        padding: 4px 2px;
-    }
-
-    /* focus durumu — hafif vurgu */
-    .rd-search:focus-within {
-        background: rgba(255,255,255,0.05);
-        border-radius: 8px;
-        border: 1px solid rgba(255,255,255,0.2);
-    }
-
-    .rd-search:focus-within #reportSearchInput {
-        width: 100%;
-        padding: 0 8px 0 6px;
-        opacity: 1;
-        pointer-events: auto;
-        border: none;
-        background: transparent;
-        color: #fff;
-        font-size: 0.85em;
     }
 
     /* 3 toggle butonu — büyüteçle aynı yükseklikte */
