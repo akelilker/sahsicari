@@ -3329,24 +3329,24 @@ label[for="editDateInput"] {
 
     /* --- MOBİL RAPORLAR DASHBOARD --- */
 
-    /* Sol: başlık+tarihler, Sağ: başlık+toggles+arama */
+    /* Sol: tarihler, Sağ: toggles, Alt: arama tam genişlik */
     .reports-dashboard {
         grid-template-areas:
             "title-filter  title-adv"
             "date-start    toggles"
             "date-end      toggles"
-            ".             search";
+            "search        search";
         gap: 6px 8px;
     }
 
-    /* Mobil: toggles dikey, 2 satıra span */
+    /* Mobil: toggles dikey */
     .area-toggles {
         flex-direction: column !important;
         gap: 4px;
         align-self: stretch;
     }
 
-    /* Mobil: arama — sağ sütunda, toggles altında */
+    /* Mobil: arama — tam genişlik, en altta */
     .area-search {
         width: 100%;
         align-self: start;
