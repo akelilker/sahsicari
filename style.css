@@ -3082,7 +3082,7 @@ label[for="editDateInput"] {
 
     .history-container {
         padding-top: 0;
-        padding-bottom: calc(var(--footer-h) + 40px);
+        padding-bottom: 12px;
         margin-bottom: 0;
         overflow-y: auto !important;
         overflow-x: hidden !important;
