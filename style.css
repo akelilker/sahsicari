@@ -2794,7 +2794,7 @@ select option {
         "title-filter  title-adv"
         "date-start    toggles"
         "date-end      search";
-    gap: 6px 10px;
+    gap: 2px 10px;
     align-items: start;
     width: 100%;
 }
@@ -2802,8 +2802,8 @@ select option {
 /* Grid alan atamaları */
 .area-title-filter { grid-area: title-filter; }
 .area-title-adv    { grid-area: title-adv; }
-.area-date-start   { grid-area: date-start; margin-top: -2px; }
-.area-date-end     { grid-area: date-end;   margin-top: 2px; }
+.area-date-start   { grid-area: date-start; }
+.area-date-end     { grid-area: date-end; }
 .area-toggles      { grid-area: toggles; }
 .area-search       { grid-area: search; }
 
@@ -3803,7 +3803,7 @@ label[for="editDateInput"] {
     border: none;
     border-radius: 0;
     padding: 2px 30px 2px 0;
-    color: #90a4ae;
+    color: #cfd8dc;
     font-family: 'Segoe UI', sans-serif;
     font-size: 0.8em;
     font-weight: 620;
@@ -4314,7 +4314,7 @@ input[type="date"]::-webkit-datetime-edit-year-field {
 .transparent-date-input,
 #editDateInput,
 .rd-date-input {
-    color: #e0e0e0;
+    color: #cfd8dc;
 }
 
 /* Masaüstünde span'lar gizli */
@@ -4554,10 +4554,8 @@ input[type="date"]::-webkit-datetime-edit-year-field {
   .mgmt-btn:hover,
   .transparent-date-input:hover,
   #editDateInput:hover,
-  .rd-date-input:hover,
   .date-picker-simple:hover,
   .rd-toggle-btn:hover,
-  .rd-btn:hover,
   .allocation-clear-btn:hover,
   .neon-btn:hover,
   .neon-btn-off:hover {
@@ -4565,6 +4563,22 @@ input[type="date"]::-webkit-datetime-edit-year-field {
     filter: brightness(1.08);
     cursor: pointer;
   }
+
+  /* Tarih input hover — titreşme yok, sadece renk parlar */
+  .rd-date-input:hover {
+    color: #fff;
+    cursor: pointer;
+  }
+
+  /* Aylık Rapor / Excel hover — çerçeve kalınlaşır, metin kalınlaşır */
+  .rd-btn:hover {
+    border-width: 2px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+  }
+  .rd-btn.orange-line:hover { color: #ffcc80; }
+  .rd-btn.green-line:hover  { color: #69f0ae; }
 
   .close-overlay-btn:hover {
     transform: translateY(-50%) scale(1.03);
