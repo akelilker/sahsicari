@@ -3194,6 +3194,8 @@ label[for="editDateInput"] {
 
     .rd-buttons-row {
         flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: stretch;
         justify-content: center;
         gap: 8px;
         margin-top: 4px;
@@ -3201,6 +3203,7 @@ label[for="editDateInput"] {
 
     .rd-buttons-row .rd-btn {
         flex: 1;
+        min-width: 0;
         font-size: 0.85em;
         padding: 1px 5px;
     }
@@ -3329,13 +3332,13 @@ label[for="editDateInput"] {
 
     /* --- MOBİL RAPORLAR DASHBOARD --- */
 
-    /* Sol: başlık+tarihler, Sağ: başlık+toggles+arama */
+    /* Sol: başlık+başlangıç+bitiş+arama, Sağ: başlık+toggles */
     .reports-dashboard {
         grid-template-areas:
             "title-filter  title-adv"
             "date-start    toggles"
             "date-end      toggles"
-            ".             search";
+            "search        .";
         gap: 6px 8px;
     }
 
@@ -3346,7 +3349,7 @@ label[for="editDateInput"] {
         align-self: stretch;
     }
 
-    /* Mobil: arama — sağ sütunda, toggles altında */
+    /* Mobil: arama — sol sütunda, tarihlerin altında */
     .area-search {
         width: 100%;
         align-self: start;
