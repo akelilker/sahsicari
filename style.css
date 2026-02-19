@@ -3332,23 +3332,26 @@ label[for="editDateInput"] {
 
     /* --- MOBİL RAPORLAR DASHBOARD --- */
 
+    /* Sol: tarihler, Sağ: toggles, Alt: arama tam genişlik */
     /* Sol: başlık+başlangıç+bitiş+arama, Sağ: başlık+toggles */
     .reports-dashboard {
         grid-template-areas:
             "title-filter  title-adv"
             "date-start    toggles"
             "date-end      toggles"
+            "search        search";
             "search        .";
         gap: 6px 8px;
     }
 
-    /* Mobil: toggles dikey, 2 satıra span */
+    /* Mobil: toggles dikey */
     .area-toggles {
         flex-direction: column !important;
         gap: 4px;
         align-self: stretch;
     }
 
+    /* Mobil: arama — tam genişlik, en altta */
     /* Mobil: arama — sol sütunda, tarihlerin altında */
     .area-search {
         width: 100%;
@@ -3380,14 +3383,17 @@ label[for="editDateInput"] {
         font-size: 0.82em;
     }
 
-    /* Büyüteç ikonu — absolute, input'un içinde solda */
+    /* Büyüteç ikonu — absolute, input içinde dikey ortalı */
     .rd-search .rd-search-icon {
         position: absolute;
         left: 8px;
+        top: 50%;
+        transform: translateY(-50%);
         font-size: 14px;
         opacity: 0.8;
         cursor: pointer;
         z-index: 1;
+        line-height: 1;
     }
 
     /* 3 toggle butonu — büyüteçle aynı yükseklikte */
