@@ -1761,33 +1761,36 @@ select option {
     z-index: 6;
 }
 
+.recalc-icon-row {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    min-height: 28px;
+    margin-bottom: 2px;
+    padding: 0 2px;
+}
 .recalc-balance-icon {
-    margin-left: auto;
-    flex: 0 0 auto;
-    width: 36px;
-    height: 36px;
-    min-width: 36px;
-    min-height: 36px;
-    border-radius: 50%;
-    border: 1px solid rgba(255,255,255,0.2);
-    background: rgba(98, 0, 234, 0.25);
-    color: #cfd8dc;
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    min-height: 24px;
+    border: none;
+    background: none;
+    color: rgba(207, 216, 220, 0.6);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.1rem;
     padding: 0;
-    transition: background 0.2s, color 0.2s;
+    transition: color 0.2s;
 }
 .recalc-balance-icon:hover {
-    background: rgba(98, 0, 234, 0.5);
-    color: #fff;
+    color: #cfd8dc;
 }
 .recalc-balance-icon::before {
     content: "↻";
     display: inline-block;
-    font-size: 1.4em;
+    font-size: 1.1rem;
     line-height: 1;
 }
 .recalc-balance-icon:hover::before {
