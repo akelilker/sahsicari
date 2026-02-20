@@ -501,6 +501,7 @@ function recalculateAllBalancesFromTransactions() {
     if (currentPerson) updateDisplays(currentPerson);
     showNotification('Bakiyeler işlemlerden yeniden hesaplandı.', 'success');
 }
+window.recalculateAllBalancesFromTransactions = recalculateAllBalancesFromTransactions;
 
 function updateMainDisplay() {
     let totalRec = 0, totalPay = 0;
