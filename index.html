@@ -231,11 +231,11 @@
             
         </div> <div class="modal-body">
             <div class="tab-content" id="yeniIslem" style="display: block;">
-                <div class="recalc-icon-row">
-                    <button type="button" class="recalc-balance-icon" onclick="recalculateAllBalancesFromTransactions()" title="Bakiyeleri yeniden hesapla" aria-label="Bakiyeleri yeniden hesapla"></button>
-                </div>
                 <div class="form-group">
-                    <label>İşlem Tipi</label>
+                    <div class="transaction-type-header">
+                        <label>İşlem Tipi</label>
+                        <button type="button" class="recalc-balance-icon" onclick="recalculateAllBalancesFromTransactions()" title="Bakiyeleri yeniden hesapla" aria-label="Bakiyeleri yeniden hesapla"></button>
+                    </div>
                     <div class="transaction-type-buttons">
                         <button class="type-btn giden" id="gidenBtn" onclick="setTransactionType('giden')" type="button">Giden TL</button>
                         <button class="type-btn gelen" id="gelenBtn" onclick="setTransactionType('gelen')" type="button">Gelen TL</button>

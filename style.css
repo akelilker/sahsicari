@@ -1761,13 +1761,14 @@ select option {
     z-index: 6;
 }
 
-.recalc-icon-row {
+.transaction-type-header {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     align-items: center;
-    min-height: 28px;
-    margin-bottom: 2px;
-    padding: 0 2px;
+    margin-bottom: 6px;
+}
+.transaction-type-header label {
+    margin-bottom: 0;
 }
 .recalc-balance-icon {
     width: 24px;
