@@ -446,6 +446,10 @@ function migrateOldDataSafely() {
                     changed = true;
                 }
             });
+            if (allData[person].categoryBalances[''] !== undefined) {
+                delete allData[person].categoryBalances[''];
+                changed = true;
+            }
         });
         if (changed) queueSave();
     } catch (error) { console.error('Migrasyon hatası:', error); }
@@ -478,6 +482,8 @@ function calculateAllBalances(person) {
             }
         });
     });
+    // Boş kategori ( "") bakiyesini kaldır – hayalet bakiye buradan kaynaklanıyordu
+    if (allData[person].categoryBalances[''] !== undefined) delete allData[person].categoryBalances[''];
     updateDisplays(person);
 }
 
@@ -1736,7 +1742,8 @@ async function processSingleTransaction() {
 }
 
 function addTransaction(person, type, amount, category, description, date = null) {
-    amount = Math.abs(amount); 
+    amount = Math.abs(amount);
+    const cat = (category != null && String(category).trim()) ? String(category).trim() : 'Genel';
     const txDate = date ? date : (transactionDateHolder || getLocalTimeISO());
     const d = new Date(txDate);
     const year = d.getFullYear().toString();
@@ -1747,7 +1754,7 @@ function addTransaction(person, type, amount, category, description, date = null
 
     allData[person][year][month].transactions.push({
         id: Date.now() + Math.random() * 1000,
-        amount, description, category, type, date: txDate, status: 'active'
+        amount, description, category: cat, type, date: txDate, status: 'active'
     });
     calculateAllBalances(person);
 }
