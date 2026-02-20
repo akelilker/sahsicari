@@ -503,6 +503,79 @@ function recalculateAllBalancesFromTransactions() {
 }
 window.recalculateAllBalancesFromTransactions = recalculateAllBalancesFromTransactions;
 
+/** Belirli bir tutarın (örn. 250000) hangi kişi/kategoride olduğunu ve kaç işlemden geldiğini bulur. */
+function findBalanceSource(targetAmount) {
+    if (targetAmount == null || targetAmount === '') targetAmount = 250000;
+    const num = parseFloat(String(targetAmount).replace(/\s/g, '').replace(',', '.')) || 250000;
+    const tolerance = 1;
+    const lines = [];
+    const found = [];
+
+    Object.keys(allData).forEach(person => {
+        if (person === 'metadata') return;
+        const bals = allData[person].categoryBalances || {};
+        Object.keys(bals).forEach(cat => {
+            const balance = Number(bals[cat]) || 0;
+            if (Math.abs(balance - num) > tolerance) return;
+            const txs = getAllTransactionsForPerson(person);
+            const catTxs = txs.filter(t => t.category === cat);
+            const sumGiden = catTxs.filter(t => t.type === 'giden').reduce((s, t) => s + (Number(t.amount) || 0), 0);
+            const sumGelen = catTxs.filter(t => t.type === 'gelen').reduce((s, t) => s + (Number(t.amount) || 0), 0);
+            const calcBalance = sumGiden - sumGelen;
+            found.push({ person, cat, balance, count: catTxs.length, sumGiden, sumGelen, calcBalance, catTxs });
+        });
+    });
+
+    found.forEach(f => {
+        lines.push(`${f.person} → "${f.cat}": bakiye ${formatAmount(f.balance)}, ${f.count} işlem (giden: ${formatAmount(f.sumGiden)}, gelen: ${formatAmount(f.sumGelen)}). Hesaplanan: ${formatAmount(f.calcBalance)}`);
+        if (f.count === 0 && Math.abs(f.balance) > 0.01) {
+            const anyMatch = getAllTransactionsForPerson(f.person).filter(t => Math.abs((Number(t.amount) || 0) - num) < 1);
+            if (anyMatch.length) lines.push(`  ⚠️ Bu kategoride işlem yok ama ${f.person} kişisinde ${formatAmount(num)} tutarlı ${anyMatch.length} işlem var. Kategorileri: ${[...new Set(anyMatch.map(t => t.category))].join(', ')}`);
+        }
+    });
+
+    if (lines.length === 0) {
+        lines.push('Bu tutarda bakiye bulunamadı. Tüm borçlu (pozitif) bakiyeler:');
+        Object.keys(allData).forEach(person => {
+            if (person === 'metadata') return;
+            const bals = allData[person].categoryBalances || {};
+            Object.keys(bals).forEach(cat => {
+                const b = Number(bals[cat]) || 0;
+                if (b > 0.01) {
+                    const txs = getAllTransactionsForPerson(person).filter(t => t.category === cat);
+                    lines.push(`${person} → "${cat}": ${formatAmount(b)} (${txs.length} işlem)`);
+                }
+            });
+        });
+    }
+
+    const msg = lines.join('\n');
+    const modal = document.getElementById('balanceSourceModal');
+    if (modal) {
+        const body = document.getElementById('balanceSourceModalBody');
+        if (body) body.textContent = msg;
+        modal.style.display = 'block';
+        if (typeof closeAllMenus === 'function') closeAllMenus();
+        return;
+    }
+    const div = document.createElement('div');
+    div.id = 'balanceSourceModal';
+    div.className = 'modal';
+    div.style.cssText = 'display:block; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; overflow:auto;';
+    div.innerHTML = `
+        <div style="max-width:90%; margin:20px auto; background:#1e2a38; padding:20px; border-radius:12px; white-space:pre-wrap; font-family:monospace; font-size:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <strong>Bakiye kaynağı (${formatAmount(num)})</strong>
+                <button type="button" onclick="document.getElementById('balanceSourceModal').remove()" style="background:#37474f; color:#fff; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;">Kapat</button>
+            </div>
+            <div id="balanceSourceModalBody" style="max-height:60vh; overflow:auto;">${msg.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
+        </div>
+    `;
+    document.body.appendChild(div);
+    div.onclick = function(e) { if (e.target === div) div.remove(); };
+}
+window.findBalanceSource = findBalanceSource;
+
 function updateMainDisplay() {
     let totalRec = 0, totalPay = 0;
     Object.keys(allData).forEach(p => {
