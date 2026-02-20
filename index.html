@@ -43,6 +43,7 @@
                     <button class="btn" onclick="showColorSelectionMenu()">Neon Işık Rengi</button>
                     <button class="btn btn-server-test" onclick="testServerConnection()">Sunucu Testi</button>
                     <button class="btn" onclick="showSyncHelp()">Rehber</button>
+                    <button class="btn" onclick="recalculateAllBalancesFromTransactions()" title="İşlem kaydı olmayan (hayalet) bakiyeleri düzeltir">🔄 Bakiyeleri Yeniden Hesapla</button>
                     <button class="btn btn-memory-clear" onclick="initiateMemoryClear()">🧹 Bellek Temizle</button>
                 </div>
             </div>
@@ -264,7 +265,10 @@
                     </div>
                 </div>
                 
-                <button class="btn btn-success" id="addTransactionBtn" onclick="processSingleTransaction()"> ✅ İşlemi Kaydet</button>
+                <div class="form-group" style="display:flex; gap:8px; flex-wrap:wrap;">
+                    <button class="btn btn-success" id="addTransactionBtn" onclick="processSingleTransaction()"> ✅ İşlemi Kaydet</button>
+                    <button class="btn btn-outline" id="gelenAllocateBtn" onclick="initiateAllocation()" style="display:none;"> 📋 Geleni Dağıt</button>
+                </div>
             </div>
             <div class="tab-content" id="islemGecmisi">
                 <div class="history-container">

@@ -214,20 +214,10 @@ function initDOMCache() {
     DOM.reportSearchInput = document.getElementById('reportSearchInput');
 
     if (DOM.amount) {
-        DOM.amount.addEventListener('blur', function() {
-            const type = DOM.transactionType ? DOM.transactionType.value : 'giden';
-            if (type === 'gelen' && deformatCurrency(this.value) > 0) {
-                initiateAllocation();
-            }
+        DOM.amount.addEventListener('input', function() {
+            updateGelenAllocateButtonVisibility();
         });
-
-        DOM.amount.addEventListener('keydown', function(event) {
-            const type = DOM.transactionType ? DOM.transactionType.value : 'giden';
-            if ((event.key === 'Enter' || event.key === 'Tab') && type === 'gelen' && deformatCurrency(this.value) > 0) {
-                event.preventDefault();
-                initiateAllocation();
-            }
-        });
+        DOM.amount.addEventListener('blur', updateGelenAllocateButtonVisibility);
     }
 
     if (DOM.startDate) DOM.startDate.addEventListener('change', renderReportPreview);
@@ -473,13 +463,16 @@ function calculateAllBalances(person) {
             const monthData = allData[person][year][month];
             if (monthData && monthData.transactions) {
                 monthData.transactions.forEach(t => {
-                    if (allData[person].categoryBalances[t.category] === undefined) {
-                        allData[person].categoryBalances[t.category] = 0;
+                    const cat = t.category != null ? String(t.category) : '';
+                    if (!cat) return;
+                    if (allData[person].categoryBalances[cat] === undefined) {
+                        allData[person].categoryBalances[cat] = 0;
                     }
+                    const amount = Math.abs(Number(t.amount)) || 0;
                     if (t.type === 'giden') {
-                        allData[person].categoryBalances[t.category] += t.amount;
+                        allData[person].categoryBalances[cat] += amount;
                     } else {
-                        allData[person].categoryBalances[t.category] -= t.amount;
+                        allData[person].categoryBalances[cat] -= amount;
                     }
                 });
             }
@@ -493,6 +486,20 @@ function calculatePersonTotalBalance(person) {
     let totalBalance = 0;
     Object.values(allData[person].categoryBalances).forEach(balance => totalBalance += (balance || 0));
     return totalBalance;
+}
+
+/** Tüm kişilerin bakiyelerini sadece işlem kayıtlarından yeniden hesaplar. Hayalet bakiye (işlemsiz görünen bakiye) varsa düzeltir. */
+function recalculateAllBalancesFromTransactions() {
+    if (!confirm('Tüm bakiyeler işlem geçmişinden yeniden hesaplanacak. Devam edilsin mi?')) return;
+    if (typeof closeAllMenus === 'function') closeAllMenus();
+    Object.keys(allData).forEach(person => {
+        if (person === 'metadata') return;
+        if (allData[person]) calculateAllBalances(person);
+    });
+    queueSave();
+    updateMainDisplay();
+    if (currentPerson) updateDisplays(currentPerson);
+    showNotification('Bakiyeler işlemlerden yeniden hesaplandı.', 'success');
 }
 
 function updateMainDisplay() {
@@ -804,6 +811,18 @@ function setTransactionTypeUnified(type, typeInputId, gidenBtnId, gelenBtnId) {
             populateCategorySelect(categorySelect, currentPerson);
         }
     }
+    updateGelenAllocateButtonVisibility();
+}
+
+function updateGelenAllocateButtonVisibility() {
+    const btn = document.getElementById('gelenAllocateBtn');
+    if (!btn) return;
+    const type = DOM.transactionType?.value || '';
+    const amount = DOM.amount ? deformatCurrency(DOM.amount.value) : 0;
+    const person = currentPerson;
+    const hasDebts = person && allData[person] && Object.keys(allData[person].categoryBalances || {}).some(c => (allData[person].categoryBalances[c] || 0) > 0.01);
+    const show = type === 'gelen' && amount > 0.01 && hasDebts;
+    btn.style.display = show ? 'inline-block' : 'none';
 }
 
 function populatePersonSelect(selectElement) {
@@ -1017,7 +1036,8 @@ function openPersonModal(person) {
     if (firstTab) firstTab.click();
 
     openModal('personModal');
-    
+    updateGelenAllocateButtonVisibility();
+
     setTimeout(() => initModalSwipe(), 100);
 }
 
@@ -1392,8 +1412,33 @@ function initiateAllocation() {
             e.preventDefault(); // Input'un blur olmasını engelle
         }
     }, true);
+
+    // Blur'da girilen tutarı koru; başka yere tıklanınca veya Tab ile silinmesin
+    content.addEventListener('blur', function(e) {
+        const input = e.target;
+        if (input.classList && input.classList.contains('allocation-input')) {
+            persistAllocationInputValue(input);
+        }
+    }, true);
     
     updateAllocationTotals();
+}
+
+function persistAllocationInputValue(input) {
+    if (!input || !input.classList.contains('allocation-input')) return;
+    const num = deformatCurrency(input.value);
+    if (num > 0.01) {
+        input.value = formatNumber(num);
+        updateAllocationTotals();
+        setTimeout(function() {
+            if (input.isConnected && deformatCurrency(input.value) < 0.01) {
+                input.value = formatNumber(num);
+                updateAllocationTotals();
+            }
+        }, 0);
+    } else {
+        updateAllocationTotals();
+    }
 }
 
 function updateAllocationTotals() {
@@ -1738,6 +1783,7 @@ function clearTransactionForm() {
     if(DOM.category) DOM.category.value = '';
     setTransactionType('');
     setCurrentDate();
+    updateGelenAllocateButtonVisibility();
 }
 
 function checkAnyMenuOpen() {
