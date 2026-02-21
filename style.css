@@ -1228,6 +1228,10 @@ overflow: hidden;
     max-height: 90vh;
     margin: 0 auto;
     position: relative;
+
+    /* Entegrasyon: Mor Çerçeve ve Neon Parlama */
+    border: 0.7px solid rgba(98, 0, 234, 0.6) !important;
+    box-shadow: 0 4px 20px rgba(98, 0, 234, 0.4) !important;
 }
 
 .modal-header {
