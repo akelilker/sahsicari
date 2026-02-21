@@ -1,6 +1,6 @@
-// Service Worker with Smart Caching - v79.19
+// Service Worker with Smart Caching - v79.20
 const DEBUG = false; // Set to true for development
-const CACHE_NAME = 'sahsi-hesap-v79.19';
+const CACHE_NAME = 'sahsi-hesap-v79.20';
 const urlsToCache = [
     '/',
     '/index.html',
@@ -24,7 +24,7 @@ const urlsToCache = [
 
 // Install Event: Pre-cache critical assets (tek bir URL hatası tüm install'ı bozmasın)
 self.addEventListener('install', (event) => {
-    DEBUG && console.log('[SW] Installing... v79.19');
+    DEBUG && console.log('[SW] Installing... v79.20');
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then((cache) => {
@@ -44,7 +44,7 @@ self.addEventListener('install', (event) => {
 
 // Activate Event: Clean up old caches
 self.addEventListener('activate', (event) => {
-    DEBUG && console.log('[SW] Activating... v79.19');
+    DEBUG && console.log('[SW] Activating... v79.20');
     event.waitUntil(
         caches.keys().then((cacheNames) => {
             return Promise.all(
