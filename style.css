@@ -3374,13 +3374,13 @@ label[for="editDateInput"] {
 
     /* --- MOBİL RAPORLAR DASHBOARD --- */
 
-    /* Sol: tarihler, Sağ: toggles, Alt: arama tam genişlik */
+    /* Sol: Filtreleme/Başlangıç/Bitiş/Arama, Sağ: Gelişmiş/Toggles */
     .reports-dashboard {
         grid-template-areas:
             "title-filter  title-adv"
             "date-start    toggles"
             "date-end      toggles"
-            "search        search";
+            "search        toggles";
         gap: 6px 8px;
     }
 
