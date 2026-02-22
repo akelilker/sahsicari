@@ -2120,12 +2120,12 @@ async function addNewPerson() {
     isProcessing = true;
     try {
         allData[name] = {
-            categories: [...defaultCategories, 'Avans'], 
+            categories: ['Havale/EFT'],
             categoryBalances: {},
             isFavorite: false
         };
-        
-        [...defaultCategories, 'Avans'].forEach(cat => {
+
+        ['Havale/EFT'].forEach(cat => {
             allData[name].categoryBalances[cat] = 0;
         });
         
@@ -3716,11 +3716,18 @@ function populateQuickPersonList() {
     
     people.forEach(person => {
         const div = document.createElement('div');
-        div.className = 'person-item quick-person-item'; 
+        div.className = 'person-item quick-person-item';
         div.textContent = person;
         div.onclick = () => selectQuickPersonFromOverlay(person);
         list.appendChild(div);
     });
+
+    const addBtn = document.createElement('div');
+    addBtn.className = 'person-item quick-person-item quick-add-person-btn';
+    addBtn.textContent = '+';
+    addBtn.title = 'Yeni Kişi Ekle';
+    addBtn.onclick = () => { closeQuickTransactionOverlay(); showPersonManagementModal(); };
+    list.appendChild(addBtn);
 }
 
 function filterQuickPersonList() {
