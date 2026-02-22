@@ -2634,6 +2634,19 @@ select option {
     margin-bottom: 0;
 }
 
+.quick-add-person-btn {
+    background: rgba(14, 21, 37, 0.6) !important;
+    border-style: dashed !important;
+    color: var(--gray-40) !important;
+    font-size: 22px !important;
+    font-weight: 400 !important;
+}
+
+.quick-add-person-btn:hover {
+    color: #ffffff !important;
+    border-color: var(--white-50) !important;
+}
+
 .person-item:hover {
     background: var(--dark-bg);
     border-color: var(--white-50);
@@ -4148,8 +4161,8 @@ label[for="editDateInput"] {
     /* Mobil menü boyutları */
     #settingsMenu {
         z-index: 2010;
-        width: 88%;
-        max-width: calc(100vw - 20px);
+        width: 50%;
+        max-width: 50vw;
     }
 
     #notificationMenu {
