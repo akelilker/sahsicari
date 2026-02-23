@@ -892,10 +892,10 @@ body.ios-pwa .history-item .description {
     backdrop-filter: none;
     border: 1px solid rgba(66, 165, 245, 0.25);
     color: #42a5f5;
-    padding: 4px 10px;
+    padding: 4px 16px;
     border-radius: 8px;
     font-size: 11px;
-    font-weight: 700;
+    font-weight: 400;
     cursor: pointer;
     min-height: 30px;
     transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -904,13 +904,13 @@ body.ios-pwa .history-item .description {
     justify-content: center;
     text-align: center;
     box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-    text-shadow: 0 0 8px rgba(66, 165, 245, 0.4);
+    text-shadow: none;
 }
 
 .btn-success {
     color: #00e676;
     border-color: rgba(0, 230, 118, 0.25);
-    text-shadow: 0 0 8px rgba(0, 230, 118, 0.4);
+    text-shadow: none;
 }
 .btn-cloud {
     color: #42a5f5;
