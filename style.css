@@ -1229,9 +1229,8 @@ overflow: hidden;
     margin: 0 auto;
     position: relative;
 
-    /* Entegrasyon: Mor Çerçeve ve Neon Parlama */
-    border: 0.7px solid rgba(98, 0, 234, 0.6) !important;
-    box-shadow: 0 4px 20px rgba(98, 0, 234, 0.4) !important;
+    border: 1px solid var(--white-20);
+    box-shadow: 0 0 30px rgba(0,0,0,0.8);
 }
 
 .modal-header {
@@ -1760,7 +1759,7 @@ select option {
     width: 100%;
     height: 4px;
     background: transparent;
-    box-shadow: 0 4px 8px rgba(98, 0, 234, 0.8);
+    box-shadow: none;
     pointer-events: none;
     z-index: 6;
 }
@@ -1829,8 +1828,8 @@ select option {
 
 .category-item {
     background: rgba(60, 55, 75, 0.16);
-    border: 0.7px solid rgba(98, 0, 234, 0.6);
-    box-shadow: 0 4px 8px rgba(98, 0, 234, 0.3);
+    border: 0.7px solid var(--white-20);
+    box-shadow: none;
     padding: 6px 4px;
     border-radius: 12px;
     display: flex;
