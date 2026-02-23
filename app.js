@@ -6,7 +6,7 @@ function formatDateTR(dateObj) {
     return `${d}.${m}.${y}`;
 }
 const API_SECRET_KEY = "Karmotor_Guvenlik_Sifresi_2025";
-const APP_VERSION = '79.19';
+const APP_VERSION = '79.20';
 
 const safeStorage = {
     getItem: function(key) {
@@ -3735,6 +3735,7 @@ function filterQuickPersonList() {
     const items = document.querySelectorAll('.person-item');
     
     items.forEach(item => {
+        if (item.classList.contains('quick-add-person-btn')) return;
         const txt = item.textContent || item.innerText;
         if (txt.toLocaleUpperCase('tr-TR').indexOf(filter) > -1) {
             item.style.display = "";
