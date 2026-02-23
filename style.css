@@ -1320,15 +1320,32 @@ overflow: hidden;
 #addPersonModal .modal-body {
     display: flex;
     flex-direction: column;
+    gap: 16px;
 }
 
-#addPersonModal .modal-body .btn {
-    order: -1;
-    margin-bottom: 15px;
+.add-person-actions {
+    display: flex;
+    gap: 10px;
 }
 
-#addPersonModal .modal-body .form-group {
-    order: 1;
+.btn-save-person {
+    flex: 1;
+    background: rgba(0, 230, 118, 0.14);
+    border: 1px solid rgba(0, 230, 118, 0.7);
+    color: #00e676;
+    text-shadow: 0 0 8px rgba(0, 230, 118, 0.4);
+    font-size: 13px;
+    min-height: 38px;
+}
+
+.btn-cancel-person {
+    flex: 1;
+    background: rgba(255, 23, 68, 0.12);
+    border: 1px solid rgba(255, 23, 68, 0.65);
+    color: #ff1744;
+    text-shadow: 0 0 8px rgba(255, 23, 68, 0.4);
+    font-size: 13px;
+    min-height: 38px;
 }
 
 #addPersonModal .modal-body .form-group label {
