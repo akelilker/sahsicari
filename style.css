@@ -1330,7 +1330,7 @@ overflow: hidden;
 
 .btn-save-person {
     flex: 1;
-    background: rgba(0, 230, 118, 0.10);
+    background: transparent;
     border: 1px solid rgba(0, 230, 118, 0.55);
     color: #00e676;
     text-shadow: 0 0 6px rgba(0, 230, 118, 0.3);
@@ -1338,11 +1338,18 @@ overflow: hidden;
     padding: 4px 8px;
     min-height: unset;
     height: 28px;
+    transition: background 0.15s;
+}
+
+.btn-save-person:hover,
+.btn-save-person:focus,
+.btn-save-person:active {
+    background: rgba(0, 230, 118, 0.14);
 }
 
 .btn-cancel-person {
     flex: 1;
-    background: rgba(255, 23, 68, 0.09);
+    background: transparent;
     border: 1px solid rgba(255, 23, 68, 0.5);
     color: #ff1744;
     text-shadow: 0 0 6px rgba(255, 23, 68, 0.3);
@@ -1350,6 +1357,13 @@ overflow: hidden;
     padding: 4px 8px;
     min-height: unset;
     height: 28px;
+    transition: background 0.15s;
+}
+
+.btn-cancel-person:hover,
+.btn-cancel-person:focus,
+.btn-cancel-person:active {
+    background: rgba(255, 23, 68, 0.14);
 }
 
 #addPersonModal .modal-body .form-group label {
