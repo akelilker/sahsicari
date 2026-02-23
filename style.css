@@ -1308,8 +1308,19 @@ overflow: hidden;
     border-radius: 15px;
 }
 
-#personManagementModal .modal-body {
-    padding-bottom: 32px;
+.modal-footer {
+    padding: 10px 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.2);
+    flex-shrink: 0;
+}
+
+#editModal .modal-content,
+#kasaCategoryDetailModal .modal-content {
+    height: auto;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
 }
 
 #categoryManagementModal .form-group label {
@@ -4375,10 +4386,6 @@ input[type="date"]::-webkit-datetime-edit-year-field {
     margin-top: -5px;
 }
 
-/* Modal body - alt padding artır, kaydet butonu görünsün */
-#editTransactionModal .modal-body {
-    padding-bottom: 30px;
-}
 
 /* Tarih input - takvim simgesi tarihin hemen sağında */
 #editTransactionModal #editDateInput {
