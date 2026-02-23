@@ -356,7 +356,10 @@
                 <label for="newPersonName">Kişi Adı</label>
                 <input id="newPersonName" onkeypress="handlePersonNameEnter(event)" placeholder="Örn: Ahmet, Ayşe..." type="text"/>
             </div>
-            <button class="btn btn-success" onclick="addNewPerson()">➕ Kişi Ekle</button>
+            <div class="add-person-actions">
+                <button class="btn btn-save-person" onclick="addNewPerson()" type="button">✓ Kaydet</button>
+                <button class="btn btn-cancel-person" onclick="closeCurrentModal(this)" type="button">✕ Vazgeç</button>
+            </div>
         </div>
     </div>
 </div>
