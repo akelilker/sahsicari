@@ -158,7 +158,7 @@ body.ios-pwa #yeniIslem .form-group label {
 
 body.ios-pwa #yeniIslem input[type="text"],
 body.ios-pwa #yeniIslem select {
-    padding: 12px 14px;
+    padding: 6px 14px;
     font-size: 1.02em;
 }
 
@@ -892,10 +892,10 @@ body.ios-pwa .history-item .description {
     backdrop-filter: none;
     border: 1px solid rgba(66, 165, 245, 0.25);
     color: #42a5f5;
-    padding: 4px 10px;
+    padding: 4px 16px;
     border-radius: 8px;
     font-size: 11px;
-    font-weight: 700;
+    font-weight: 400;
     cursor: pointer;
     min-height: 30px;
     transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -904,13 +904,13 @@ body.ios-pwa .history-item .description {
     justify-content: center;
     text-align: center;
     box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-    text-shadow: 0 0 8px rgba(66, 165, 245, 0.4);
+    text-shadow: none;
 }
 
 .btn-success {
     color: #00e676;
     border-color: rgba(0, 230, 118, 0.25);
-    text-shadow: 0 0 8px rgba(0, 230, 118, 0.4);
+    text-shadow: none;
 }
 .btn-cloud {
     color: #42a5f5;
@@ -1308,8 +1308,19 @@ overflow: hidden;
     border-radius: 15px;
 }
 
-#personManagementModal .modal-body {
-    padding-bottom: 32px;
+.modal-footer {
+    padding: 10px 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.2);
+    flex-shrink: 0;
+}
+
+#editModal .modal-content,
+#kasaCategoryDetailModal .modal-content {
+    height: auto;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
 }
 
 #categoryManagementModal .form-group label {
@@ -1320,15 +1331,50 @@ overflow: hidden;
 #addPersonModal .modal-body {
     display: flex;
     flex-direction: column;
+    gap: 16px;
 }
 
-#addPersonModal .modal-body .btn {
-    order: -1;
-    margin-bottom: 15px;
+.add-person-actions {
+    display: flex;
+    gap: 8px;
 }
 
-#addPersonModal .modal-body .form-group {
-    order: 1;
+.btn-save-person {
+    flex: 1;
+    background: transparent;
+    border: 1px solid rgba(0, 230, 118, 0.55);
+    color: #00e676;
+    text-shadow: 0 0 6px rgba(0, 230, 118, 0.3);
+    font-size: 11px;
+    padding: 4px 8px;
+    min-height: unset;
+    height: 28px;
+    transition: background 0.15s;
+}
+
+.btn-save-person:hover,
+.btn-save-person:focus,
+.btn-save-person:active {
+    background: rgba(0, 230, 118, 0.14);
+}
+
+.btn-cancel-person {
+    flex: 1;
+    background: transparent;
+    border: 1px solid rgba(255, 23, 68, 0.5);
+    color: #ff1744;
+    text-shadow: 0 0 6px rgba(255, 23, 68, 0.3);
+    font-size: 11px;
+    padding: 4px 8px;
+    min-height: unset;
+    height: 28px;
+    transition: background 0.15s;
+}
+
+.btn-cancel-person:hover,
+.btn-cancel-person:focus,
+.btn-cancel-person:active {
+    background: rgba(255, 23, 68, 0.14);
 }
 
 #addPersonModal .modal-body .form-group label {
@@ -1476,6 +1522,7 @@ height: 100%;
     height: 35px;
     font-size: 14px;
     padding: 3px 8px;
+    line-height: normal;
 }
 
 #yeniIslem .form-group label {
@@ -3188,6 +3235,7 @@ label[for="editDateInput"] {
     #personModal #yeniIslem .form-group input:not(.date-picker-simple):not(.transparent-date-input),
     #personModal #yeniIslem .form-group select {
         height: 38px;
+        line-height: normal;
     }
 
     .date-row-transparent {
@@ -4338,10 +4386,6 @@ input[type="date"]::-webkit-datetime-edit-year-field {
     margin-top: -5px;
 }
 
-/* Modal body - alt padding artır, kaydet butonu görünsün */
-#editTransactionModal .modal-body {
-    padding-bottom: 30px;
-}
 
 /* Tarih input - takvim simgesi tarihin hemen sağında */
 #editTransactionModal #editDateInput {
