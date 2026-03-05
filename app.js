@@ -3344,11 +3344,17 @@ async function finalizeClear() {
 let deferredPrompt;
 let pwaInstallBannerDismissed = false;
 
+function hasCustomPWAInstallUI() {
+    return !!(document.getElementById('pwaInstallBanner') && document.getElementById('pwaInstallBtn'));
+}
+
 window.addEventListener('beforeinstallprompt', (e) => {
+    // Only intercept default browser prompt when custom install UI is available.
+    if (!hasCustomPWAInstallUI()) return;
+
     e.preventDefault();
     deferredPrompt = e;
 
-    // Check if user previously dismissed
     const dismissed = localStorage.getItem('pwaInstallDismissed');
     if (!dismissed && !pwaInstallBannerDismissed) {
         showPWAInstallBanner();
@@ -3368,11 +3374,7 @@ function showPWAInstallBanner() {
             if (!deferredPrompt) return;
 
             deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-
-            if (outcome === 'accepted') {
-                console.log('PWA installed successfully');
-            }
+            await deferredPrompt.userChoice;
 
             deferredPrompt = null;
             hidePWAInstallBanner();
