@@ -1,14 +1,16 @@
-// Service Worker with Smart Caching - v79.20
+// Service Worker with Smart Caching - v79.21
 const DEBUG = false; // Set to true for development
-const CACHE_NAME = 'sahsi-hesap-v79.20';
+const SW_VERSION = '79.21';
+const CACHE_NAME = `sahsi-hesap-v${SW_VERSION}`;
+const API_BYPASS_PATHS = new Set(['/load.php', '/save.php', '/kd_load.php', '/kd_save.php']);
 const urlsToCache = [
     '/',
     '/index.html',
     '/kasa.html',
     '/offline.html',
     '/storage.js?v=1.0',
-    '/style.css?v=79.19',
-    '/app.js?v=79.19',
+    '/style.css?v=79.21',
+    '/app.js?v=79.21',
     '/kasa.css?v=1.11',
     '/kasa.js?v=1.11',
     '/manifest.json',
@@ -24,7 +26,7 @@ const urlsToCache = [
 
 // Install Event: Pre-cache critical assets (tek bir URL hatası tüm install'ı bozmasın)
 self.addEventListener('install', (event) => {
-    DEBUG && console.log('[SW] Installing... v79.20');
+    DEBUG && console.log('[SW] Installing... v' + SW_VERSION);
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then((cache) => {
@@ -44,7 +46,7 @@ self.addEventListener('install', (event) => {
 
 // Activate Event: Clean up old caches
 self.addEventListener('activate', (event) => {
-    DEBUG && console.log('[SW] Activating... v79.20');
+    DEBUG && console.log('[SW] Activating... v' + SW_VERSION);
     event.waitUntil(
         caches.keys().then((cacheNames) => {
             return Promise.all(
@@ -66,6 +68,12 @@ self.addEventListener('fetch', (event) => {
 
     // Skip external CDN requests (always fetch fresh)
     if (url.origin !== location.origin) {
+        event.respondWith(fetch(request));
+        return;
+    }
+
+    // Never cache write requests or backend API endpoints
+    if (request.method !== 'GET' || API_BYPASS_PATHS.has(url.pathname) || url.pathname.endsWith('.php')) {
         event.respondWith(fetch(request));
         return;
     }
@@ -103,8 +111,9 @@ self.addEventListener('fetch', (event) => {
                 if (cachedResponse) {
                     // Serve from cache, update in background
                     fetch(request).then((response) => {
+                        if (!response || response.status !== 200) return;
                         caches.open(CACHE_NAME).then((cache) => {
-                            cache.put(request, response);
+                            cache.put(request, response.clone());
                         });
                     }).catch(() => {}); // Ignore fetch errors in background
                     return cachedResponse;
@@ -225,3 +234,4 @@ function removeFromSyncQueue(db, itemId) {
         request.onerror = () => reject(request.error);
     });
 }
+

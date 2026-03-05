@@ -5,8 +5,7 @@ function formatDateTR(dateObj) {
     const y = dateObj.getFullYear();
     return `${d}.${m}.${y}`;
 }
-const API_SECRET_KEY = "Karmotor_Guvenlik_Sifresi_2025";
-const APP_VERSION = '78.34';
+const APP_VERSION = '79.21';
 
 const safeStorage = {
     getItem: function(key) {
@@ -76,7 +75,12 @@ function getLocalTimeISO() {
 function sanitizeHTML(str) {
     if (str === null || str === undefined) return '';
     const strValue = String(str);
-    return strValue.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    return strValue
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
 }
 
 function formatTitleCase(str) {
@@ -316,7 +320,7 @@ function updateServerStatus(type, message) {
 async function testServerConnection() {
     updateServerStatus('', '🔄 Bağlantı test ediliyor...');
     try {
-        const response = await fetch('load.php?test=1&auth=' + API_SECRET_KEY, { 
+        const response = await fetch('load.php?test=1&t=' + Date.now(), { 
             method: 'GET', 
             headers: { 
                 'Accept': 'application/json'
@@ -325,10 +329,10 @@ async function testServerConnection() {
         
         if (response.ok) {
             const text = await response.text();
-            if (text.includes('success') || text.trim().startsWith('{')) { 
-                updateServerStatus('success', '✅ Sunucu Bağlantısı & Yetki Başarılı');
+            if (text.trim().startsWith('{')) { 
+                updateServerStatus('success', 'Sunucu baglantisi basarili');
             } else {
-                updateServerStatus('error', '❌ Şifre/Yetki Hatası!'); 
+                updateServerStatus('error', 'Sunucu cevabi gecersiz'); 
             }
         } else {
             updateServerStatus('error', `❌ HTTP Hatası: ${response.status}`);
@@ -344,8 +348,8 @@ function saveDataToServer(data, force = false) {
         return Promise.reject("Boş veri koruması: Kayıt iptal edildi.");
     }
 
-    let url = 'save.php?auth=' + API_SECRET_KEY;
-    if (force) url += '&force=true';
+    let url = 'save.php';
+    if (force) url += '?force=true';
 
     return fetch(url, {
         method: 'POST',
@@ -374,7 +378,7 @@ function saveDataToServer(data, force = false) {
 }
 
 function loadDataFromServer() {
-    return fetch('load.php?auth=' + API_SECRET_KEY, { 
+    return fetch('load.php?t=' + Date.now(), { 
         method: 'GET', 
         headers: { 
             'Accept': 'application/json'
@@ -1369,7 +1373,7 @@ function showCategoryDetails(categoryName) {
                     <td class="val-gelen">${t.type==='gelen' ? formatNumber(t.amount) : ''}</td>
                     <td class="val-giden">${t.type==='giden' ? formatNumber(t.amount) : ''}</td>
                     <td class="val-bakiye">${formatNumber(runningBalance)}</td>
-                    <td>${t.description || ''}</td>
+                    <td>${sanitizeHTML(t.description || '')}</td>
                 </tr>
             `);
         });
@@ -2149,23 +2153,40 @@ function showPersonManagementModal() {
     const list = document.getElementById('personManagementList');
     list.innerHTML = '';
     Object.keys(allData).sort().forEach(p => {
-        if(p==='metadata') return;
+        if (p === 'metadata') return;
+
         const item = document.createElement('div');
         item.className = 'management-list-item';
-        const icon = allData[p].isFavorite ? '⭐ ' : '☆';
-        const iconClass = allData[p].isFavorite ? 'is-fav' : 'not-fav';
-        
-        item.innerHTML = `
-            <span>${p}</span>
-            <div class="management-actions">
-                <button class="mgmt-btn ${iconClass}" onclick="toggleFav('${p}')">${icon}</button>
-                <button class="mgmt-btn" onclick="editPersonName('${p}')">✏️</button>
-                <button class="mgmt-btn" onclick="deletePersonByName('${p}')">✕</button> 
-            </div>`;
+
+        const nameSpan = document.createElement('span');
+        nameSpan.textContent = p;
+
+        const actions = document.createElement('div');
+        actions.className = 'management-actions';
+
+        const favBtn = document.createElement('button');
+        favBtn.className = `mgmt-btn ${allData[p].isFavorite ? 'is-fav' : 'not-fav'}`;
+        favBtn.textContent = allData[p].isFavorite ? 'Fav' : 'Fav+';
+        favBtn.addEventListener('click', () => toggleFav(p));
+
+        const editBtn = document.createElement('button');
+        editBtn.className = 'mgmt-btn';
+        editBtn.textContent = 'Edit';
+        editBtn.addEventListener('click', () => editPersonName(p));
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'mgmt-btn';
+        deleteBtn.textContent = 'Del';
+        deleteBtn.addEventListener('click', () => deletePersonByName(p));
+
+        actions.appendChild(favBtn);
+        actions.appendChild(editBtn);
+        actions.appendChild(deleteBtn);
+        item.appendChild(nameSpan);
+        item.appendChild(actions);
         list.appendChild(item);
     });
 }
-
 function toggleFav(p) {
     allData[p].isFavorite = !allData[p].isFavorite;
     queueSave();
@@ -2216,25 +2237,42 @@ function populateCategoryEditor(person) {
     const listDiv = document.getElementById('categoryManagementList');
     if (!editor || !listDiv) return;
     if (!person) { editor.style.display = 'none'; return; }
-    
+
     listDiv.innerHTML = '';
     const categories = allData[person].categories || [];
     categories.forEach(cat => {
         if (cat === 'BEN') return;
+
         const item = document.createElement('div');
         item.className = 'management-list-item';
-        
-        item.innerHTML = `
-            <span>${sanitizeHTML(cat)}</span>
-            <div class="management-actions">
-                <button class="mgmt-btn" onclick="editCategoryName('${person}', '${cat}')">✏️</button>
-                <button class="mgmt-btn" style="color: #ef5350 !important; font-weight: bold; font-size: 1.2em;" onclick="deleteCategoryFromManager('${person}', '${cat}')">✕</button>
-            </div>`;
+
+        const nameSpan = document.createElement('span');
+        nameSpan.textContent = cat;
+
+        const actions = document.createElement('div');
+        actions.className = 'management-actions';
+
+        const editBtn = document.createElement('button');
+        editBtn.className = 'mgmt-btn';
+        editBtn.textContent = 'Edit';
+        editBtn.addEventListener('click', () => editCategoryName(person, cat));
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'mgmt-btn';
+        deleteBtn.style.color = '#ef5350';
+        deleteBtn.style.fontWeight = 'bold';
+        deleteBtn.style.fontSize = '1.2em';
+        deleteBtn.textContent = 'Del';
+        deleteBtn.addEventListener('click', () => deleteCategoryFromManager(person, cat));
+
+        actions.appendChild(editBtn);
+        actions.appendChild(deleteBtn);
+        item.appendChild(nameSpan);
+        item.appendChild(actions);
         listDiv.appendChild(item);
     });
     editor.style.display = 'block';
 }
-
 function addCategoryFromManager() {
     const person = document.getElementById('categoryManagementPersonSelect').value;
     const categoryName = document.getElementById('newManagedCategoryInput').value.trim();
@@ -4581,3 +4619,7 @@ function confirmSiriTransaction(person, amount, type, desc) {
 document.addEventListener('DOMContentLoaded', () => {
     setTimeout(checkSiriParams, 1000);
 });
+
+
+
+

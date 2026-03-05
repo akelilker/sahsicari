@@ -1,35 +1,20 @@
 <?php
-// kd_load.php - Kasa Defteri Veri YÃ¼kleme v1.0
 error_reporting(0);
 ini_set('display_errors', 0);
 
 header('Content-Type: application/json; charset=utf-8');
-header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
-header('Access-Control-Allow-Origin: *');
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
 
-$gizliAnahtar = "Karmotor_Guvenlik_Sifresi_2025";
-
-$gelenAnahtar = "";
-if (isset($_GET['auth'])) {
-    $gelenAnahtar = $_GET['auth'];
-} elseif (isset($_SERVER['HTTP_X_AUTH_TOKEN'])) {
-    $gelenAnahtar = $_SERVER['HTTP_X_AUTH_TOKEN'];
-}
-
-if ($gelenAnahtar !== $gizliAnahtar) {
-    http_response_code(403);
-    echo json_encode(["status" => "error", "message" => "Yetkisiz"]);
-    exit;
-}
+require_once __DIR__ . '/request_guard.php';
+enforce_same_origin();
 
 $mainFile = __DIR__ . '/kd_veriler.json';
 
-function isValidJson($text) {
+function isValidJson(string $text): bool {
     $decoded = json_decode($text, true);
     return (json_last_error() === JSON_ERROR_NONE && is_array($decoded));
 }
- 
-// Ana dosya varsa ve geÃ§erliyse onu dÃ¶ndÃ¼r
+
 if (file_exists($mainFile)) {
     $content = @file_get_contents($mainFile);
     if ($content !== false && isValidJson($content)) {
@@ -38,26 +23,25 @@ if (file_exists($mainFile)) {
     }
 }
 
-// Dosya yoksa veya bozuksa varsayÄ±lan veri dÃ¶ndÃ¼r
 $defaultData = [
     "baslangicBakiye" => 0,
     "kategoriler" => [
         "Kasa",
-        "MaaÅŸ Ã–demeleri",
-        "Ä°ÅŸyeri Kira+Aidat",
+        "Maaþ Ödemeleri",
+        "Ýþyeri Kira+Aidat",
         "Sahibinden.com",
         "Yemek",
-        "YakÄ±t",
+        "Yakýt",
         "Noter",
         "Sair Giderler",
         "Ekspertiz",
-        "Oto YÄ±kama+BakÄ±m",
+        "Oto Yýkama+Bakým",
         "Kargo",
         "Elektrik",
         "Su",
-        "Ã‡ekici",
-        "GSM+Ä°nternet",
-        "KDV GeÃ§ici+Kurumlar+Muhtasar+DiÄŸer Vergi",
+        "Çekici",
+        "GSM+Ýnternet",
+        "KDV Geçici+Kurumlar+Muhtasar+Diðer Vergi",
         "Sigorta"
     ],
     "islemler" => []

@@ -1,37 +1,22 @@
 <?php
-// load.php - v78.34 - Güvenli Veri Çekme (bozuk JSON korumalı)
 error_reporting(0);
 ini_set('display_errors', 0);
 
 header('Content-Type: application/json; charset=utf-8');
-header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
-header('Access-Control-Allow-Origin: *');
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
 
-$gizliAnahtar = "Karmotor_Guvenlik_Sifresi_2025";
-
-$gelenAnahtar = "";
-if (isset($_GET['auth'])) {
-    $gelenAnahtar = $_GET['auth'];
-} elseif (isset($_SERVER['HTTP_X_AUTH_TOKEN'])) {
-    $gelenAnahtar = $_SERVER['HTTP_X_AUTH_TOKEN'];
-}
-
-if ($gelenAnahtar !== $gizliAnahtar) {
-    http_response_code(403);
-    echo json_encode(["status" => "error", "message" => "Yetkisiz"]);
-    exit;
-}
+require_once __DIR__ . '/request_guard.php';
+enforce_same_origin();
 
 $mainFile = __DIR__ . '/veriler.json';
 $backupDir = __DIR__ . '/backups';
 
-function isValidJsonObjectOrArray($text) {
+function isValidJsonObjectOrArray(string $text): bool {
     $decoded = json_decode($text, true);
     if (json_last_error() !== JSON_ERROR_NONE) return false;
-    return is_array($decoded); // senin formatın array/object
+    return is_array($decoded);
 }
 
-// 1) Ana dosya sağlamsa onu ver
 if (file_exists($mainFile)) {
     $content = @file_get_contents($mainFile);
     if ($content !== false && isValidJsonObjectOrArray($content)) {
@@ -40,7 +25,6 @@ if (file_exists($mainFile)) {
     }
 }
 
-// 2) Ana dosya bozuksa: en yeni yedeği bul, sağlamsa onu döndür
 $backupFiles = glob($backupDir . '/veriler_*.json');
 if ($backupFiles) {
     usort($backupFiles, function($a, $b) {
@@ -56,6 +40,5 @@ if ($backupFiles) {
     }
 }
 
-// 3) Hiçbir şey yoksa / hepsi bozuksa boş obje
 echo json_encode(new stdClass());
 ?>

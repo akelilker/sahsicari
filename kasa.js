@@ -13,7 +13,6 @@ islemler: []
 let currentIslemTip = 'giris';
 let selectedIslemId = null;
 let currentKasaCategory = null;
-const AUTH_KEY = "Karmotor_Guvenlik_Sifresi_2025";
 
 // Kategori ikonları
 const katIkonlar = {
@@ -30,10 +29,21 @@ setDefaultDate();
 if (window.navigator.standalone === true) document.body.classList.add('ios-pwa');
 });
 
+function sanitizeHTML(str) {
+if (str === null || str === undefined) return '';
+return String(str)
+.replace(/&/g, '&amp;')
+.replace(/</g, '&lt;')
+.replace(/>/g, '&gt;')
+.replace(/"/g, '&quot;')
+.replace(/'/g, '&#39;');
+}
+
+
 // ==================== DATA ====================
 async function loadData() {
 try {
-const res = await fetch(`kd_load.php?auth=${AUTH_KEY}&t=${Date.now()}`);
+const res = await fetch(`kd_load.php?t=${Date.now()}`);
 if (res.ok) {
 const data = await res.json();
 if (data && typeof data === 'object') kasaData = { ...kasaData, ...data };
@@ -44,7 +54,7 @@ updateAll();
 
 async function saveData() {
 try {
-const res = await fetch(`kd_save.php?auth=${AUTH_KEY}`, {
+const res = await fetch('kd_save.php', {
 method: 'POST',
 headers: { 'Content-Type': 'application/json' },
 body: JSON.stringify(kasaData)
@@ -113,8 +123,8 @@ html += islemler.map(i => `
                 <span class="history-date">${formatDate(i.tarih)}</span>
             </div>
             <div>
-                <span class="history-category">${i.kategori}</span>
-                ${i.aciklama ? `<span class="history-meta"> - ${i.aciklama}</span>` : ''}
+                <span class="history-category">${sanitizeHTML(i.kategori)}</span>
+                ${i.aciklama ? `<span class="history-meta"> - ${sanitizeHTML(i.aciklama)}</span>` : ''}
             </div>
         </div>
         
@@ -713,3 +723,5 @@ n.textContent = msg;
 n.className = 'notification show' + (type === 'error' ? ' error' : '');
 setTimeout(() => n.classList.remove('show'), 3000);
 }
+
+
