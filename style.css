@@ -158,7 +158,7 @@ body.ios-pwa #yeniIslem .form-group label {
 
 body.ios-pwa #yeniIslem input[type="text"],
 body.ios-pwa #yeniIslem select {
-    padding: 12px 14px;
+    padding: 6px 14px;
     font-size: 1.02em;
 }
 
@@ -892,10 +892,10 @@ body.ios-pwa .history-item .description {
     backdrop-filter: none;
     border: 1px solid rgba(66, 165, 245, 0.25);
     color: #42a5f5;
-    padding: 4px 10px;
+    padding: 4px 16px;
     border-radius: 8px;
     font-size: 11px;
-    font-weight: 700;
+    font-weight: 400;
     cursor: pointer;
     min-height: 30px;
     transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -904,13 +904,13 @@ body.ios-pwa .history-item .description {
     justify-content: center;
     text-align: center;
     box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-    text-shadow: 0 0 8px rgba(66, 165, 245, 0.4);
+    text-shadow: none;
 }
 
 .btn-success {
     color: #00e676;
     border-color: rgba(0, 230, 118, 0.25);
-    text-shadow: 0 0 8px rgba(0, 230, 118, 0.4);
+    text-shadow: none;
 }
 .btn-cloud {
     color: #42a5f5;
@@ -1228,6 +1228,9 @@ overflow: hidden;
     max-height: 90vh;
     margin: 0 auto;
     position: relative;
+
+    border: 1px solid var(--white-20);
+    box-shadow: 0 0 30px rgba(0,0,0,0.8);
 }
 
 .modal-header {
@@ -1305,8 +1308,19 @@ overflow: hidden;
     border-radius: 15px;
 }
 
-#personManagementModal .modal-body {
-    padding-bottom: 32px;
+.modal-footer {
+    padding: 10px 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.2);
+    flex-shrink: 0;
+}
+
+#editModal .modal-content,
+#kasaCategoryDetailModal .modal-content {
+    height: auto;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
 }
 
 #categoryManagementModal .form-group label {
@@ -1317,15 +1331,50 @@ overflow: hidden;
 #addPersonModal .modal-body {
     display: flex;
     flex-direction: column;
+    gap: 16px;
 }
 
-#addPersonModal .modal-body .btn {
-    order: -1;
-    margin-bottom: 15px;
+.add-person-actions {
+    display: flex;
+    gap: 8px;
 }
 
-#addPersonModal .modal-body .form-group {
-    order: 1;
+.btn-save-person {
+    flex: 1;
+    background: transparent;
+    border: 1px solid rgba(0, 230, 118, 0.55);
+    color: #00e676;
+    text-shadow: 0 0 6px rgba(0, 230, 118, 0.3);
+    font-size: 11px;
+    padding: 4px 8px;
+    min-height: unset;
+    height: 28px;
+    transition: background 0.15s;
+}
+
+.btn-save-person:hover,
+.btn-save-person:focus,
+.btn-save-person:active {
+    background: rgba(0, 230, 118, 0.14);
+}
+
+.btn-cancel-person {
+    flex: 1;
+    background: transparent;
+    border: 1px solid rgba(255, 23, 68, 0.5);
+    color: #ff1744;
+    text-shadow: 0 0 6px rgba(255, 23, 68, 0.3);
+    font-size: 11px;
+    padding: 4px 8px;
+    min-height: unset;
+    height: 28px;
+    transition: background 0.15s;
+}
+
+.btn-cancel-person:hover,
+.btn-cancel-person:focus,
+.btn-cancel-person:active {
+    background: rgba(255, 23, 68, 0.14);
 }
 
 #addPersonModal .modal-body .form-group label {
@@ -1473,6 +1522,7 @@ height: 100%;
     height: 35px;
     font-size: 14px;
     padding: 3px 8px;
+    line-height: normal;
 }
 
 #yeniIslem .form-group label {
@@ -1756,9 +1806,50 @@ select option {
     width: 100%;
     height: 4px;
     background: transparent;
-    box-shadow: 0 4px 8px rgba(98, 0, 234, 0.8);
+    box-shadow: none;
     pointer-events: none;
     z-index: 6;
+}
+
+.transaction-type-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+.transaction-type-header label {
+    margin-bottom: 0;
+}
+.recalc-balance-icon {
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    min-height: 24px;
+    border: none;
+    background: none;
+    color: rgba(207, 216, 220, 0.6);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: color 0.2s;
+}
+.recalc-balance-icon:hover {
+    color: #cfd8dc;
+}
+.recalc-balance-icon::before {
+    content: "↻";
+    display: inline-block;
+    font-size: 1.1rem;
+    line-height: 1;
+}
+.recalc-balance-icon:hover::before {
+    animation: recalc-spin 0.6s ease-in-out;
+}
+@keyframes recalc-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(-360deg); }
 }
 
 .category-balance-grid {
@@ -1784,8 +1875,8 @@ select option {
 
 .category-item {
     background: rgba(60, 55, 75, 0.16);
-    border: 0.7px solid rgba(98, 0, 234, 0.6);
-    box-shadow: 0 4px 8px rgba(98, 0, 234, 0.3);
+    border: 0.7px solid var(--white-20);
+    box-shadow: none;
     padding: 6px 4px;
     border-radius: 12px;
     display: flex;
@@ -2589,6 +2680,19 @@ select option {
     margin-bottom: 0;
 }
 
+.quick-add-person-btn {
+    background: rgba(14, 21, 37, 0.6) !important;
+    border-style: dashed !important;
+    color: var(--gray-40) !important;
+    font-size: 22px !important;
+    font-weight: 400 !important;
+}
+
+.quick-add-person-btn:hover {
+    color: #ffffff !important;
+    border-color: var(--white-50) !important;
+}
+
 .person-item:hover {
     background: var(--dark-bg);
     border-color: var(--white-50);
@@ -3131,6 +3235,7 @@ label[for="editDateInput"] {
     #personModal #yeniIslem .form-group input:not(.date-picker-simple):not(.transparent-date-input),
     #personModal #yeniIslem .form-group select {
         height: 38px;
+        line-height: normal;
     }
 
     .date-row-transparent {
@@ -3194,8 +3299,6 @@ label[for="editDateInput"] {
 
     .rd-buttons-row {
         flex-direction: row;
-        flex-wrap: nowrap;
-        align-items: stretch;
         justify-content: center;
         gap: 8px;
         margin-top: 4px;
@@ -3203,7 +3306,6 @@ label[for="editDateInput"] {
 
     .rd-buttons-row .rd-btn {
         flex: 1;
-        min-width: 0;
         font-size: 0.85em;
         padding: 1px 5px;
     }
@@ -3332,15 +3434,13 @@ label[for="editDateInput"] {
 
     /* --- MOBİL RAPORLAR DASHBOARD --- */
 
-    /* Sol: tarihler, Sağ: toggles, Alt: arama tam genişlik */
-    /* Sol: başlık+başlangıç+bitiş+arama, Sağ: başlık+toggles */
+    /* Sol: Filtreleme/Başlangıç/Bitiş/Arama, Sağ: Gelişmiş/Toggles */
     .reports-dashboard {
         grid-template-areas:
             "title-filter  title-adv"
             "date-start    toggles"
             "date-end      toggles"
-            "search        search";
-            "search        .";
+            "search        toggles";
         gap: 6px 8px;
     }
 
@@ -3352,7 +3452,6 @@ label[for="editDateInput"] {
     }
 
     /* Mobil: arama — tam genişlik, en altta */
-    /* Mobil: arama — sol sütunda, tarihlerin altında */
     .area-search {
         width: 100%;
         align-self: start;
@@ -4109,8 +4208,8 @@ label[for="editDateInput"] {
     /* Mobil menü boyutları */
     #settingsMenu {
         z-index: 2010;
-        width: 88%;
-        max-width: calc(100vw - 20px);
+        width: 50%;
+        max-width: 50vw;
     }
 
     #notificationMenu {
@@ -4287,10 +4386,6 @@ input[type="date"]::-webkit-datetime-edit-year-field {
     margin-top: -5px;
 }
 
-/* Modal body - alt padding artır, kaydet butonu görünsün */
-#editTransactionModal .modal-body {
-    padding-bottom: 30px;
-}
 
 /* Tarih input - takvim simgesi tarihin hemen sağında */
 #editTransactionModal #editDateInput {

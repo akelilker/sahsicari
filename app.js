@@ -6,7 +6,7 @@ function formatDateTR(dateObj) {
     return `${d}.${m}.${y}`;
 }
 const API_SECRET_KEY = "Karmotor_Guvenlik_Sifresi_2025";
-const APP_VERSION = '79.19';
+const APP_VERSION = '78.34';
 
 const safeStorage = {
     getItem: function(key) {
@@ -214,20 +214,10 @@ function initDOMCache() {
     DOM.reportSearchInput = document.getElementById('reportSearchInput');
 
     if (DOM.amount) {
-        DOM.amount.addEventListener('blur', function() {
-            const type = DOM.transactionType ? DOM.transactionType.value : 'giden';
-            if (type === 'gelen' && deformatCurrency(this.value) > 0) {
-                initiateAllocation();
-            }
+        DOM.amount.addEventListener('input', function() {
+            updateGelenAllocateButtonVisibility();
         });
-
-        DOM.amount.addEventListener('keydown', function(event) {
-            const type = DOM.transactionType ? DOM.transactionType.value : 'giden';
-            if ((event.key === 'Enter' || event.key === 'Tab') && type === 'gelen' && deformatCurrency(this.value) > 0) {
-                event.preventDefault();
-                initiateAllocation();
-            }
-        });
+        DOM.amount.addEventListener('blur', updateGelenAllocateButtonVisibility);
     }
 
     if (DOM.startDate) DOM.startDate.addEventListener('change', renderReportPreview);
@@ -456,6 +446,10 @@ function migrateOldDataSafely() {
                     changed = true;
                 }
             });
+            if (allData[person].categoryBalances[''] !== undefined) {
+                delete allData[person].categoryBalances[''];
+                changed = true;
+            }
         });
         if (changed) queueSave();
     } catch (error) { console.error('Migrasyon hatası:', error); }
@@ -473,18 +467,23 @@ function calculateAllBalances(person) {
             const monthData = allData[person][year][month];
             if (monthData && monthData.transactions) {
                 monthData.transactions.forEach(t => {
-                    if (allData[person].categoryBalances[t.category] === undefined) {
-                        allData[person].categoryBalances[t.category] = 0;
+                    const cat = t.category != null ? String(t.category) : '';
+                    if (!cat) return;
+                    if (allData[person].categoryBalances[cat] === undefined) {
+                        allData[person].categoryBalances[cat] = 0;
                     }
+                    const amount = Math.abs(Number(t.amount)) || 0;
                     if (t.type === 'giden') {
-                        allData[person].categoryBalances[t.category] += t.amount;
+                        allData[person].categoryBalances[cat] += amount;
                     } else {
-                        allData[person].categoryBalances[t.category] -= t.amount;
+                        allData[person].categoryBalances[cat] -= amount;
                     }
                 });
             }
         });
     });
+    // Boş kategori ( "") bakiyesini kaldır – hayalet bakiye buradan kaynaklanıyordu
+    if (allData[person].categoryBalances[''] !== undefined) delete allData[person].categoryBalances[''];
     updateDisplays(person);
 }
 
@@ -494,6 +493,94 @@ function calculatePersonTotalBalance(person) {
     Object.values(allData[person].categoryBalances).forEach(balance => totalBalance += (balance || 0));
     return totalBalance;
 }
+
+/** Tüm kişilerin bakiyelerini sadece işlem kayıtlarından yeniden hesaplar. Hayalet bakiye (işlemsiz görünen bakiye) varsa düzeltir. */
+function recalculateAllBalancesFromTransactions() {
+    if (!confirm('Tüm bakiyeler işlem geçmişinden yeniden hesaplanacak. Devam edilsin mi?')) return;
+    if (typeof closeAllMenus === 'function') closeAllMenus();
+    Object.keys(allData).forEach(person => {
+        if (person === 'metadata') return;
+        if (allData[person]) calculateAllBalances(person);
+    });
+    queueSave();
+    updateMainDisplay();
+    if (currentPerson) updateDisplays(currentPerson);
+    showNotification('Bakiyeler işlemlerden yeniden hesaplandı.', 'success');
+}
+window.recalculateAllBalancesFromTransactions = recalculateAllBalancesFromTransactions;
+
+/** Belirli bir tutarın (örn. 250000) hangi kişi/kategoride olduğunu ve kaç işlemden geldiğini bulur. */
+function findBalanceSource(targetAmount) {
+    if (targetAmount == null || targetAmount === '') targetAmount = 250000;
+    const num = parseFloat(String(targetAmount).replace(/\s/g, '').replace(',', '.')) || 250000;
+    const tolerance = 1;
+    const lines = [];
+    const found = [];
+
+    Object.keys(allData).forEach(person => {
+        if (person === 'metadata') return;
+        const bals = allData[person].categoryBalances || {};
+        Object.keys(bals).forEach(cat => {
+            const balance = Number(bals[cat]) || 0;
+            if (Math.abs(balance - num) > tolerance) return;
+            const txs = getAllTransactionsForPerson(person);
+            const catTxs = txs.filter(t => t.category === cat);
+            const sumGiden = catTxs.filter(t => t.type === 'giden').reduce((s, t) => s + (Number(t.amount) || 0), 0);
+            const sumGelen = catTxs.filter(t => t.type === 'gelen').reduce((s, t) => s + (Number(t.amount) || 0), 0);
+            const calcBalance = sumGiden - sumGelen;
+            found.push({ person, cat, balance, count: catTxs.length, sumGiden, sumGelen, calcBalance, catTxs });
+        });
+    });
+
+    found.forEach(f => {
+        lines.push(`${f.person} → "${f.cat}": bakiye ${formatAmount(f.balance)}, ${f.count} işlem (giden: ${formatAmount(f.sumGiden)}, gelen: ${formatAmount(f.sumGelen)}). Hesaplanan: ${formatAmount(f.calcBalance)}`);
+        if (f.count === 0 && Math.abs(f.balance) > 0.01) {
+            const anyMatch = getAllTransactionsForPerson(f.person).filter(t => Math.abs((Number(t.amount) || 0) - num) < 1);
+            if (anyMatch.length) lines.push(`  ⚠️ Bu kategoride işlem yok ama ${f.person} kişisinde ${formatAmount(num)} tutarlı ${anyMatch.length} işlem var. Kategorileri: ${[...new Set(anyMatch.map(t => t.category))].join(', ')}`);
+        }
+    });
+
+    if (lines.length === 0) {
+        lines.push('Bu tutarda bakiye bulunamadı. Tüm borçlu (pozitif) bakiyeler:');
+        Object.keys(allData).forEach(person => {
+            if (person === 'metadata') return;
+            const bals = allData[person].categoryBalances || {};
+            Object.keys(bals).forEach(cat => {
+                const b = Number(bals[cat]) || 0;
+                if (b > 0.01) {
+                    const txs = getAllTransactionsForPerson(person).filter(t => t.category === cat);
+                    lines.push(`${person} → "${cat}": ${formatAmount(b)} (${txs.length} işlem)`);
+                }
+            });
+        });
+    }
+
+    const msg = lines.join('\n');
+    const modal = document.getElementById('balanceSourceModal');
+    if (modal) {
+        const body = document.getElementById('balanceSourceModalBody');
+        if (body) body.textContent = msg;
+        modal.style.display = 'block';
+        if (typeof closeAllMenus === 'function') closeAllMenus();
+        return;
+    }
+    const div = document.createElement('div');
+    div.id = 'balanceSourceModal';
+    div.className = 'modal';
+    div.style.cssText = 'display:block; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; overflow:auto;';
+    div.innerHTML = `
+        <div style="max-width:90%; margin:20px auto; background:#1e2a38; padding:20px; border-radius:12px; white-space:pre-wrap; font-family:monospace; font-size:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <strong>Bakiye kaynağı (${formatAmount(num)})</strong>
+                <button type="button" onclick="document.getElementById('balanceSourceModal').remove()" style="background:#37474f; color:#fff; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;">Kapat</button>
+            </div>
+            <div id="balanceSourceModalBody" style="max-height:60vh; overflow:auto;">${msg.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
+        </div>
+    `;
+    document.body.appendChild(div);
+    div.onclick = function(e) { if (e.target === div) div.remove(); };
+}
+window.findBalanceSource = findBalanceSource;
 
 function updateMainDisplay() {
     let totalRec = 0, totalPay = 0;
@@ -804,6 +891,18 @@ function setTransactionTypeUnified(type, typeInputId, gidenBtnId, gelenBtnId) {
             populateCategorySelect(categorySelect, currentPerson);
         }
     }
+    updateGelenAllocateButtonVisibility();
+}
+
+function updateGelenAllocateButtonVisibility() {
+    const btn = document.getElementById('gelenAllocateBtn');
+    if (!btn) return;
+    const type = DOM.transactionType?.value || '';
+    const amount = DOM.amount ? deformatCurrency(DOM.amount.value) : 0;
+    const person = currentPerson;
+    const hasDebts = person && allData[person] && Object.keys(allData[person].categoryBalances || {}).some(c => (allData[person].categoryBalances[c] || 0) > 0.01);
+    const show = type === 'gelen' && amount > 0.01 && hasDebts;
+    btn.style.display = show ? 'inline-block' : 'none';
 }
 
 function populatePersonSelect(selectElement) {
@@ -1017,7 +1116,8 @@ function openPersonModal(person) {
     if (firstTab) firstTab.click();
 
     openModal('personModal');
-    
+    updateGelenAllocateButtonVisibility();
+
     setTimeout(() => initModalSwipe(), 100);
 }
 
@@ -1392,8 +1492,33 @@ function initiateAllocation() {
             e.preventDefault(); // Input'un blur olmasını engelle
         }
     }, true);
+
+    // Blur'da girilen tutarı koru; başka yere tıklanınca veya Tab ile silinmesin
+    content.addEventListener('blur', function(e) {
+        const input = e.target;
+        if (input.classList && input.classList.contains('allocation-input')) {
+            persistAllocationInputValue(input);
+        }
+    }, true);
     
     updateAllocationTotals();
+}
+
+function persistAllocationInputValue(input) {
+    if (!input || !input.classList.contains('allocation-input')) return;
+    const num = deformatCurrency(input.value);
+    if (num > 0.01) {
+        input.value = formatNumber(num);
+        updateAllocationTotals();
+        setTimeout(function() {
+            if (input.isConnected && deformatCurrency(input.value) < 0.01) {
+                input.value = formatNumber(num);
+                updateAllocationTotals();
+            }
+        }, 0);
+    } else {
+        updateAllocationTotals();
+    }
 }
 
 function updateAllocationTotals() {
@@ -1617,7 +1742,8 @@ async function processSingleTransaction() {
 }
 
 function addTransaction(person, type, amount, category, description, date = null) {
-    amount = Math.abs(amount); 
+    amount = Math.abs(amount);
+    const cat = (category != null && String(category).trim()) ? String(category).trim() : 'Genel';
     const txDate = date ? date : (transactionDateHolder || getLocalTimeISO());
     const d = new Date(txDate);
     const year = d.getFullYear().toString();
@@ -1628,7 +1754,7 @@ function addTransaction(person, type, amount, category, description, date = null
 
     allData[person][year][month].transactions.push({
         id: Date.now() + Math.random() * 1000,
-        amount, description, category, type, date: txDate, status: 'active'
+        amount, description, category: cat, type, date: txDate, status: 'active'
     });
     calculateAllBalances(person);
 }
@@ -1738,6 +1864,7 @@ function clearTransactionForm() {
     if(DOM.category) DOM.category.value = '';
     setTransactionType('');
     setCurrentDate();
+    updateGelenAllocateButtonVisibility();
 }
 
 function checkAnyMenuOpen() {
@@ -1993,12 +2120,12 @@ async function addNewPerson() {
     isProcessing = true;
     try {
         allData[name] = {
-            categories: [...defaultCategories, 'Avans'], 
+            categories: ['Havale/EFT'],
             categoryBalances: {},
             isFavorite: false
         };
-        
-        [...defaultCategories, 'Avans'].forEach(cat => {
+
+        ['Havale/EFT'].forEach(cat => {
             allData[name].categoryBalances[cat] = 0;
         });
         
@@ -3589,11 +3716,18 @@ function populateQuickPersonList() {
     
     people.forEach(person => {
         const div = document.createElement('div');
-        div.className = 'person-item quick-person-item'; 
+        div.className = 'person-item quick-person-item';
         div.textContent = person;
         div.onclick = () => selectQuickPersonFromOverlay(person);
         list.appendChild(div);
     });
+
+    const addBtn = document.createElement('div');
+    addBtn.className = 'person-item quick-person-item quick-add-person-btn';
+    addBtn.textContent = '+';
+    addBtn.title = 'Yeni Kişi Ekle';
+    addBtn.onclick = () => { closeQuickTransactionOverlay(); showPersonManagementModal(); };
+    list.appendChild(addBtn);
 }
 
 function filterQuickPersonList() {
@@ -3601,6 +3735,7 @@ function filterQuickPersonList() {
     const items = document.querySelectorAll('.person-item');
     
     items.forEach(item => {
+        if (item.classList.contains('quick-add-person-btn')) return;
         const txt = item.textContent || item.innerText;
         if (txt.toLocaleUpperCase('tr-TR').indexOf(filter) > -1) {
             item.style.display = "";

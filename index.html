@@ -188,7 +188,7 @@
             </div>
             
             <div class="quick-actions-row">
-                <button class="btn btn-success" onclick="processQuickTransaction()"> ✅ İşlemi Kaydet</button>
+                <button class="btn btn-success" onclick="processQuickTransaction()">İşlemi Kaydet</button>
                 <button class="btn btn-danger" onclick="resetQuickPanel()">↩️ Listeye Dön</button>
             </div>
         </div>
@@ -232,7 +232,10 @@
         </div> <div class="modal-body">
             <div class="tab-content" id="yeniIslem" style="display: block;">
                 <div class="form-group">
-                    <label>İşlem Tipi</label>
+                    <div class="transaction-type-header">
+                        <label>İşlem Tipi</label>
+                        <button type="button" class="recalc-balance-icon" onclick="recalculateAllBalancesFromTransactions()" title="Bakiyeleri yeniden hesapla" aria-label="Bakiyeleri yeniden hesapla"></button>
+                    </div>
                     <div class="transaction-type-buttons">
                         <button class="type-btn giden" id="gidenBtn" onclick="setTransactionType('giden')" type="button">Giden TL</button>
                         <button class="type-btn gelen" id="gelenBtn" onclick="setTransactionType('gelen')" type="button">Gelen TL</button>
@@ -264,7 +267,10 @@
                     </div>
                 </div>
                 
-                <button class="btn btn-success" id="addTransactionBtn" onclick="processSingleTransaction()"> ✅ İşlemi Kaydet</button>
+                <div class="form-group" style="display:flex; gap:8px; flex-wrap:wrap;">
+                    <button class="btn btn-success" id="addTransactionBtn" onclick="processSingleTransaction()">İşlemi Kaydet</button>
+                    <button class="btn btn-outline" id="gelenAllocateBtn" onclick="initiateAllocation()" style="display:none;"> 📋 Geleni Dağıt</button>
+                </div>
             </div>
             <div class="tab-content" id="islemGecmisi">
                 <div class="history-container">
@@ -350,7 +356,10 @@
                 <label for="newPersonName">Kişi Adı</label>
                 <input id="newPersonName" onkeypress="handlePersonNameEnter(event)" placeholder="Örn: Ahmet, Ayşe..." type="text"/>
             </div>
-            <button class="btn btn-success" onclick="addNewPerson()">➕ Kişi Ekle</button>
+            <div class="add-person-actions">
+                <button class="btn btn-save-person" onclick="addNewPerson()" type="button">✓ Kaydet</button>
+                <button class="btn btn-cancel-person" onclick="closeCurrentModal(this)" type="button">✕ Vazgeç</button>
+            </div>
         </div>
     </div>
 </div>
@@ -370,7 +379,7 @@
 </div>
 
 <div class="modal" id="personManagementModal">
-    <div class="modal-content" style="max-width: 500px;">
+    <div class="modal-content">
         <div class="modal-header">
             <div class="header-top-row">
                 <h2> 👥 Kişi Yönetimi</h2>
@@ -385,7 +394,7 @@
 </div>
 
 <div class="modal" id="categoryManagementModal">
-    <div class="modal-content" style="max-width: 500px;">
+    <div class="modal-content">
         <div class="modal-header">
             <div class="header-top-row">
                 <h2> 🏷️ Kategori Yönetimi</h2>
@@ -412,7 +421,7 @@
 </div>
 
 <div class="modal" id="monthlySummaryModal">
-    <div class="modal-content" style="max-width:400px;">
+    <div class="modal-content">
         <div class="modal-header">
             <div class="header-top-row">
                 <h2> 🗓️ Aylık Rapor</h2>
@@ -435,7 +444,7 @@
 </div>
 
 <div class="modal" id="syncHelpModal">
-    <div class="modal-content" style="max-width:500px;">
+    <div class="modal-content">
         <div class="modal-header">
             <div class="header-top-row">
                 <h2> ℹ️ Uygulama Rehberi</h2>
@@ -568,6 +577,6 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.min.js" async></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js" async></script>
 <script src="storage.js?v=1.0" defer></script>
-<script src="app.js?v=79.19" defer></script>
+<script src="app.js?v=79.20" defer></script>
 </body>
 </html>
