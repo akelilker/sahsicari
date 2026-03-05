@@ -90,6 +90,15 @@ function formatTitleCase(str) {
     ).join(' ');
 }
 
+function debounce(fn, delay = 180) {
+    let timeoutId = null;
+    return function(...args) {
+        const context = this;
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => fn.apply(context, args), delay);
+    };
+}
+
 function deformatCurrency(value) {
     if (value === null || value === undefined) return 0;
     const stringValue = String(value);
@@ -141,6 +150,7 @@ let quickPersonSelectedValue = null;
 let quickAllocationDesc = '';
 let quickAllocationCategory = ''; 
 let currentReportFilterType = 'all';
+let renderReportPreviewDebounced = null;
 
 const months = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
 const defaultCategories = ['Elden', 'Havale/EFT', 'Pınar H.', 'İş Bankası KK', 'Black KK', 'Ek Hesap', 'Fiesta']; 
@@ -226,7 +236,8 @@ function initDOMCache() {
 
     if (DOM.startDate) DOM.startDate.addEventListener('change', renderReportPreview);
     if (DOM.endDate) DOM.endDate.addEventListener('change', renderReportPreview);
-    if (DOM.reportSearchInput) DOM.reportSearchInput.addEventListener('input', renderReportPreview);
+    if (!renderReportPreviewDebounced) renderReportPreviewDebounced = debounce(renderReportPreview, 180);
+    if (DOM.reportSearchInput) DOM.reportSearchInput.addEventListener('input', renderReportPreviewDebounced);
 
     const zeroToggle = document.getElementById('showZeroBalanceToggle');
     if (zeroToggle) {
@@ -612,18 +623,20 @@ window.findBalanceSource = findBalanceSource;
 
 function updateMainDisplay() {
     let totalRec = 0, totalPay = 0;
+    const people = [];
     Object.keys(allData).forEach(p => {
-        if(p === 'metadata') return;
+        if (p === 'metadata') return;
+        people.push(p);
         const bal = calculatePersonTotalBalance(p);
-        if(bal > 0.01) totalRec += bal;
-        else if(bal < -0.01) totalPay += Math.abs(bal);
+        if (bal > 0.01) totalRec += bal;
+        else if (bal < -0.01) totalPay += Math.abs(bal);
     });
-    
+
     if(DOM.totalReceivable) DOM.totalReceivable.textContent = formatAmount(totalRec);
     if(DOM.totalPayable) DOM.totalPayable.textContent = formatAmount(totalPay);
-    if(DOM.totalPeople) DOM.totalPeople.textContent = Object.keys(allData).filter(p => p !== 'metadata').length;
-    
-    if(DOM.personSelect) populatePersonSelect(DOM.personSelect);
+    if(DOM.totalPeople) DOM.totalPeople.textContent = people.length;
+
+    if (DOM.personSelect) populatePersonSelect(DOM.personSelect, people.sort((a, b) => a.localeCompare(b, 'tr-TR')));
     updateQuickGrid();
 }
 
@@ -933,14 +946,17 @@ function updateGelenAllocateButtonVisibility() {
     btn.style.display = show ? 'inline-block' : 'none';
 }
 
-function populatePersonSelect(selectElement) {
+function populatePersonSelect(selectElement, sortedPeople = null) {
     if (!selectElement) return;
     const currentVal = selectElement.value;
-    
+
     while (selectElement.options.length > 1) selectElement.remove(1);
-    
-    Object.keys(allData).sort().forEach(person => {
-        if (person === 'metadata') return;
+
+    const peopleToRender = sortedPeople || Object.keys(allData)
+        .filter(person => person !== 'metadata')
+        .sort((a, b) => a.localeCompare(b, 'tr-TR'));
+
+    peopleToRender.forEach(person => {
         selectElement.add(new Option(person, person));
     });
     selectElement.value = currentVal;
@@ -2428,21 +2444,22 @@ function setReportFilterType(type) {
 }
 
 function getFilteredTransactions() {
-    let txs = getAllTransactionsForPerson(currentPerson);
-    const startVal = document.getElementById('startDate').value;
-    const endVal = document.getElementById('endDate').value;
-    const searchText = document.getElementById('reportSearchInput') ? document.getElementById('reportSearchInput').value.toLocaleLowerCase('tr-TR') : '';
-    
+    const allTransactions = getAllTransactionsForPerson(currentPerson);
+    let txs = allTransactions;
+    const startVal = DOM.startDate ? DOM.startDate.value : '';
+    const endVal = DOM.endDate ? DOM.endDate.value : '';
+    const searchText = DOM.reportSearchInput ? DOM.reportSearchInput.value.toLocaleLowerCase('tr-TR') : '';
+
     if (startVal && endVal) {
         const start = new Date(startVal);
         const end = new Date(endVal);
-        end.setHours(23, 59, 59); 
+        end.setHours(23, 59, 59);
         txs = txs.filter(t => {
             const d = new Date(t.date);
             return d >= start && d <= end;
         });
     }
-    
+
     if (currentReportFilterType !== 'all') {
         txs = txs.filter(t => t.type === currentReportFilterType);
     }
@@ -2455,8 +2472,8 @@ function getFilteredTransactions() {
             return desc.includes(searchText) || cat.includes(searchText) || amt.includes(searchText);
         });
     }
-    
-    return { allTransactions: getAllTransactionsForPerson(currentPerson), periodTransactions: txs };
+
+    return { allTransactions, periodTransactions: txs };
 }
 
 function renderReportPreview() {

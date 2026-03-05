@@ -13,6 +13,9 @@ islemler: []
 let currentIslemTip = 'giris';
 let selectedIslemId = null;
 let currentKasaCategory = null;
+let historyClickBound = false;
+let kategoriGridClickBound = false;
+let kategoriListClickBound = false;
 
 // Kategori ikonları
 const katIkonlar = {
@@ -101,6 +104,8 @@ el.className = 'info-amount ' + (bakiye >= 0 ? 'text-income' : 'text-expense');
 
 function updateHistory() {
 const container = document.getElementById('historyContainer');
+if (!container) return;
+bindHistoryClickOnce();
 const islemler = [...kasaData.islemler].sort((a, b) => new Date(b.tarih) - new Date(a.tarih));
 
 if (islemler.length === 0) {
@@ -140,6 +145,13 @@ html += `</div>`;
 
 container.innerHTML = html;
 
+}
+
+
+function bindHistoryClickOnce() {
+if (historyClickBound) return;
+const container = document.getElementById('historyContainer');
+if (!container) return;
 container.addEventListener('click', function(e) {
     const historyItem = e.target.closest('.history-item');
     if (historyItem && historyItem.dataset.islemId) {
@@ -149,12 +161,13 @@ container.addEventListener('click', function(e) {
         showEditModal(historyItem.dataset.islemId);
     }
 }, true);
-
+historyClickBound = true;
 }
 
 function updateKategoriGrid() {
 const grid = document.getElementById('kategoriGrid');
 if (!grid) return;
+bindKategoriGridClickOnce();
 
 const toplamlar = {};
 kasaData.islemler.forEach(i => {
@@ -173,6 +186,13 @@ grid.innerHTML = giderKat.map(k => `
     </div>
 `).join('');
 
+}
+
+
+function bindKategoriGridClickOnce() {
+if (kategoriGridClickBound) return;
+const grid = document.getElementById('kategoriGrid');
+if (!grid) return;
 grid.addEventListener('click', function(e) {
     const card = e.target.closest('.kategori-card');
     if (card && card.dataset.kategori) {
@@ -182,7 +202,7 @@ grid.addEventListener('click', function(e) {
         showKasaCategoryDetails(card.dataset.kategori);
     }
 }, true);
-
+kategoriGridClickBound = true;
 }
 
 function updateKategoriSelect() {
@@ -202,6 +222,7 @@ if (currentIslemTip === 'giris') {
 function updateKategoriListesi() {
 const list = document.getElementById('kategoriListesi');
 if (!list) return;
+bindKategoriListClickOnce();
 
 const giderKat = kasaData.kategoriler.filter(k => k !== 'Kasa');
 list.innerHTML = giderKat.map(k => `
@@ -211,6 +232,13 @@ list.innerHTML = giderKat.map(k => `
     </div>
 `).join('');
 
+}
+
+
+function bindKategoriListClickOnce() {
+if (kategoriListClickBound) return;
+const list = document.getElementById('kategoriListesi');
+if (!list) return;
 list.addEventListener('click', function(e) {
     const btn = e.target.closest('.kategori-sil-btn');
     if (btn && btn.dataset.kategori) {
@@ -220,7 +248,7 @@ list.addEventListener('click', function(e) {
         kategoriSil(btn.dataset.kategori);
     }
 }, true);
-
+kategoriListClickBound = true;
 }
 
 function updateRaporOzet() {
