@@ -239,6 +239,28 @@ function initDOMCache() {
 }
 
 let saveTimer = null;
+async function queueServerSyncPayload(payload) {
+    try {
+        const db = await openIndexedDB();
+        const existing = await getSyncQueue(db);
+        for (const item of existing) {
+            if (item && typeof item.url === 'string' && item.url.includes('save.php')) {
+                await removeSyncQueueItem(db, item.id);
+            }
+        }
+        await addToSyncQueue(db, {
+            url: 'save.php',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+    } catch (error) {
+        console.error('Sync queue add failed:', error);
+    }
+}
 
 function queueSave() {
     if (saveTimer) clearTimeout(saveTimer);
@@ -257,10 +279,12 @@ function queueSave() {
                 await advancedStorage.removeItem('sahsiHesapTakibiData');
             } else {
                 await advancedStorage.setItem('sahsiHesapTakibiData', JSON.stringify(allData));
+                await queueServerSyncPayload(allData);
             }
             await advancedStorage.setItem('sahsiHesapTakibiNotifications', JSON.stringify(notificationHistory));
         } catch (error) {
             await advancedStorage.setItem('sahsiHesapTakibiData', JSON.stringify(allData));
+            await queueServerSyncPayload(allData);
         }
         saveTimer = null;
     }, 1000);
@@ -2535,37 +2559,6 @@ function createCategorySummaryData(person, allTransactions, periodTransactions, 
     return { categoryData: data, activeCategories };
 }
 
-function createTransactionDetailsData(transactions) {
-    const data = [['Tarih', 'İşlem Tipi', 'Kategori', 'Açıklama', 'Tutar']];
-    const sortedTransactions = [...transactions].sort((a,b) => new Date(a.date) - new Date(b.date));
-    
-    sortedTransactions.forEach(t => {
-        data.push([
-            formatDateTR(new Date(t.date)),
-            t.type === 'giden' ? 'Giden' : 'Gelen',
-            t.category,
-            t.description,
-            t.amount
-        ]);
-    });
-    return data;
-}
-
-function applyNumberFormattingToSheet(ws, colIndexes, startRow) {
-    if(!ws['!ref']) return;
-    const range = XLSX.utils.decode_range(ws['!ref']);
-    
-    for(let R = startRow; R <= range.e.r; ++R) {
-        colIndexes.forEach(C => {
-            const cellRef = XLSX.utils.encode_cell({r: R, c: C});
-            if(ws[cellRef]) {
-                ws[cellRef].t = 'n'; 
-                ws[cellRef].z = '#,##0.00'; 
-            }
-        });
-    }
-}
-
 function exportToExcel() {
     if (exportInProgress) return showNotification("⚠️ Rapor hazırlanıyor...", "warning");
     const person = currentPerson;
@@ -3465,11 +3458,18 @@ async function manualSync() {
 function openIndexedDB() {
     return new Promise((resolve, reject) => {
         const request = indexedDB.open('SahsiHesapDB', 1);
+        request.onupgradeneeded = (event) => {
+            const db = event.target.result;
+            if (!db.objectStoreNames.contains('data')) db.createObjectStore('data');
+            if (!db.objectStoreNames.contains('syncQueue')) {
+                const syncStore = db.createObjectStore('syncQueue', { keyPath: 'id', autoIncrement: true });
+                syncStore.createIndex('timestamp', 'timestamp', { unique: false });
+            }
+        };
         request.onsuccess = () => resolve(request.result);
         request.onerror = () => reject(request.error);
     });
 }
-
 function getSyncQueue(db) {
     return new Promise((resolve, reject) => {
         const transaction = db.transaction('syncQueue', 'readonly');
@@ -3516,11 +3516,6 @@ if ('serviceWorker' in navigator) {
     });
 }
 
-if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-    });
-}
-
 document.addEventListener("DOMContentLoaded", () => {
     const root = document.documentElement;
     root.style.setProperty("--sa-top", "env(safe-area-inset-top)");
@@ -3536,17 +3531,6 @@ document.addEventListener("DOMContentLoaded", () => {
         document.body.classList.add('ios-pwa');
     }
 });
-window.installPWA = function() {
-    if (!deferredPrompt) {
-        alert("PWA kurulumu şu anda kullanılamıyor");
-        return;
-    }
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then((choiceResult) => {
-        deferredPrompt = null;
-    });
-};
-
 const closeMenuOutside = (event) => {
     if (!event.target.closest('.notification-icon-btn')) {
         const dropdowns = document.querySelectorAll('.dropdown-menu');
@@ -4619,6 +4603,9 @@ function confirmSiriTransaction(person, amount, type, desc) {
 document.addEventListener('DOMContentLoaded', () => {
     setTimeout(checkSiriParams, 1000);
 });
+
+
+
 
 
 
