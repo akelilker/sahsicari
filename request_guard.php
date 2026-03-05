@@ -22,9 +22,14 @@ function is_loopback_host(string $host): bool {
     return in_array($host, ['localhost', '127.0.0.1', '::1'], true);
 }
 
+function strip_www_prefix(string $host): string {
+    return (strpos($host, 'www.') === 0) ? substr($host, 4) : $host;
+}
+
 function hosts_match(string $left, string $right): bool {
     if ($left === '' || $right === '') return false;
     if ($left === $right) return true;
+    if (strip_www_prefix($left) === strip_www_prefix($right)) return true;
 
     // Treat local loopback aliases as equivalent for local development.
     return is_loopback_host($left) && is_loopback_host($right);
