@@ -12,10 +12,10 @@ function normalize_host(?string $value): string {
     // Header may be "host:port"; parse_url needs a scheme for reliable host parsing.
     $parsed = parse_url((strpos($trimmed, '://') !== false) ? $trimmed : ('http://' . $trimmed), PHP_URL_HOST);
     if (is_string($parsed) && $parsed !== '') {
-        return strtolower($parsed);
+        return strtolower(trim($parsed, '[]'));
     }
 
-    return strtolower($trimmed);
+    return strtolower(trim($trimmed, '[]'));
 }
 
 function is_loopback_host(string $host): bool {
@@ -38,6 +38,12 @@ function enforce_same_origin(): void {
     }
 
     $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+    $origin = is_string($origin) ? trim($origin) : '';
+    if (strtolower($origin) === 'null') {
+        // PWA/standalone contexts may send Origin: null.
+        $origin = '';
+    }
+
     if ($origin !== '') {
         $originHost = normalize_host($origin);
         if (!hosts_match($originHost, $host)) {
@@ -59,4 +65,3 @@ function enforce_same_origin(): void {
     }
 }
 ?>
-
