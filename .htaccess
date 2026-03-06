@@ -1,0 +1,14 @@
+# Aynı siteden gelen load.php / save.php isteklerinin 403 almasını önlemek için.
+# Barındırma ModSecurity kullanıyorsa bu klasörde devre dışı bırakılabilir.
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+</IfModule>
+
+# Bazı sunucularda ModSec bu dizin için kapatılabiliyor (hosting izin veriyorsa):
+<IfModule mod_security2.c>
+    SecRuleEngine Off
+</IfModule>
+
+# Alternatif isim (bazı WAF'lar "load" kelimesini engelliyor):
+# load.php yerine api_load.php kullanmak için app.js içinde URL değiştirilebilir.

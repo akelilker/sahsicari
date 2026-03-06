@@ -2,7 +2,7 @@
 const DEBUG = false; // Set to true for development
 const SW_VERSION = '79.21';
 const CACHE_NAME = `sahsi-hesap-v${SW_VERSION}`;
-const API_BYPASS_PATHS = new Set(['/load.php', '/save.php', '/kd_load.php', '/kd_save.php']);
+const API_BYPASS_PATHS = new Set(['/load.php', '/get_data.php', '/save.php', '/kd_load.php', '/kd_save.php']);
 const urlsToCache = [
     '/',
     '/index.html',

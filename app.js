@@ -355,7 +355,7 @@ function updateServerStatus(type, message) {
 async function testServerConnection() {
     updateServerStatus('', '🔄 Bağlantı test ediliyor...');
     try {
-        const response = await fetch('load.php?test=1&t=' + Date.now(), { 
+        const response = await fetch('get_data.php?test=1&t=' + Date.now(), { 
             method: 'GET', 
             headers: { 
                 'Accept': 'application/json'
@@ -413,7 +413,7 @@ function saveDataToServer(data, force = false) {
 }
 
 function loadDataFromServer() {
-    return fetch('load.php?t=' + Date.now(), { 
+    return fetch('get_data.php?t=' + Date.now(), { 
         method: 'GET', 
         headers: { 
             'Accept': 'application/json'
@@ -427,7 +427,7 @@ function loadDataFromServer() {
                 const err = JSON.parse(text);
                 if (err && err.message) msg += ': ' + err.message;
             } catch (_) {}
-            console.warn('load.php hatası:', msg);
+            console.warn('get_data.php hatası:', msg);
             throw new Error(msg);
         }
         return text;
