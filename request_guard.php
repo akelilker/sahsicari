@@ -49,24 +49,34 @@ function enforce_same_origin(): void {
         $origin = '';
     }
 
+    $originOk = false;
     if ($origin !== '') {
         $originHost = normalize_host($origin);
         if (!hosts_match($originHost, $host)) {
-            deny_request(403, 'Cross-origin request denied');
+            deny_request(403, 'Cross-origin request denied (Origin: ' . $originHost . ' vs Host: ' . $host . ')');
         }
+        $originOk = true;
     }
 
     $referer = $_SERVER['HTTP_REFERER'] ?? '';
     if ($origin === '' && $referer !== '') {
         $refererHost = normalize_host($referer);
         if (!hosts_match($refererHost, $host)) {
-            deny_request(403, 'Invalid referer');
+            deny_request(403, 'Invalid referer (Referer host: ' . $refererHost . ' vs Host: ' . $host . ')');
         }
+        $originOk = true;
     }
 
+    // Sec-Fetch-Site: only enforce when we couldn't validate via Origin/Referer.
+    // GET (read-only) is allowed without Origin/Referer so load.php works in PWA / strict referrer.
     $secFetchSite = $_SERVER['HTTP_SEC_FETCH_SITE'] ?? '';
-    if ($secFetchSite !== '' && !in_array($secFetchSite, ['same-origin', 'same-site', 'none'], true)) {
-        deny_request(403, 'Fetch-site policy violation');
+    $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
+    if (!$originOk && $secFetchSite !== '' && !in_array($secFetchSite, ['same-origin', 'same-site', 'none'], true)) {
+        if ($method === 'GET') {
+            // Read-only: allow GET when Origin/Referer missing (PWA, privacy, etc.)
+        } else {
+            deny_request(403, 'Fetch-site policy violation (Sec-Fetch-Site: ' . $secFetchSite . ')');
+        }
     }
 }
 ?>

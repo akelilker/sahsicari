@@ -419,9 +419,18 @@ function loadDataFromServer() {
             'Accept': 'application/json'
         } 
     })
-    .then(response => {
-        if (!response.ok) throw new Error('HTTP ' + response.status);
-        return response.text();
+    .then(async response => {
+        const text = await response.text();
+        if (!response.ok) {
+            let msg = 'HTTP ' + response.status;
+            try {
+                const err = JSON.parse(text);
+                if (err && err.message) msg += ': ' + err.message;
+            } catch (_) {}
+            console.warn('load.php hatası:', msg);
+            throw new Error(msg);
+        }
+        return text;
     })
     .then(text => {
         try {
