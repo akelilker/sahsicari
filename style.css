@@ -2145,6 +2145,44 @@ select option {
     color: #78909c;
     opacity: 0.6;
 }
+#personManagementList .management-actions .mgmt-btn,
+#categoryManagementList .management-actions .mgmt-btn {
+    font-size: 0;
+    color: transparent;
+}
+
+#personManagementList .management-actions .mgmt-btn::before,
+#categoryManagementList .management-actions .mgmt-btn::before {
+    font-size: 24px;
+    line-height: 1;
+    font-weight: 700;
+    display: block;
+    color: #b0bec5;
+}
+
+#personManagementList .management-actions .mgmt-btn:nth-child(1)::before {
+    content: '\2606';
+    color: #78909c;
+}
+
+#personManagementList .management-actions .mgmt-btn.is-fav:nth-child(1)::before {
+    content: '\2605';
+    color: #ffeb3b;
+    text-shadow: 0 0 10px rgba(255, 235, 59, 0.5);
+}
+
+#personManagementList .management-actions .mgmt-btn:nth-child(2)::before,
+#categoryManagementList .management-actions .mgmt-btn:nth-child(1)::before {
+    content: '\270F';
+    color: #b0bec5;
+}
+
+#personManagementList .management-actions .mgmt-btn:nth-child(3)::before,
+#categoryManagementList .management-actions .mgmt-btn:nth-child(2)::before {
+    content: '\2716';
+    color: #ff1744 !important;
+    text-shadow: 0 0 8px rgba(255, 23, 68, 0.4);
+}
 
 .detail-table {
     width: 100%;
@@ -3250,48 +3288,14 @@ label[for="editDateInput"] {
     }
 
     #personManagementModal .modal-body > .btn.btn-success {
-        font-size: 12.5px;
+        font-size: 14px;
         min-height: 34px;
         height: 34px;
+        margin-top: 6px;
     }
 
-    #personManagementList .management-actions .mgmt-btn,
-    #categoryManagementList .management-actions .mgmt-btn {
-        font-size: 0;
-        color: transparent;
-    }
-
-    #personManagementList .management-actions .mgmt-btn::before,
-    #categoryManagementList .management-actions .mgmt-btn::before {
-        font-size: 24px;
-        line-height: 1;
-        font-weight: 700;
-        display: block;
-        color: #b0bec5;
-    }
-
-    #personManagementList .management-actions .mgmt-btn:nth-child(1)::before {
-        content: '\2606';
-        color: #78909c;
-    }
-
-    #personManagementList .management-actions .mgmt-btn.is-fav:nth-child(1)::before {
-        content: '\2605';
-        color: #ffeb3b;
-        text-shadow: 0 0 10px rgba(255, 235, 59, 0.5);
-    }
-
-    #personManagementList .management-actions .mgmt-btn:nth-child(2)::before,
-    #categoryManagementList .management-actions .mgmt-btn:nth-child(1)::before {
-        content: '\270F';
-        color: #b0bec5;
-    }
-
-    #personManagementList .management-actions .mgmt-btn:nth-child(3)::before,
-    #categoryManagementList .management-actions .mgmt-btn:nth-child(2)::before {
-        content: '\2716';
-        color: #ff1744;
-        text-shadow: 0 0 8px rgba(255, 23, 68, 0.4);
+    #personManagementList .management-list-item > span {
+        font-size: 1.08em;
     }
 
     .date-row-transparent {
