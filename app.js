@@ -3250,11 +3250,13 @@ function initiateMemoryClear() {
         yesBtn.onclick = attemptBackupAndClear; 
         yesBtn.textContent = "EVET";
     }
-    const noBtn = document.querySelector('#customMemoryOverlay .btn-no');
+    const noBtn = document.querySelector('.btn-no');
     if(noBtn) {
         noBtn.onclick = closeMemoryOverlay;
     }
 } 
+
+const BACKUP_TIMEOUT_MS = 12000;
 
 async function attemptBackupAndClear() {
     const yesBtn = document.querySelector('#customMemoryOverlay .btn-yes');
@@ -3263,8 +3265,8 @@ async function attemptBackupAndClear() {
     if(yesBtn) {
         yesBtn.disabled = true;
         yesBtn.textContent = "Yedekleniyor...";
-        noBtn.disabled = true;
     }
+    if(noBtn) noBtn.disabled = true;
     
     const alertTitle = document.getElementById('memAlertTitle');
     const alertMessage = document.getElementById('memAlertMessage');
@@ -3272,87 +3274,93 @@ async function attemptBackupAndClear() {
     alertTitle.textContent = "Yedekleme İşlemi";
     alertMessage.innerHTML = "Sunucuya veri yedekleniyor, lütfen bekleyin...";
 
+    function showBackupFailedAndOfferClear() {
+        const overlay = document.getElementById('customMemoryOverlay');
+        if (overlay) overlay.classList.add('error-state');
+        if (alertTitle) alertTitle.textContent = "⚠️ YEDEKLEME BAŞARISIZ!";
+        if (alertMessage) alertMessage.innerHTML = "Sunucuya erişilemedi veya zaman aşımı.<br>Yine de silerseniz veriler kaybolabilir.<br>Devam edilsin mi?";
+        if (yesBtn) {
+            yesBtn.disabled = false;
+            yesBtn.textContent = "EVET, SİL";
+            yesBtn.onclick = () => { if (yesBtn) yesBtn.disabled = true; finalizeClear(); };
+        }
+        if (noBtn) noBtn.disabled = false;
+    }
+
     try {
         const data = await advancedStorage.getItem('sahsiHesapTakibiData');
 
-        if(data) {
-            await saveDataToServer(JSON.parse(data), true);
+        if (data) {
+            const savePromise = saveDataToServer(JSON.parse(data), true);
+            const timeoutPromise = new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Yedekleme zaman aşımı')), BACKUP_TIMEOUT_MS)
+            );
+            await Promise.race([savePromise, timeoutPromise]);
             
             alertTitle.textContent = "Yedekleme Başarılı ✅";
             alertMessage.innerHTML = "Sunucuya kaydedildi. Şimdi bellek temizlenecek...";
-            
             if(yesBtn) yesBtn.textContent = "TEMİZLENİYOR...";
             if(noBtn) noBtn.style.display = "none";
-            setTimeout(() => finalizeClear(), 1500);
+            setTimeout(() => finalizeClear(), 800);
             
         } else {
             alertTitle.textContent = "Yedekleme Gerekmiyor";
             alertMessage.innerHTML = "Yerel veri bulunamadı. Bellek temizleniyor...";
             if(yesBtn) yesBtn.textContent = "TEMİZLENİYOR...";
             if(noBtn) noBtn.style.display = "none";
-            setTimeout(() => finalizeClear(), 1000);
+            setTimeout(() => finalizeClear(), 600);
         }
         
     } catch (e) {
         console.error("Yedekleme hatası:", e);
-        
-        const overlay = document.getElementById('customMemoryOverlay');
-        overlay.classList.add('error-state');
-
-        alertTitle.textContent = "⚠️ YEDEKLEME BAŞARISIZ!";
-        alertMessage.innerHTML = "Sunucuya erişilemedi/kaydedilemedi.<br>Yine de silerseniz **veriler kaybolabilir**.<br>Devam edilsin mi?";
-        
-        if(yesBtn) {
-            yesBtn.disabled = false; 
-            yesBtn.textContent = "EVET, SİL";
-            yesBtn.onclick = finalizeClear;
-            noBtn.disabled = false;
-        }
+        showBackupFailedAndOfferClear();
     }
 }
 
+const CLEAR_TIMEOUT_MS = 5000;
+
 async function finalizeClear() {
-    const btn = document.querySelector('#customMemoryOverlay .btn-yes');
-    const noBtn = document.querySelector('#customMemoryOverlay .btn-no');
-    if(btn) btn.innerText = 'TEMİZLENİYOR...';
-    if(noBtn) noBtn.style.display = "none";
+    const overlay = document.getElementById('customMemoryOverlay');
+    const btn = overlay?.querySelector('.btn-yes');
+    const noBtn = overlay?.querySelector('.btn-no');
+    if (btn) btn.innerText = 'TEMİZLENİYOR...';
+    if (noBtn) noBtn.style.display = 'none';
+
+    const alertTitle = document.getElementById('memAlertTitle');
+    const alertMessage = document.getElementById('memAlertMessage');
+    function showDoneAndReload() {
+        if (alertTitle) alertTitle.textContent = '✅ BAŞARILI';
+        if (alertMessage) alertMessage.innerHTML = 'Bellek temizlendi. Sayfa yenileniyor...';
+        setTimeout(() => {
+            window.location.href = window.location.pathname || '/';
+        }, 800);
+    }
 
     try {
         localStorage.removeItem('sahsiHesapTakibiData');
         localStorage.removeItem('sahsiHesapTakibiNotifications');
         
-        if ('serviceWorker' in navigator) {
+        const unregisterSW = async () => {
+            if (!('serviceWorker' in navigator)) return;
             const registrations = await navigator.serviceWorker.getRegistrations();
-            for (const registration of registrations) {
-                await registration.unregister();
-            }
-        }
-        
-        if ('caches' in window) {
+            for (const reg of registrations) await reg.unregister();
+        };
+        const clearCaches = async () => {
+            if (!('caches' in window)) return;
             const keys = await caches.keys();
-            for (const key of keys) {
-                await caches.delete(key);
-            }
-        }
+            for (const key of keys) await caches.delete(key);
+        };
+        const timeout = (ms) => new Promise((_, rej) => setTimeout(rej, ms, new Error('timeout')));
         
-        const alertTitle = document.getElementById('memAlertTitle');
-        const alertMessage = document.getElementById('memAlertMessage');
-        alertTitle.textContent = "✅ BAŞARILI";
-        alertMessage.innerHTML = "Bellek temizlendi. Sayfa yenileniyor...";
-
-        setTimeout(() => {
-            const separator = window.location.pathname.includes('?') ? '&' : '?';
-            window.location.replace(window.location.pathname + separator + 'refresh=' + Date.now());
-
-            // Fallback: if replace is ignored in standalone/PWA contexts.
-            setTimeout(() => {
-                window.location.reload();
-            }, 700);
-        }, 1500); 
+        await Promise.race([
+            Promise.all([unregisterSW(), clearCaches()]),
+            timeout(CLEAR_TIMEOUT_MS)
+        ]).catch(() => { /* timeout veya hata: yine de devam */ });
         
+        showDoneAndReload();
     } catch (e) {
         console.error("Temizleme hatası:", e);
-        window.location.reload(true);
+        showDoneAndReload();
     }
 }
 
