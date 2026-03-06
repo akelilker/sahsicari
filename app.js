@@ -3317,9 +3317,7 @@ async function attemptBackupAndClear() {
     }
 }
 
-const CLEAR_TIMEOUT_MS = 5000;
-
-async function finalizeClear() {
+function finalizeClear() {
     const overlay = document.getElementById('customMemoryOverlay');
     const btn = overlay?.querySelector('.btn-yes');
     const noBtn = overlay?.querySelector('.btn-no');
@@ -3328,40 +3326,25 @@ async function finalizeClear() {
 
     const alertTitle = document.getElementById('memAlertTitle');
     const alertMessage = document.getElementById('memAlertMessage');
-    function showDoneAndReload() {
-        if (alertTitle) alertTitle.textContent = '✅ BAŞARILI';
-        if (alertMessage) alertMessage.innerHTML = 'Bellek temizlendi. Sayfa yenileniyor...';
-        setTimeout(() => {
-            window.location.href = window.location.pathname || '/';
-        }, 800);
+
+    localStorage.removeItem('sahsiHesapTakibiData');
+    localStorage.removeItem('sahsiHesapTakibiNotifications');
+
+    if (alertTitle) alertTitle.textContent = '✅ BAŞARILI';
+    if (alertMessage) alertMessage.innerHTML = 'Bellek temizlendi. Sayfa yenileniyor...';
+
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(regs => {
+            regs.forEach(reg => reg.unregister());
+        }).catch(() => {});
+    }
+    if ('caches' in window) {
+        caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k)))).catch(() => {});
     }
 
-    try {
-        localStorage.removeItem('sahsiHesapTakibiData');
-        localStorage.removeItem('sahsiHesapTakibiNotifications');
-        
-        const unregisterSW = async () => {
-            if (!('serviceWorker' in navigator)) return;
-            const registrations = await navigator.serviceWorker.getRegistrations();
-            for (const reg of registrations) await reg.unregister();
-        };
-        const clearCaches = async () => {
-            if (!('caches' in window)) return;
-            const keys = await caches.keys();
-            for (const key of keys) await caches.delete(key);
-        };
-        const timeout = (ms) => new Promise((_, rej) => setTimeout(rej, ms, new Error('timeout')));
-        
-        await Promise.race([
-            Promise.all([unregisterSW(), clearCaches()]),
-            timeout(CLEAR_TIMEOUT_MS)
-        ]).catch(() => { /* timeout veya hata: yine de devam */ });
-        
-        showDoneAndReload();
-    } catch (e) {
-        console.error("Temizleme hatası:", e);
-        showDoneAndReload();
-    }
+    setTimeout(() => {
+        window.location.href = window.location.pathname || '/';
+    }, 400);
 }
 
 let deferredPrompt;
