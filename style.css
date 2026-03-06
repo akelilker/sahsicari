@@ -3470,11 +3470,11 @@ label[for="editDateInput"] {
         transition: none;
     }
 
-    /* Input — global stili koru, sadece yüksekliği küçült */
+    /* Input — büyüteç sola yaslı olduğu için padding-left ikon genişliği kadar */
     .rd-search #reportSearchInput {
         flex: 1;
         width: 100%;
-        padding: 4px 8px 4px 28px;
+        padding: 4px 8px 4px 26px;
         opacity: 1;
         pointer-events: auto;
         transition: none;
@@ -3482,10 +3482,11 @@ label[for="editDateInput"] {
         font-size: 0.82em;
     }
 
-    /* Büyüteç ikonu — absolute, input içinde dikey ortalı */
+    /* Büyüteç ikonu — sola yaslı, input alanının en solunda */
     .rd-search .rd-search-icon {
         position: absolute;
-        left: 8px;
+        left: 0;
+        padding-left: 6px;
         top: 50%;
         transform: translateY(-50%);
         font-size: 14px;
@@ -3493,6 +3494,8 @@ label[for="editDateInput"] {
         cursor: pointer;
         z-index: 1;
         line-height: 1;
+        display: flex;
+        align-items: center;
     }
 
     /* 3 toggle butonu — büyüteçle aynı yükseklikte */
@@ -3980,9 +3983,12 @@ label[for="editDateInput"] {
 
 .rd-search-icon {
     position: absolute;
-    left: 10px;
+    left: 0;
+    padding-left: 8px;
     font-size: 1.1em;
     opacity: 0.6;
+    display: flex;
+    align-items: center;
 }
 
 #reportSearchInput {
@@ -3995,6 +4001,10 @@ label[for="editDateInput"] {
     font-size: 0.9em;
     outline: none;
     text-shadow: 0 1px 1px rgba(0,0,0,0.55);
+}
+/* Raporlar arama: büyüteç sola yaslı */
+.rd-search #reportSearchInput {
+    padding-left: 28px;
 }
 
 #reportSearchInput::placeholder {
