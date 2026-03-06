@@ -3433,6 +3433,9 @@ label[for="editDateInput"] {
     }
 
     /* --- MOBİL RAPORLAR DASHBOARD --- */
+    #personModal #raporlar {
+        padding: 6px 4px 0;
+    }
 
     /* Sol: Filtreleme/Başlangıç/Bitiş/Arama, Sağ: Gelişmiş/Toggles */
     .reports-dashboard {
@@ -3441,7 +3444,7 @@ label[for="editDateInput"] {
             "date-start    toggles"
             "date-end      toggles"
             "search        toggles";
-        gap: 6px 8px;
+        gap: 6px 6px;
     }
 
     /* Mobil: toggles dikey */
@@ -3459,7 +3462,7 @@ label[for="editDateInput"] {
         overflow: hidden;
     }
 
-    /* rd-search: mobilde büyüteç stili */
+    /* rd-search: mobilde büyüteç sola yaslı, sol boşluk minimum */
     .rd-search {
         margin: 0;
         width: 100%;
@@ -3469,12 +3472,15 @@ label[for="editDateInput"] {
         overflow: hidden;
         transition: none;
     }
+    .rd-search .rd-search-icon {
+        padding-left: 2px;
+    }
 
-    /* Input — büyüteç sola yaslı olduğu için padding-left ikon genişliği kadar */
+    /* Input — büyüteç sola yaslı, metin ikona yakın */
     .rd-search #reportSearchInput {
         flex: 1;
         width: 100%;
-        padding: 4px 8px 4px 26px;
+        padding: 4px 6px 4px 22px;
         opacity: 1;
         pointer-events: auto;
         transition: none;
