@@ -1324,8 +1324,19 @@ overflow: hidden;
 }
 
 #categoryManagementModal .form-group label {
+    margin-top: 6px;
     margin-bottom: 10px;
     display: block;
+    text-align: center;
+}
+
+#categoryManagementModal #categoryManagementPersonSelect {
+    height: 33px;
+    text-align: center;
+    text-align-last: center;
+    line-height: 1.2;
+    padding-top: 0;
+    padding-bottom: 0;
 }
 
 #addPersonModal .modal-body {
@@ -3236,6 +3247,51 @@ label[for="editDateInput"] {
     #personModal #yeniIslem .form-group select {
         height: 38px;
         line-height: normal;
+    }
+
+    #personManagementModal .modal-body > .btn.btn-success {
+        font-size: 12.5px;
+        min-height: 34px;
+        height: 34px;
+    }
+
+    #personManagementList .management-actions .mgmt-btn,
+    #categoryManagementList .management-actions .mgmt-btn {
+        font-size: 0;
+        color: transparent;
+    }
+
+    #personManagementList .management-actions .mgmt-btn::before,
+    #categoryManagementList .management-actions .mgmt-btn::before {
+        font-size: 24px;
+        line-height: 1;
+        font-weight: 700;
+        display: block;
+        color: #b0bec5;
+    }
+
+    #personManagementList .management-actions .mgmt-btn:nth-child(1)::before {
+        content: '\2606';
+        color: #78909c;
+    }
+
+    #personManagementList .management-actions .mgmt-btn.is-fav:nth-child(1)::before {
+        content: '\2605';
+        color: #ffeb3b;
+        text-shadow: 0 0 10px rgba(255, 235, 59, 0.5);
+    }
+
+    #personManagementList .management-actions .mgmt-btn:nth-child(2)::before,
+    #categoryManagementList .management-actions .mgmt-btn:nth-child(1)::before {
+        content: '\270F';
+        color: #b0bec5;
+    }
+
+    #personManagementList .management-actions .mgmt-btn:nth-child(3)::before,
+    #categoryManagementList .management-actions .mgmt-btn:nth-child(2)::before {
+        content: '\2716';
+        color: #ff1744;
+        text-shadow: 0 0 8px rgba(255, 23, 68, 0.4);
     }
 
     .date-row-transparent {
