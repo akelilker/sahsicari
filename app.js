@@ -3312,8 +3312,8 @@ async function attemptBackupAndClear() {
 }
 
 async function finalizeClear() {
-    const btn = document.querySelector('.btn-yes');
-    const noBtn = document.querySelector('.btn-no');
+    const btn = document.querySelector('#customMemoryOverlay .btn-yes');
+    const noBtn = document.querySelector('#customMemoryOverlay .btn-no');
     if(btn) btn.innerText = 'TEMİZLENİYOR...';
     if(noBtn) noBtn.style.display = "none";
 
@@ -3341,7 +3341,13 @@ async function finalizeClear() {
         alertMessage.innerHTML = "Bellek temizlendi. Sayfa yenileniyor...";
 
         setTimeout(() => {
-            window.location.href = window.location.pathname;
+            const separator = window.location.pathname.includes('?') ? '&' : '?';
+            window.location.replace(window.location.pathname + separator + 'refresh=' + Date.now());
+
+            // Fallback: if replace is ignored in standalone/PWA contexts.
+            setTimeout(() => {
+                window.location.reload();
+            }, 700);
         }, 1500); 
         
     } catch (e) {
