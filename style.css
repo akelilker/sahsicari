@@ -1147,6 +1147,47 @@ body.modal-open-ios .global-status-bar {
     justify-content: space-between;
     align-items: center;
 }
+.status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.status-dot {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    line-height: 1;
+    transition: color 0.25s ease, text-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.status-dot::before {
+    content: "🖥";
+    font-size: 13px;
+}
+
+.status-dot.online {
+    color: #00ff00;
+    text-shadow: 0 0 8px rgba(0, 255, 0, 0.5);
+}
+
+.status-dot.offline {
+    color: #ff1744;
+    text-shadow: 0 0 8px rgba(255, 23, 68, 0.5);
+}
+
+.status-dot.syncing {
+    color: #ffea00;
+    text-shadow: 0 0 8px rgba(255, 234, 0, 0.5);
+    animation: statusSyncPulse 1s ease-in-out infinite;
+}
+
+@keyframes statusSyncPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.12); }
+}
 
 #serverStatusText {
     font-weight: 600;
@@ -1164,6 +1205,10 @@ body.modal-open-ios .global-status-bar {
     color: #00FF00;
     animation: statusDim 4s forwards;
     opacity: 1;
+}
+
+#serverStatusText.text-offline {
+    color: #ff1744;
 }
 
 @keyframes versionEmbed {
