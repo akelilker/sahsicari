@@ -2867,9 +2867,10 @@ select option {
 }
 
 .person-item:hover {
-    background: var(--dark-bg);
-    border-color: var(--white-50);
+    background: rgba(14, 21, 37, 0.98);
+    border-color: #8fb3ff;
     color: #ffffff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.35);
     transform: scale(1.02);
     z-index: 100;
 }
