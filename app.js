@@ -395,17 +395,17 @@ async function testServerConnection() {
 
 function saveDataToServer(data, force = false) {
     if (!data || typeof data !== 'object' || Object.keys(data).length === 0) {
-        console.warn("🛑 GÜVENLİK: Boş veya hatalı veri kaydedilmeye çalışıldı! İşlem iptal edildi.");
-        return Promise.reject("Boş veri koruması: Kayıt iptal edildi.");
+        console.warn("GUVENLIK: Bos veya hatali veri kaydedilmeye calisildi! Islem iptal edildi.");
+        return Promise.reject("Bos veri korumasi: Kayit iptal edildi.");
     }
 
-    let url = 'save.php';
-    if (force) url += '?force=true';
+    const primaryUrl = force ? 'save.php?force=true' : 'save.php';
+    const fallbackUrl = force ? 'api_save.php?force=true' : 'api_save.php';
 
-    return fetch(url, {
+    const sendSave = (url) => fetch(url, {
         method: 'POST',
-        headers: { 
-            'Content-Type': 'application/json', 
+        headers: {
+            'Content-Type': 'application/json',
             'Accept': 'application/json',
             'X-Requested-With': 'XMLHttpRequest'
         },
@@ -416,7 +416,7 @@ function saveDataToServer(data, force = false) {
         const rawText = await response.text();
 
         if (response.status === 409) {
-            throw new Error("ANTI-WIPE: Sunucu veri kaybını engelledi.");
+            throw new Error("ANTI-WIPE: Sunucu veri kaybini engelledi.");
         }
 
         if (!response.ok) {
@@ -432,16 +432,26 @@ function saveDataToServer(data, force = false) {
     }).then(text => {
         try {
             const result = JSON.parse(text);
-            updateServerStatus('success', '✅ Sunucuya kaydedildi');
+            updateServerStatus('success', 'Sunucuya kaydedildi');
             return result;
-        } catch (e) { throw new Error('Sunucu hatası: ' + text); }
-    }).catch(error => {
-        console.error(error);
-        updateServerStatus('error', '❌ Kayıt Hatası');
-        throw error;
+        } catch (e) {
+            throw new Error('Sunucu hatasi: ' + text);
+        }
     });
-}
 
+    return sendSave(primaryUrl)
+        .catch(error => {
+            if (String(error && error.message || '').includes('HTTP 403')) {
+                return sendSave(fallbackUrl);
+            }
+            throw error;
+        })
+        .catch(error => {
+            console.error(error);
+            updateServerStatus('error', 'Kayit Hatasi');
+            throw error;
+        });
+}
 function loadDataFromServer() {
     return fetch('get_data.php?t=' + Date.now(), { 
         method: 'GET', 
