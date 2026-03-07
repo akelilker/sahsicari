@@ -3305,8 +3305,6 @@ function closeMemoryOverlay() {
         yesBtn.disabled = false;
         yesBtn.style.display = '';
     }
-    const skipBtn = document.getElementById('memorySkipBackupBtn');
-    if (skipBtn) skipBtn.style.display = '';
     const noBtn = overlay.querySelector('.btn-no');
     if (noBtn) noBtn.style.display = '';
 
@@ -3335,10 +3333,6 @@ function initiateMemoryClear() {
         yesBtn.textContent = "EVET";
         yesBtn.style.display = "";
     }
-    const skipBtn = document.getElementById('memorySkipBackupBtn');
-    if (skipBtn) {
-        skipBtn.onclick = () => { finalizeClear(); };
-    }
     const noBtn = document.querySelector('#customMemoryOverlay .btn-no');
     if (noBtn) noBtn.onclick = closeMemoryOverlay;
 } 
@@ -3354,8 +3348,6 @@ async function attemptBackupAndClear() {
         yesBtn.textContent = "Yedekleniyor...";
     }
     if(noBtn) noBtn.disabled = true;
-    const skipBtn = document.getElementById('memorySkipBackupBtn');
-    if (skipBtn) skipBtn.style.display = 'none';
     
     const alertTitle = document.getElementById('memAlertTitle');
     const alertMessage = document.getElementById('memAlertMessage');
@@ -3367,7 +3359,7 @@ async function attemptBackupAndClear() {
         const overlay = document.getElementById('customMemoryOverlay');
         if (overlay) overlay.classList.add('error-state');
         if (alertTitle) alertTitle.textContent = "⚠️ YEDEKLEME BAŞARISIZ!";
-        if (alertMessage) alertMessage.innerHTML = "Sunucuya erişilemedi veya zaman aşımı.<br>Yine de silerseniz veriler kaybolabilir.<br>Devam edilsin mi?";
+        if (alertMessage) alertMessage.innerHTML = 'Sunucuya Yedeklenemedi.<br>Devam Etmek İstediğinize Emin misiniz?';
         if (yesBtn) {
             yesBtn.disabled = false;
             yesBtn.textContent = "EVET, SİL";
