@@ -1594,7 +1594,8 @@ height: 100%;
     border: 1px solid rgba(0, 255, 0, 0.6);
     color: #00FF00;
     box-shadow: none;
-    padding: 10px 10px;
+    padding: 10px 20px;
+    margin-top: 5px;
     font-weight: 300;
     text-shadow: 0 0 7px rgba(0, 255, 0, 0.35);
     transition: transform 0.2s ease, border-width 0.2s ease, font-size 0.2s ease, background-color 0.2s ease, color 0.2s ease;
@@ -1707,10 +1708,11 @@ select option {
     text-shadow: 0 0 8px rgba(255, 23, 68, 0.4);
 }
 .type-btn.active.gelen {
-    background: rgba(0, 230, 118, 0.25);
-    border: 1px solid rgba(0, 230, 118, 0.8);
-    text-shadow: 0 0 8px rgba(0, 230, 118, 0.4);
-    box-shadow: 0 0 8px rgba(0, 230, 118, 0.3);
+    background: rgba(0, 255, 0, 0.2);
+    border: 1px solid rgba(0, 255, 0, 0.8);
+    color: #00FF00;
+    text-shadow: 0 0 8px rgba(0, 255, 0, 0.4);
+    box-shadow: 0 0 8px rgba(0, 255, 0, 0.3);
 }
 
 #personTotalInfo {
@@ -1908,14 +1910,14 @@ select option {
     background: transparent;
     border: none;
     box-shadow: none;
-    color: #00e676;
+    color: #00FF00;
     font-weight: 700;
     margin-top: 12px;
     transition: all 0.2s ease;
     display: flex;
     justify-content: center;
     align-items: center;
-    text-shadow: 0 0 8px rgba(0, 230, 118, 0.4);
+    text-shadow: 0 0 8px rgba(0, 255, 0, 0.4);
 }
 
 #showZeroBalanceToggle {
@@ -4030,9 +4032,9 @@ label[for="editDateInput"] {
     width: auto;
     align-self: center;
     min-width: 150px;
-    color: #00e676;
-    border-color: rgba(0, 230, 118, 0.25);
-    text-shadow: none;
+    color: #00FF00;
+    border-color: rgba(0, 255, 0, 0.5);
+    text-shadow: 0 0 8px rgba(0, 255, 0, 0.4);
     box-shadow: none;
     background-image: none;
 }
@@ -4056,7 +4058,7 @@ label[for="editDateInput"] {
 }
 
 .area-title-filter { color: #ff9800; text-shadow: none; }
-.area-title-adv    { color: #4caf50; text-shadow: none; }
+.area-title-adv    { color: #00FF00; text-shadow: 0 0 8px rgba(0, 255, 0, 0.35); }
 
 .rd-date-group {
     display: flex;
@@ -4206,7 +4208,8 @@ label[for="editDateInput"] {
     border: 1px solid rgba(0, 255, 0, 0.6);
     color: #00FF00;
     box-shadow: none;
-    padding: 10px 10px;
+    padding: 10px 20px;
+    margin-top: 5px;
     font-weight: 300;
     text-shadow: 0 0 7px rgba(0, 255, 0, 0.35);
     transition: transform 0.2s ease, border-width 0.2s ease, font-size 0.2s ease, background-color 0.2s ease, color 0.2s ease;
@@ -4244,10 +4247,10 @@ label[for="editDateInput"] {
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
 }
 .rd-btn.green-line {
-    border-color: #4caf50;
-    color: #00e676;
+    border-color: rgba(0, 255, 0, 0.6);
+    color: #00FF00;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    text-shadow: 0 0 6px rgba(0, 255, 0, 0.3);
 }
 /* BELLEK TEMİZLEME & UYARI PENCERESİ */
 .custom-alert-overlay {
@@ -4869,7 +4872,7 @@ input[type="date"]::-webkit-datetime-edit-year-field {
     cursor: pointer;
   }
   .rd-btn.orange-line:hover { color: #ffcc80; }
-  .rd-btn.green-line:hover  { color: #69f0ae; }
+  .rd-btn.green-line:hover  { color: #00FF00; text-shadow: 0 0 10px rgba(0, 255, 0, 0.5); }
 
   .close-overlay-btn:hover {
     transform: translateY(-50%) scale(1.03);
