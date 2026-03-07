@@ -2606,12 +2606,21 @@ select option {
 }
 
 #allocationOverlay .quick-panel-header {
-    margin-bottom: 10px;
-    position: static;
+    margin: -16px -14px 12px -14px !important;
+    padding: 10px 44px 10px 14px;
+    position: relative !important;
+    border-radius: 16px 16px 0 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+    background: linear-gradient(to bottom, rgba(46, 125, 50, 0.95) 0%, rgba(20, 24, 38, 0.86) 100%);
 }
 
 #allocationOverlay .quick-panel-header h3 {
-    font-size: 0.95em;
+    margin: 0 auto !important;
+    color: #ffffff !important;
+    font-size: 1.02em !important;
+    font-weight: 800;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8), 0 0 4px rgba(255, 255, 255, 0.2);
+    padding: 0;
 }
 
 #allocationOverlay .quick-panel-content {
@@ -2619,15 +2628,18 @@ select option {
 }
 
 #allocationOverlay .close-overlay-btn {
-    position: absolute;
-    right: 20px;
-    top: 10px;
-    transform: none;
-    margin: 0;
+    position: absolute !important;
+    right: 10px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    margin: 0 !important;
     z-index: 100;
-    background: transparent;
-    border: none;
+    width: 28px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.22);
     box-shadow: none;
+    color: #e8f5e9;
 }
 
 .quick-panel-header h3 {
