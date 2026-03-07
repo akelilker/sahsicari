@@ -241,14 +241,22 @@ function initDOMCache() {
 
     const zeroToggle = document.getElementById('showZeroBalanceToggle');
     if (zeroToggle) {
+        syncZeroBalanceToggleText();
         zeroToggle.addEventListener('change', () => {
-             if(currentPerson && document.getElementById('kategoriDurumu').style.display === 'block') {
-                 updateCategoryBalanceDisplay(currentPerson);
-             }
+            syncZeroBalanceToggleText();
+            if (currentPerson && document.getElementById('kategoriDurumu').style.display === 'block') {
+                updateCategoryBalanceDisplay(currentPerson);
+            }
         });
     }
 }
 
+function syncZeroBalanceToggleText() {
+    const toggle = document.getElementById('showZeroBalanceToggle');
+    const label = document.getElementById('showZeroBalanceToggleBtn');
+    if (!toggle || !label) return;
+    label.textContent = toggle.checked ? 'Bakiyeleri \u00D6ster' : 'S\u0131f\u0131r Bakiyeleri \u00D6ster';
+}
 let saveTimer = null;
 async function queueServerSyncPayload(payload) {
     try {
