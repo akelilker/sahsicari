@@ -1252,6 +1252,10 @@ overflow: hidden;
     margin-bottom: 12px; /* <--- Boşluk açıldı */
 }
 
+#personModal .modal-header .header-top-row {
+    margin-bottom: 2px;
+}
+
 .modal-header h2 {
     flex-grow: 1;
     text-align: center;
@@ -1293,7 +1297,7 @@ overflow: hidden;
 }
 
 #categoryDetailModal {
-    padding-bottom: calc(40px + env(safe-area-inset-bottom) + 18px);
+    padding-bottom: calc(40px + env(safe-area-inset-bottom) + 10px);
 }
 
 #addPersonModal .modal-content,
@@ -1371,7 +1375,7 @@ overflow: hidden;
     font-size: 11px;
     padding: 4px 8px;
     min-height: unset;
-    height: 28px;
+    height: 31px;
     transition: background 0.15s;
 }
 
@@ -1390,7 +1394,7 @@ overflow: hidden;
     font-size: 11px;
     padding: 4px 8px;
     min-height: unset;
-    height: 28px;
+    height: 31px;
     transition: background 0.15s;
 }
 
@@ -1403,6 +1407,15 @@ overflow: hidden;
 #addPersonModal .modal-body .form-group label {
     margin-bottom: 10px;
     display: block;
+}
+
+#personManagementModal .modal-body > .btn.btn-success {
+    font-size: 16px;
+    min-height: 36px;
+    height: 36px;
+    margin-top: 6px;
+    border-color: rgba(0, 230, 118, 0.45);
+    border-width: 1.5px;
 }
 
 .modal-body {
@@ -1574,7 +1587,7 @@ height: 100%;
     display: none !important;
 }
 
-#addTransactionBtn {
+#personModal #addTransactionBtn {
     margin-top: 18px;
 }
 
@@ -2215,8 +2228,8 @@ select option {
 #personManagementList .management-actions .mgmt-btn:nth-child(3)::before,
 #categoryManagementList .management-actions .mgmt-btn:nth-child(2)::before {
     content: '\2716';
-    color: #ff1744 !important;
-    text-shadow: 0 0 8px rgba(255, 23, 68, 0.4);
+    color: #ff3355 !important;
+    text-shadow: 0 0 10px rgba(255, 23, 68, 0.65);
 }
 
 .detail-table {
@@ -2305,6 +2318,7 @@ select option {
     color: #ffea00;
     font-weight: 700;
     text-shadow: 0 0 14px rgba(255, 234, 0, 0.5);
+    padding-right: 2px;
 }
 
 .detail-table th:nth-child(5),
@@ -2315,6 +2329,7 @@ select option {
     color: #ffffff;
     font-weight: 500;
     white-space: normal;
+    padding-left: 2px;
 }
 
 .mobile-hint { display: none !important; }
@@ -2864,16 +2879,16 @@ select option {
 }
 
 .report-col.left-col .report-header {
-    background: rgba(255, 23, 68, 0.15);
+    background: transparent;
     /* FIX: Sol rapor başlığı kırmızısı net */
     color: #ff1744;
-    border: 1px solid var(--red-30);
+    border: none;
 }
 
 .report-col.right-col .report-header {
-    background: rgba(0, 230, 118, 0.15);
-    color: #b9f6ca;
-    border: 1px solid rgba(0, 230, 118, 0.3);
+    background: transparent;
+    color: #00e676;
+    border: none;
 }
 
 .report-list {
@@ -3352,10 +3367,12 @@ label[for="editDateInput"] {
     }
 
     #personManagementModal .modal-body > .btn.btn-success {
-        font-size: 14px;
-        min-height: 34px;
-        height: 34px;
+        font-size: 16px;
+        min-height: 36px;
+        height: 36px;
         margin-top: 6px;
+        border-color: rgba(0, 230, 118, 0.45);
+        border-width: 1.5px;
     }
 
     #personManagementList .management-list-item > span {
@@ -3905,7 +3922,7 @@ label[for="editDateInput"] {
     }
     /* Kişi modalı masaüstü boşluk düzenlemeleri */
     #personModal .modal-header .header-top-row {
-        margin-bottom: 9px; /* MURAT başlığı ile Murat Borcu/Net Alacağınız arası 3px azaltıldı (12→9) */
+        margin-bottom: 0;
     }
     #personModal .tab-buttons .tab-btn {
         padding: 12px 8px 3px 8px; /* Sekme başlıkları ile yatay çizgi arası toplam 3px */
@@ -4155,19 +4172,19 @@ label[for="editDateInput"] {
     width: 100%;
     margin-top: 8px;
 }
-#addTransactionBtn {
+#personModal #addTransactionBtn {
     background: transparent;
     font-size: 0.8em;
-    border: 1px solid rgba(129, 199, 132, 0.35);
+    border: 1px solid rgba(0, 230, 118, 0.45);
     color: #00e676;
     box-shadow: none;
     padding: 10px 0;
-    font-weight: 800;
+    font-weight: 400;
     text-shadow: 0 0 8px rgba(0, 230, 118, 0.3);
 }
 
-#addTransactionBtn:hover {
-    background: transparent;
+#personModal #addTransactionBtn:hover {
+    background: rgba(0, 230, 118, 0.18);
     transform: scale(1.02);
     text-shadow: 0 0 8px rgba(0, 230, 118, 0.4);
     box-shadow: 0 0 10px rgba(0, 230, 118, 0.25);
