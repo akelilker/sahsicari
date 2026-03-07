@@ -266,6 +266,7 @@ function syncZeroBalanceToggleText() {
     label.textContent = toggle.checked ? 'Geri Dön' : 'Sıfır Bakiyeleri Göster';
 }
 let saveTimer = null;
+let statusDotHideTimer = null;
 async function queueServerSyncPayload(payload) {
     try {
         const db = await openIndexedDB();
@@ -344,6 +345,11 @@ function updateServerStatus(type, message) {
     const dot = DOM.statusDot;
     const text = DOM.serverStatusText;
     if (!dot || !text) return;
+
+    if (statusDotHideTimer) {
+        clearTimeout(statusDotHideTimer);
+        statusDotHideTimer = null;
+    }
     
     dot.className = 'status-dot';
     text.className = ''; 
@@ -353,6 +359,9 @@ function updateServerStatus(type, message) {
         dot.classList.add('online');
         text.classList.add('text-online'); 
         text.textContent = 'Sistem hazır'; 
+        statusDotHideTimer = setTimeout(() => {
+            if (DOM.statusDot) DOM.statusDot.classList.add('hidden');
+        }, 10000);
     } else if (type === 'error') {
         dot.classList.add('offline');
         text.classList.add('text-offline'); 

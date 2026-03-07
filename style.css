@@ -1163,6 +1163,10 @@ body.modal-open-ios .global-status-bar {
     transition: color 0.25s ease, text-shadow 0.25s ease, transform 0.25s ease;
 }
 
+
+.status-dot.hidden {
+    display: none;
+}
 .status-dot::before {
     content: "🖥";
     font-size: 13px;
@@ -1171,11 +1175,15 @@ body.modal-open-ios .global-status-bar {
 .status-dot.online {
     color: #00ff00;
     text-shadow: 0 0 8px rgba(0, 255, 0, 0.5);
+    animation: statusDim 4s forwards;
+    opacity: 1;
 }
 
 .status-dot.offline {
     color: #ff1744;
     text-shadow: 0 0 8px rgba(255, 23, 68, 0.5);
+    animation: statusDim 4s forwards;
+    opacity: 1;
 }
 
 .status-dot.syncing {
@@ -1209,6 +1217,8 @@ body.modal-open-ios .global-status-bar {
 
 #serverStatusText.text-offline {
     color: #ff1744;
+    animation: statusDim 4s forwards;
+    opacity: 1;
 }
 
 @keyframes versionEmbed {
