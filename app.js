@@ -5,7 +5,7 @@ function formatDateTR(dateObj) {
     const y = dateObj.getFullYear();
     return `${d}.${m}.${y}`;
 }
-const APP_VERSION = '78.34';
+const APP_VERSION = '78.35';
 
 const safeStorage = {
     getItem: function(key) {
