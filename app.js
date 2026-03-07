@@ -406,8 +406,11 @@ function saveDataToServer(data, force = false) {
         method: 'POST',
         headers: { 
             'Content-Type': 'application/json', 
-            'Accept': 'application/json'
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
         },
+        credentials: 'same-origin',
+        mode: 'same-origin',
         body: JSON.stringify(data)
     }).then(async response => {
         const rawText = await response.text();
