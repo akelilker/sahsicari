@@ -5071,24 +5071,31 @@ input[type="date"]::-webkit-datetime-edit-year-field {
     overflow: hidden;
     text-overflow: ellipsis;
     color: inherit;
+    animation: pwaTextPulse 2.2s ease-in-out infinite;
+}
+
+@keyframes pwaTextPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.06); }
 }
 
 .pwa-install-btn {
     background: transparent;
     color: #00e676;
-    border: none;
+    border: 1px solid rgba(0, 230, 118, 0.7);
     padding: 4px 12px;
     border-radius: 6px;
     font-weight: 600;
     cursor: pointer;
     font-size: 13px;
     flex-shrink: 0;
-    transition: transform 0.2s ease, background 0.2s ease;
+    transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
 }
 
 .pwa-install-btn:hover {
     transform: scale(1.03);
     background: rgba(0, 230, 118, 0.1);
+    border-color: #00e676;
 }
 
 .pwa-install-close {
@@ -5157,6 +5164,7 @@ input[type="date"]::-webkit-datetime-edit-year-field {
     .pwa-install-btn {
         background: white;
         color: #667eea;
+        border: none;
         padding: 10px 24px;
         font-size: 14px;
     }
