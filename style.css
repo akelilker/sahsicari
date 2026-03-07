@@ -5162,17 +5162,18 @@ input[type="date"]::-webkit-datetime-edit-year-field {
     }
 
     .pwa-install-btn {
-        background: white;
-        color: #667eea;
-        border: none;
+        background: transparent;
+        color: #00e676;
+        border: 1px solid rgba(0, 230, 118, 0.8);
         padding: 10px 24px;
         font-size: 14px;
     }
 
     .pwa-install-btn:hover {
         transform: scale(1.05);
-        background: white;
-        box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+        background: rgba(0, 230, 118, 0.15);
+        border-color: #00e676;
+        box-shadow: 0 0 12px rgba(0, 230, 118, 0.3);
     }
 
     .pwa-install-close {
