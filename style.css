@@ -2610,7 +2610,7 @@ select option {
     padding: 10px 44px 10px 14px;
     position: relative !important;
     border-radius: 16px 16px 0 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+    border-bottom: none;
     background: linear-gradient(to bottom, rgba(46, 125, 50, 0.95) 0%, rgba(20, 24, 38, 0.86) 100%);
 }
 
@@ -3987,6 +3987,9 @@ label[for="editDateInput"] {
     min-width: 150px;
     color: #00e676;
     border-color: rgba(0, 230, 118, 0.25);
+    text-shadow: none;
+    box-shadow: none;
+    background-image: none;
 }
 
 /* RAPORLAR EKRANI DETAY STİLLERİ */
