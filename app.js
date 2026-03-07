@@ -3307,7 +3307,12 @@ function closeMemoryOverlay() {
         yesBtn.onclick = attemptBackupAndClear; 
         yesBtn.textContent = 'EVET';
         yesBtn.disabled = false;
+        yesBtn.style.display = '';
     }
+    const skipBtn = document.getElementById('memorySkipBackupBtn');
+    if (skipBtn) skipBtn.style.display = '';
+    const noBtn = overlay.querySelector('.btn-no');
+    if (noBtn) noBtn.style.display = '';
 
     setTimeout(() => {
         overlay.style.display = 'none';
@@ -3329,17 +3334,20 @@ function initiateMemoryClear() {
     );
     
     const yesBtn = document.querySelector('#customMemoryOverlay .btn-yes');
-    if(yesBtn) {
-        yesBtn.onclick = attemptBackupAndClear; 
+    if (yesBtn) {
+        yesBtn.onclick = attemptBackupAndClear;
         yesBtn.textContent = "EVET";
+        yesBtn.style.display = "";
     }
-    const noBtn = document.querySelector('.btn-no');
-    if(noBtn) {
-        noBtn.onclick = closeMemoryOverlay;
+    const skipBtn = document.getElementById('memorySkipBackupBtn');
+    if (skipBtn) {
+        skipBtn.onclick = () => { finalizeClear(); };
     }
+    const noBtn = document.querySelector('#customMemoryOverlay .btn-no');
+    if (noBtn) noBtn.onclick = closeMemoryOverlay;
 } 
 
-const BACKUP_TIMEOUT_MS = 12000;
+const BACKUP_TIMEOUT_MS = 5000;
 
 async function attemptBackupAndClear() {
     const yesBtn = document.querySelector('#customMemoryOverlay .btn-yes');
@@ -3350,6 +3358,8 @@ async function attemptBackupAndClear() {
         yesBtn.textContent = "Yedekleniyor...";
     }
     if(noBtn) noBtn.disabled = true;
+    const skipBtn = document.getElementById('memorySkipBackupBtn');
+    if (skipBtn) skipBtn.style.display = 'none';
     
     const alertTitle = document.getElementById('memAlertTitle');
     const alertMessage = document.getElementById('memAlertMessage');

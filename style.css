@@ -4374,6 +4374,13 @@ label[for="editDateInput"] {
     text-shadow: 0 1px 1px rgba(0,0,0,0.55);
 }
 
+.btn-skip-backup {
+    background: rgba(255, 152, 0, 0.2);
+    color: #ff9800;
+    border: 1px solid rgba(255, 152, 0, 0.5);
+    text-shadow: 0 0 8px rgba(255, 152, 0, 0.3);
+}
+
 @keyframes shake {
     0%, 100% { transform: translateX(0); }
     25% { transform: translateX(-5px); }
