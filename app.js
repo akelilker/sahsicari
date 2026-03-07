@@ -409,12 +409,23 @@ function saveDataToServer(data, force = false) {
             'Accept': 'application/json'
         },
         body: JSON.stringify(data)
-    }).then(response => {
+    }).then(async response => {
+        const rawText = await response.text();
+
         if (response.status === 409) {
             throw new Error("ANTI-WIPE: Sunucu veri kaybını engelledi.");
         }
-        if (!response.ok) throw new Error('HTTP ' + response.status);
-        return response.text();
+
+        if (!response.ok) {
+            let detail = rawText;
+            try {
+                const parsed = JSON.parse(rawText);
+                if (parsed && typeof parsed.message === 'string') detail = parsed.message;
+            } catch (e) {}
+            throw new Error('HTTP ' + response.status + (detail ? ' - ' + detail : ''));
+        }
+
+        return rawText;
     }).then(text => {
         try {
             const result = JSON.parse(text);
@@ -3350,7 +3361,13 @@ async function attemptBackupAndClear() {
         const data = await advancedStorage.getItem('sahsiHesapTakibiData');
 
         if (data) {
-            const savePromise = saveDataToServer(JSON.parse(data), true);
+            const parsedData = JSON.parse(data);
+            const savePromise = saveDataToServer(parsedData, true).catch(async (err) => {
+                if (String(err && err.message || '').includes('HTTP 403')) {
+                    return saveDataToServer(parsedData, false);
+                }
+                throw err;
+            });
             const timeoutPromise = new Promise((_, reject) =>
                 setTimeout(() => reject(new Error('Yedekleme zaman aşımı')), BACKUP_TIMEOUT_MS)
             );
