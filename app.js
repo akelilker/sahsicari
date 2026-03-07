@@ -352,14 +352,15 @@ function updateServerStatus(type, message) {
     if (type === 'success') {
         dot.classList.add('online');
         text.classList.add('text-online'); 
-        text.textContent = message || 'Sistem hazır'; 
+        text.textContent = 'Sistem hazır'; 
     } else if (type === 'error') {
         dot.classList.add('offline');
         text.classList.add('text-offline'); 
-        text.textContent = message || 'Bağlantı Hatası';
+        text.textContent = 'Sistem hazır';
     } else {
         dot.classList.add('syncing');
-        text.textContent = message || 'İşleniyor...';
+        text.classList.add('text-online');
+        text.textContent = 'Sistem hazır';
         text.style.color = '#ffea00'; 
     }
 }
