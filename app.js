@@ -4296,7 +4296,7 @@ function updateVersionDisplay() {
     const versionElement = document.querySelector('.version');
     if (!versionElement) return;
 
-    const currentVersion = 'v' + APP_VERSION;
+    const currentVersion = APP_VERSION;
     
     const userAgent = navigator.userAgent || navigator.vendor || window.opera;
     const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
