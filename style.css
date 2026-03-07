@@ -2870,6 +2870,15 @@ select option {
     overflow: hidden;
 }
 
+.report-col.right-col {
+    border-left: 1px solid rgba(120, 144, 156, 0.5);
+    padding-left: 12px;
+}
+
+.report-col.left-col {
+    padding-right: 12px;
+}
+
 .report-header {
     display: flex;
     justify-content: center;
@@ -2955,10 +2964,10 @@ select option {
 
 .new-summary-container {
     margin-top: 10px;
-    padding: 10px 0;
+    padding: 10px 0 0;
     background: transparent;
     border: none;
-    border-top: 1px dashed rgba(255, 255, 255, 0.15);
+    border-top: 1px solid rgba(120, 144, 156, 0.5);
 }
 
 .summary-top-row {
@@ -2967,36 +2976,42 @@ select option {
     gap: 10px;
     margin-bottom: 10px;
     padding-bottom: 8px;
-    border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(120, 144, 156, 0.35);
 }
 
 .summary-box-item {
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
     flex: 1;
+    min-width: 0;
 }
 
 .summary-label {
     font-size: 0.60em;
     color: #90a4ae;
-    margin-bottom: 3px;
+    margin-bottom: 0;
     letter-spacing: 0.3px;
     font-weight: 600;
     text-transform: uppercase;
+    flex-shrink: 0;
 }
 
 .summary-val {
     font-weight: 800;
     font-size: 0.8em;
+    flex-shrink: 0;
+    text-align: right;
 }
 
 .summary-net-row {
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: baseline;
     gap: 10px;
-    padding-top: 5px;
+    padding-top: 8px;
 }
 
 .summary-net-row .summary-label {
