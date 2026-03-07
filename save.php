@@ -46,9 +46,20 @@ if (!$force && file_exists($mainFile)) {
     }
 }
 
-if (!is_dir($backupDir)) @mkdir($backupDir, 0755, true);
+if (!is_dir($backupDir) && !mkdir($backupDir, 0755, true)) {
+    error_log('save.php backup mkdir failed: ' . $backupDir);
+    http_response_code(500);
+    echo json_encode(["status" => "error", "message" => "Yedek klasoru olusturulamadi"], JSON_UNESCAPED_UNICODE);
+    exit;
+}
 if (file_exists($mainFile)) {
-    @copy($mainFile, $backupDir . '/veriler_' . date('Y-m-d_H-i-s') . '.json');
+    $backupFile = $backupDir . '/veriler_' . date('Y-m-d_H-i-s') . '.json';
+    if (!copy($mainFile, $backupFile)) {
+        error_log('save.php backup copy failed: ' . $backupFile);
+        http_response_code(500);
+        echo json_encode(["status" => "error", "message" => "Yedekleme basarisiz, kayit iptal edildi"], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
 }
 
 $otuzGunOnce = time() - (30 * 24 * 60 * 60);

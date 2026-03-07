@@ -291,17 +291,12 @@ async function queueServerSyncPayload(payload) {
 
 function queueSave() {
     if (saveTimer) clearTimeout(saveTimer);
-    
-    if (!hasLoadedServerData) {
-        console.warn("⚠️ Veriler sunucudan henüz tam yüklenmediği için otomatik kayıt engellendi.");
-        return;
-    }
 
     saveTimer = setTimeout(async () => {
         if (!allData.metadata) allData.metadata = {};
         allData.metadata.lastUpdate = new Date().toISOString();
         try {
-            if (Object.keys(allData).length > 0 && navigator.onLine && hasLoadedServerData) {
+            if (Object.keys(allData).length > 0 && navigator.onLine) {
                 await saveDataToServer(allData, false);
                 await advancedStorage.removeItem('sahsiHesapTakibiData');
             } else {
@@ -310,6 +305,7 @@ function queueSave() {
             }
             await advancedStorage.setItem('sahsiHesapTakibiNotifications', JSON.stringify(notificationHistory));
         } catch (error) {
+            updateServerStatus('error', 'Sunucuya kaydedilemedi, yerelde bekliyor');
             await advancedStorage.setItem('sahsiHesapTakibiData', JSON.stringify(allData));
             await queueServerSyncPayload(allData);
         }
@@ -356,11 +352,11 @@ function updateServerStatus(type, message) {
     if (type === 'success') {
         dot.classList.add('online');
         text.classList.add('text-online'); 
-        text.textContent = 'Sistem hazır'; 
+        text.textContent = message || 'Sistem hazır'; 
     } else if (type === 'error') {
         dot.classList.add('offline');
         text.classList.add('text-offline'); 
-        text.textContent = 'Bağlantı Hatası';
+        text.textContent = message || 'Bağlantı Hatası';
     } else {
         dot.classList.add('syncing');
         text.textContent = message || 'İşleniyor...';
