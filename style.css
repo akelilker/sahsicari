@@ -405,6 +405,7 @@ body.ios-pwa .history-item .description {
 .top-controls {
     position: relative;
     display: flex;
+    align-items: center;
     justify-content: flex-end;
     gap: 12px;
     z-index: 2005;
@@ -5015,19 +5016,80 @@ input[type="date"]::-webkit-datetime-edit-year-field {
     pointer-events: auto !important;
 }
 
-/* PWA Install Banner */
+/* PWA Install Banner — Masaüstü: container içinde, ayarlar satırında, yeşil metin, hover’da büyüme + yarı saydam yeşil */
 .pwa-install-banner {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 16px;
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: 320px;
+    max-height: 44px;
+    background: transparent;
+    color: #00e676;
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid transparent;
     z-index: 10000;
     animation: slideUp 0.4s ease-out;
-    backdrop-filter: blur(10px);
+    transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.pwa-install-banner:hover {
+    transform: scale(1.02);
+    background: rgba(0, 230, 118, 0.12);
+    border-color: rgba(0, 230, 118, 0.4);
+    box-shadow: 0 2px 8px rgba(0, 230, 118, 0.15);
+}
+
+.pwa-install-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: 100%;
+    margin: 0;
+    min-height: 32px;
+}
+
+.pwa-install-text {
+    flex: 1;
+    font-size: 13px;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: inherit;
+}
+
+.pwa-install-btn {
+    background: transparent;
+    color: #00e676;
+    border: none;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 13px;
+    flex-shrink: 0;
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.pwa-install-btn:hover {
+    transform: scale(1.03);
+    background: rgba(0, 230, 118, 0.1);
+}
+
+.pwa-install-close {
+    background: transparent;
+    border: none;
+    color: #00e676;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0 4px;
+    opacity: 0.85;
+    flex-shrink: 0;
+    transition: opacity 0.2s;
+}
+
+.pwa-install-close:hover {
+    opacity: 1;
 }
 
 @keyframes slideUp {
@@ -5041,99 +5103,57 @@ input[type="date"]::-webkit-datetime-edit-year-field {
     }
 }
 
-@keyframes slideDown {
-    from {
-        transform: translateY(0);
-        opacity: 1;
+/* Mobil: altta tam genişlik, lila gradyan */
+@media (max-width: 768px) {
+    .pwa-install-banner {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        max-width: none;
+        max-height: none;
+        flex: none;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 16px;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+        border: none;
     }
-    to {
-        transform: translateY(100%);
-        opacity: 0;
+
+    .pwa-install-banner:hover {
+        transform: none;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-color: transparent;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
     }
-}
 
-.pwa-install-content {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-.pwa-install-icon {
-    font-size: 32px;
-    flex-shrink: 0;
-}
-
-.pwa-install-text {
-    flex: 1;
-}
-
-.pwa-install-text strong {
-    display: block;
-    font-size: 16px;
-    margin-bottom: 4px;
-}
-
-.pwa-install-text p {
-    font-size: 13px;
-    opacity: 0.9;
-    margin: 0;
-}
-
-.pwa-install-btn {
-    background: white;
-    color: #667eea;
-    border: none;
-    padding: 10px 24px;
-    border-radius: 8px;
-    font-weight: bold;
-    cursor: pointer;
-    font-size: 14px;
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.pwa-install-btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
-}
-
-.pwa-install-close {
-    background: transparent;
-    border: none;
-    color: white;
-    font-size: 24px;
-    cursor: pointer;
-    padding: 0 8px;
-    opacity: 0.8;
-    transition: opacity 0.2s;
-}
-
-.pwa-install-close:hover {
-    opacity: 1;
-}
-
-@media (max-width: 600px) {
     .pwa-install-content {
-        flex-wrap: wrap;
+        max-width: 600px;
+        margin: 0 auto;
+        min-height: 0;
     }
 
     .pwa-install-text {
-        order: 1;
-        flex: 1 0 calc(100% - 56px);
-    }
-
-    .pwa-install-icon {
-        order: 0;
-    }
-
-    .pwa-install-close {
-        order: 2;
+        color: white;
+        white-space: normal;
+        font-size: 16px;
     }
 
     .pwa-install-btn {
-        order: 3;
-        flex: 1 0 100%;
-        margin-top: 8px;
+        background: white;
+        color: #667eea;
+        padding: 10px 24px;
+        font-size: 14px;
+    }
+
+    .pwa-install-btn:hover {
+        transform: scale(1.05);
+        background: white;
+        box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+    }
+
+    .pwa-install-close {
+        color: white;
+        font-size: 24px;
     }
 }

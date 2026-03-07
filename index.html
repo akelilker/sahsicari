@@ -36,6 +36,13 @@
         <div id="menuBackdrop" class="menu-backdrop-overlay" onclick="closeAllMenus()"></div>
         
         <div class="top-controls">
+            <div id="pwaInstallBanner" class="pwa-install-banner" style="display: none;">
+                <div class="pwa-install-content">
+                    <span class="pwa-install-text">Uygulamayı İndirmek İçin Tıklayın</span>
+                    <button id="pwaInstallBtn" class="pwa-install-btn">Yükle</button>
+                    <button id="pwaInstallClose" class="pwa-install-close" title="Kapat">✕</button>
+                </div>
+            </div>
             <div class="pos-rel"><button id="settingsIcon" class="notification-icon-btn" onclick="toggleSettingsMenu()" title="Ayarlar"> ⚙️  </button>
                 <div class="dropdown-menu" id="settingsMenu">
                     <button class="btn" onclick="showPersonManagementModal()">Kişi Yönetimi</button>
@@ -52,19 +59,6 @@
                     <div style="padding:10px; text-align:center; color:#78909c;">Yükleniyor...</div>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <!-- PWA Install Prompt Banner -->
-    <div id="pwaInstallBanner" class="pwa-install-banner" style="display: none;">
-        <div class="pwa-install-content">
-            <div class="pwa-install-icon">📱</div>
-            <div class="pwa-install-text">
-                <strong>Uygulamayı Yükle</strong>
-                <p>Daha hızlı erişim için ana ekrana ekle</p>
-            </div>
-            <button id="pwaInstallBtn" class="pwa-install-btn">Yükle</button>
-            <button id="pwaInstallClose" class="pwa-install-close">✕</button>
         </div>
     </div>
 
