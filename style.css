@@ -4388,12 +4388,13 @@ label[for="editDateInput"] {
 }
 
 .btn-no {
-    background: var(--white-10);
-    color: #eceff1;
-    border: 1px solid var(--white-10);
-    text-shadow: 0 1px 1px rgba(0,0,0,0.55);
-}
+    background: rgba(0, 230, 118, 0.2);
+    color: #00e676;
+    border: 1px solid rgba(0, 230, 118, 0.5);
+    box-shadow: 0 0 15px rgba(0, 230, 118, 0.1);
+    text-shadow: 0 0 8px rgba(0, 230, 118, 0.4);
 
+}
 .btn-skip-backup {
     background: rgba(255, 152, 0, 0.2);
     color: #ff9800;
