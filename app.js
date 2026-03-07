@@ -231,7 +231,15 @@ function initDOMCache() {
         DOM.amount.addEventListener('input', function() {
             updateGelenAllocateButtonVisibility();
         });
-        DOM.amount.addEventListener('blur', updateGelenAllocateButtonVisibility);
+        DOM.amount.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === 'Tab') {
+                setTimeout(maybeTriggerMainAutoAllocation, 40);
+            }
+        });
+        DOM.amount.addEventListener('blur', function() {
+            updateGelenAllocateButtonVisibility();
+            setTimeout(maybeTriggerMainAutoAllocation, 80);
+        });
     }
 
     if (DOM.startDate) DOM.startDate.addEventListener('change', renderReportPreview);
@@ -950,17 +958,54 @@ function setTransactionTypeUnified(type, typeInputId, gidenBtnId, gelenBtnId) {
         }
     }
     updateGelenAllocateButtonVisibility();
+    if (typeInputId === 'transactionType') {
+        maybeTriggerMainAutoAllocation();
+    }
 }
 
 function updateGelenAllocateButtonVisibility() {
     const btn = document.getElementById('gelenAllocateBtn');
     if (!btn) return;
-    const type = DOM.transactionType?.value || '';
-    const amount = DOM.amount ? deformatCurrency(DOM.amount.value) : 0;
+    // Manual allocation button is deprecated; keep hidden for backward compatibility.
+    btn.style.display = 'none';
+}
+
+function getDebtorCategoriesForPerson(person) {
+    if (!person || !allData[person]) return [];
+    return Object.keys(allData[person].categoryBalances || {})
+        .filter(c => (allData[person].categoryBalances[c] || 0) > 0.01)
+        .sort((a, b) => (allData[person].categoryBalances[b] || 0) - (allData[person].categoryBalances[a] || 0));
+}
+
+function applySingleDebtDefaultCategory(selectElement, person) {
+    if (!selectElement) return false;
+    const debts = getDebtorCategoriesForPerson(person);
+    if (debts.length !== 1) return false;
+    const targetCategory = debts[0];
+    const hasOption = Array.from(selectElement.options || []).some(opt => opt.value === targetCategory);
+    if (!hasOption) return false;
+    selectElement.value = targetCategory;
+    return true;
+}
+
+function maybeTriggerMainAutoAllocation() {
+    if (!DOM.amount || !DOM.category) return;
+    if (document.getElementById('allocationOverlay')?.style.display === 'flex') return;
+
     const person = currentPerson;
-    const hasDebts = person && allData[person] && Object.keys(allData[person].categoryBalances || {}).some(c => (allData[person].categoryBalances[c] || 0) > 0.01);
-    const show = type === 'gelen' && amount > 0.01 && hasDebts;
-    btn.style.display = show ? 'inline-block' : 'none';
+    const type = DOM.transactionType?.value || '';
+    const amount = deformatCurrency(DOM.amount.value || '0');
+    if (!person || type !== 'gelen' || amount <= 0.01) return;
+
+    const debts = getDebtorCategoriesForPerson(person);
+    if (debts.length === 1) {
+        applySingleDebtDefaultCategory(DOM.category, person);
+        return;
+    }
+
+    if (debts.length > 1) {
+        initiateAllocation();
+    }
 }
 
 function populatePersonSelect(selectElement, sortedPeople = null) {
@@ -1470,9 +1515,7 @@ function initiateAllocation() {
     const person = currentPerson;
     if (amount <= 0.01) return;
 
-    const debts = Object.keys(allData[person].categoryBalances || {})
-        .filter(c => allData[person].categoryBalances[c] > 0.01)
-        .sort((a,b) => allData[person].categoryBalances[b] - allData[person].categoryBalances[a]);
+    const debts = getDebtorCategoriesForPerson(person);
         
     if (debts.length === 0) return;
 
@@ -1769,11 +1812,23 @@ async function processSingleTransaction() {
     if(isProcessing) return;
     
     const amount = deformatCurrency(DOM.amount?.value || '0');
-    const category = DOM.category?.value || '';
+    let category = DOM.category?.value || '';
     const transType = DOM.transactionType?.value || '';
     if (amount === 0) return showNotification('Tutar giriniz!', 'error');
-    if (!category) return showNotification('Kategori seçiniz!', 'error');
     if (!transType) return showNotification('İşlem tipi seçiniz!', 'error');
+
+    if (transType === 'gelen') {
+        const debts = getDebtorCategoriesForPerson(currentPerson);
+        if (debts.length === 1) {
+            applySingleDebtDefaultCategory(DOM.category, currentPerson);
+            category = DOM.category?.value || category;
+        } else if (debts.length > 1) {
+            initiateAllocation();
+            return;
+        }
+    }
+
+    if (!category) return showNotification('Kategori seçiniz!', 'error');
 
     let desc = DOM.description?.value?.trim() || '';
     desc = formatTitleCase(desc); 
@@ -3841,6 +3896,9 @@ function setQuickTransactionType(type) {
     
     if (quickPersonSelectedValue) {
         populateCategorySelect(document.getElementById('quickCategory'), quickPersonSelectedValue);
+        if (type === 'gelen') {
+            applySingleDebtDefaultCategory(document.getElementById('quickCategory'), quickPersonSelectedValue);
+        }
     }
 }
 
@@ -3848,32 +3906,34 @@ function checkQuickAllocation() {
     const type = document.getElementById('quickTransactionType')?.value;
     const person = quickPersonSelectedValue;
     const amount = deformatCurrency(document.getElementById('quickAmount')?.value || '0');
-    
+
     if (type !== 'gelen' || !person || amount <= 0) return;
-    
-    if (allData[person]) {
-        const debts = Object.keys(allData[person].categoryBalances || {})
-            .filter(c => allData[person].categoryBalances[c] > 0.01);
-        
-        if (debts.length > 0) {
-            const desc = document.getElementById('quickDescription')?.value?.trim() || '';
-            
-            closeQuickTransactionOverlay();
-            
-            currentPerson = person;
-            quickAllocationDesc = desc;
-            
-            setTimeout(() => {
-                const tempInput = document.createElement('input');
-                tempInput.value = amount.toLocaleString('tr-TR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                const origAmount = DOM.amount;
-                DOM.amount = tempInput;
-                
-                initiateAllocation();
-                
-                DOM.amount = origAmount;
-            }, 150);
-        }
+    if (!allData[person]) return;
+
+    const debts = getDebtorCategoriesForPerson(person);
+    if (debts.length === 1) {
+        applySingleDebtDefaultCategory(document.getElementById('quickCategory'), person);
+        return;
+    }
+
+    if (debts.length > 1) {
+        const desc = document.getElementById('quickDescription')?.value?.trim() || '';
+
+        closeQuickTransactionOverlay();
+
+        currentPerson = person;
+        quickAllocationDesc = desc;
+
+        setTimeout(() => {
+            const tempInput = document.createElement('input');
+            tempInput.value = amount.toLocaleString('tr-TR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            const origAmount = DOM.amount;
+            DOM.amount = tempInput;
+
+            initiateAllocation();
+
+            DOM.amount = origAmount;
+        }, 150);
     }
 }
 
@@ -3898,8 +3958,10 @@ document.addEventListener('DOMContentLoaded', () => {
             quickCategorySelect.addEventListener('mousedown', (e) => {
                 const type = document.getElementById('quickTransactionType')?.value;
                 const amount = deformatCurrency(document.getElementById('quickAmount')?.value || '0');
-                
-                if (type === 'gelen' && amount > 0) {
+                const person = quickPersonSelectedValue;
+                const debtCount = person ? getDebtorCategoriesForPerson(person).length : 0;
+
+                if (type === 'gelen' && amount > 0 && debtCount > 1) {
                     e.preventDefault();
                     checkQuickAllocation();
                 }
@@ -3922,22 +3984,25 @@ async function processQuickTransaction() {
     
     const person = quickPersonSelectedValue;
     const amount = deformatCurrency(document.getElementById('quickAmount').value);
-    const category = document.getElementById('quickCategory').value;
+    let category = document.getElementById('quickCategory').value;
     const type = document.getElementById('quickTransactionType').value;
-    
+
     if (!person) return showNotification('Kişi seçiniz!', 'error');
     if (amount === 0) return showNotification('Tutar giriniz!', 'error');
-    if (!category) return showNotification('Kategori seçiniz!', 'error');
     if (!type) return showNotification('İşlem tipi seçiniz!', 'error');
 
     let desc = document.getElementById('quickDescription').value.trim();
     desc = formatTitleCase(desc); 
 
     if (type === 'gelen' && allData[person]) {
-        const debts = Object.keys(allData[person].categoryBalances || {})
-            .filter(c => allData[person].categoryBalances[c] > 0.01);
-        
-        if (debts.length > 0) {
+        const debts = getDebtorCategoriesForPerson(person);
+
+        if (debts.length === 1) {
+            applySingleDebtDefaultCategory(document.getElementById('quickCategory'), person);
+            category = document.getElementById('quickCategory').value || category;
+        }
+
+        if (debts.length > 1) {
             closeQuickTransactionOverlay();
             
             currentPerson = person;
@@ -3958,6 +4023,8 @@ async function processQuickTransaction() {
             return;
         }
     }
+
+    if (!category) return showNotification('Kategori seçiniz!', 'error');
  
     isProcessing = true;
     const btn = document.querySelector('#quickTransactionForm .btn-success');
