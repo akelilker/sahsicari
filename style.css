@@ -1292,6 +1292,10 @@ overflow: hidden;
     padding-bottom: calc(40px + env(safe-area-inset-bottom) + 10px);
 }
 
+#categoryDetailModal {
+    padding-bottom: calc(40px + env(safe-area-inset-bottom) + 18px);
+}
+
 #addPersonModal .modal-content,
 #personManagementModal .modal-content,
 #categoryManagementModal .modal-content,
