@@ -263,7 +263,7 @@ function syncZeroBalanceToggleText() {
     const toggle = document.getElementById('showZeroBalanceToggle');
     const label = document.getElementById('showZeroBalanceToggleBtn');
     if (!toggle || !label) return;
-    label.textContent = toggle.checked ? 'Bakiyeleri \u00D6ster' : 'S\u0131f\u0131r Bakiyeleri \u00D6ster';
+    label.textContent = toggle.checked ? 'Geri Dön' : 'Sıfır Bakiyeleri Göster';
 }
 let saveTimer = null;
 async function queueServerSyncPayload(payload) {
@@ -2368,13 +2368,9 @@ function populateCategoryEditor(person) {
         editBtn.className = 'mgmt-btn';
         editBtn.textContent = 'Edit';
         editBtn.addEventListener('click', () => editCategoryName(person, cat));
-
         const deleteBtn = document.createElement('button');
         deleteBtn.className = 'mgmt-btn';
-        deleteBtn.style.color = '#ef5350';
-        deleteBtn.style.fontWeight = 'bold';
-        deleteBtn.style.fontSize = '1.2em';
-        deleteBtn.textContent = 'Del';
+        deleteBtn.textContent = '';
         deleteBtn.addEventListener('click', () => deleteCategoryFromManager(person, cat));
 
         actions.appendChild(editBtn);

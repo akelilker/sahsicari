@@ -1934,7 +1934,7 @@ select option {
 
 .category-item {
     background: rgba(60, 55, 75, 0.16);
-    border: 0.7px solid var(--white-20);
+    border: 0.7px solid var(--tab-purple);
     box-shadow: none;
     padding: 6px 4px;
     border-radius: 12px;
@@ -2221,7 +2221,7 @@ select option {
 
 #personManagementList .management-actions .mgmt-btn:nth-child(2)::before,
 #categoryManagementList .management-actions .mgmt-btn:nth-child(1)::before {
-    content: '\270F';
+    content: '\270E';
     color: #b0bec5;
 }
 
