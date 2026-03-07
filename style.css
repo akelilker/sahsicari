@@ -2331,62 +2331,62 @@ select option {
 }
 
 @media screen and (max-width: 480px) and (orientation: portrait) {
-    .detail-table {
+    #categoryDetailContent .detail-table {
         font-size: 9px;
         width: 100%;
         table-layout: fixed;
     }
 
-    .detail-table thead th {
+    #categoryDetailContent .detail-table thead th {
         min-width: 0;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        padding: 5px 2px;
+        padding: 5px 1px;
         font-size: 8px;
     }
 
-    .detail-table tbody td {
-        padding: 4px 2px;
+    #categoryDetailContent .detail-table tbody td {
+        padding: 4px 1px;
         font-size: 9px;
     }
 
-    .detail-table th:nth-child(1),
-    .detail-table td:nth-child(1) {
-        width: 52px;
+    #categoryDetailContent .detail-table th:nth-child(1),
+    #categoryDetailContent .detail-table td:nth-child(1) {
+        width: 48px;
         font-size: 8px;
     }
 
-    .detail-table th:nth-child(2),
-    .detail-table td:nth-child(2) {
-        width: 78px;
-        min-width: 78px;
+    #categoryDetailContent .detail-table th:nth-child(2),
+    #categoryDetailContent .detail-table td:nth-child(2) {
+        width: 70px;
+        min-width: 70px;
         font-size: 9px;
     }
 
-    .detail-table th:nth-child(3),
-    .detail-table td:nth-child(3) {
-        width: 78px;
-        min-width: 78px;
+    #categoryDetailContent .detail-table th:nth-child(3),
+    #categoryDetailContent .detail-table td:nth-child(3) {
+        width: 70px;
+        min-width: 70px;
         font-size: 9px;
     }
 
-    .detail-table th:nth-child(4),
-    .detail-table td:nth-child(4) {
-        width: 78px;
-        min-width: 78px;
+    #categoryDetailContent .detail-table th:nth-child(4),
+    #categoryDetailContent .detail-table td:nth-child(4) {
+        width: 70px;
+        min-width: 70px;
         font-size: 9px;
     }
 
-    .detail-table th:nth-child(5),
-    .detail-table td:nth-child(5) {
+    #categoryDetailContent .detail-table th:nth-child(5),
+    #categoryDetailContent .detail-table td:nth-child(5) {
         width: auto;
         min-width: 0;
         max-width: none;
         font-size: 9px;
     }
 
-    .detail-table tbody td:last-child {
+    #categoryDetailContent .detail-table tbody td:last-child {
         display: -webkit-box !important;
         -webkit-line-clamp: 3;
         line-clamp: 3;
