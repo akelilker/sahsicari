@@ -1,4 +1,4 @@
-﻿name: Deploy to cPanel
+name: Deploy to cPanel
 
 on:
   push:
@@ -24,11 +24,19 @@ jobs:
           server-dir: /public_html/sahsicari/
           dangerous-clean-slate: false
           exclude: |
-            **/.git*
+            .git/**
+            .github/**
+            .claude/**
+            .vscode/**
+            **/.git/**
             **/.github/**
-            **/node_modules/**
-            **/backups/**
-            **/kd_backups/**
-            **/veriler.json
-            **/kd_veriler.json
-            **/.DS_Store
+            **/.claude/**
+            **/.vscode/**
+            node_modules/**
+            backups/**
+            kd_backups/**
+            veriler.json
+            kd_veriler.json
+            .DS_Store
+            .cpanel.yml
+            DEPLOY-*.md
