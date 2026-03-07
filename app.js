@@ -1852,7 +1852,7 @@ async function processSingleTransaction() {
         isProcessing = false;
         if(DOM.addTransactionBtn) { 
             DOM.addTransactionBtn.disabled = false; 
-            DOM.addTransactionBtn.textContent = ' ✅ İşlemi Kaydet'; 
+            DOM.addTransactionBtn.textContent = 'Kaydet'; 
         }
     }
 }
@@ -4038,7 +4038,7 @@ async function processQuickTransaction() {
         
     } finally {
         isProcessing = false;
-        if(btn) { btn.disabled = false; btn.textContent = ' ✅ İşlemi Kaydet'; }
+        if(btn) { btn.disabled = false; btn.textContent = 'Kaydet'; }
     }
 }
 

@@ -1588,7 +1588,15 @@ height: 100%;
 }
 
 #personModal #addTransactionBtn {
-    margin-top: 18px;
+    background: transparent;
+    font-size: 0.78em;
+    border: 1px solid rgba(86, 255, 176, 0.5);
+    color: #56ffb0;
+    box-shadow: none;
+    padding: 10px 0;
+    font-weight: 300;
+    text-shadow: 0 0 7px rgba(86, 255, 176, 0.28);
+    transition: transform 0.2s ease, border-width 0.2s ease, font-size 0.2s ease, background-color 0.2s ease, color 0.2s ease;
 }
 
 .modal-body label {
@@ -2178,11 +2186,7 @@ select option {
     min-height: 40px;
 }
 
-.mgmt-btn.delete-btn,
-.mgmt-btn[onclick*="delete"] {
-    color: #ff1744;
-    text-shadow: 0 0 8px rgba(255, 23, 68, 0.4);
-}
+
 .mgmt-btn.is-fav {
     color: #ffeb3b;
     opacity: 1;
@@ -3933,6 +3937,14 @@ label[for="editDateInput"] {
         height: 31px;
         padding: 2px 8px;
     }
+    #categoryDetailContent .detail-table th:nth-child(1),
+    #categoryDetailContent .detail-table td:nth-child(1) {
+        padding-right: 1px;
+    }
+    #categoryDetailContent .detail-table th:nth-child(2),
+    #categoryDetailContent .detail-table td:nth-child(2) {
+        padding-left: 2px;
+    }
     /* Veriler kutusu: aynı yeşil ton, sadece parlak */
     .control-panel {
         background: linear-gradient(
@@ -4174,20 +4186,24 @@ label[for="editDateInput"] {
 }
 #personModal #addTransactionBtn {
     background: transparent;
-    font-size: 0.8em;
-    border: 1px solid rgba(0, 230, 118, 0.45);
-    color: #00e676;
+    font-size: 0.78em;
+    border: 1px solid rgba(86, 255, 176, 0.5);
+    color: #56ffb0;
     box-shadow: none;
     padding: 10px 0;
-    font-weight: 400;
-    text-shadow: 0 0 8px rgba(0, 230, 118, 0.3);
+    font-weight: 300;
+    text-shadow: 0 0 7px rgba(86, 255, 176, 0.28);
+    transition: transform 0.2s ease, border-width 0.2s ease, font-size 0.2s ease, background-color 0.2s ease, color 0.2s ease;
 }
 
 #personModal #addTransactionBtn:hover {
-    background: rgba(0, 230, 118, 0.18);
+    background: rgba(86, 255, 176, 0.2);
+    color: #7fffc6;
+    border-width: 1.6px;
+    font-size: 0.82em;
     transform: scale(1.02);
-    text-shadow: 0 0 8px rgba(0, 230, 118, 0.4);
-    box-shadow: 0 0 10px rgba(0, 230, 118, 0.25);
+    text-shadow: 0 0 8px rgba(127, 255, 198, 0.45);
+    box-shadow: 0 0 10px rgba(86, 255, 176, 0.22);
 }
 
 .rd-btn {
