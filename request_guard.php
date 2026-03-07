@@ -68,13 +68,11 @@ function enforce_same_origin(): void {
     }
 
     // Sec-Fetch-Site: only enforce when we couldn't validate via Origin/Referer.
-    // GET (read-only) is allowed without Origin/Referer so load.php works in PWA / strict referrer.
+    // GET: allow without Origin/Referer (PWA, privacy). POST: allow when Sec-Fetch-Site is none (PWA direkt).
     $secFetchSite = $_SERVER['HTTP_SEC_FETCH_SITE'] ?? '';
     $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
     if (!$originOk && $secFetchSite !== '' && !in_array($secFetchSite, ['same-origin', 'same-site', 'none'], true)) {
-        if ($method === 'GET') {
-            // Read-only: allow GET when Origin/Referer missing (PWA, privacy, etc.)
-        } else {
+        if ($method !== 'GET') {
             deny_request(403, 'Fetch-site policy violation (Sec-Fetch-Site: ' . $secFetchSite . ')');
         }
     }

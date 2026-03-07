@@ -271,12 +271,12 @@ async function queueServerSyncPayload(payload) {
         const db = await openIndexedDB();
         const existing = await getSyncQueue(db);
         for (const item of existing) {
-            if (item && typeof item.url === 'string' && item.url.includes('save.php')) {
+            if (item && typeof item.url === 'string' && (item.url.includes('save.php') || item.url.includes('write_data.php'))) {
                 await removeSyncQueueItem(db, item.id);
             }
         }
         await addToSyncQueue(db, {
-            url: 'save.php',
+            url: 'write_data.php',
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -399,8 +399,8 @@ function saveDataToServer(data, force = false) {
         return Promise.reject("Bos veri korumasi: Kayit iptal edildi.");
     }
 
-    const primaryUrl = force ? 'save.php?force=true' : 'save.php';
-    const fallbackUrl = force ? 'api_save.php?force=true' : 'api_save.php';
+    const primaryUrl = force ? 'write_data.php?force=true' : 'write_data.php';
+    const fallbackUrl = force ? 'save.php?force=true' : 'save.php';
 
     const sendSave = (url) => fetch(url, {
         method: 'POST',
