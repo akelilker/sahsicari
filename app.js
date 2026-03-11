@@ -4705,7 +4705,8 @@ function initMobileDateDisplay() {
                 // #region agent log
                 fetch('http://127.0.0.1:7907/ingest/5d8741d3-3489-4f86-b195-36ed376ce6aa',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'1296d6'},body:JSON.stringify({sessionId:'1296d6',location:'app.js:startDateGroup',message:'startDateGroup click',data:{targetId:e.target.id,targetTag:e.target.tagName,targetClass:(e.target.className||'').slice(0,80)},hypothesisId:'H2',timestamp:Date.now()})}).catch(function(){});
                 // #endregion
-                if (e.target !== startDateInput && !e.target.matches('label')) {
+                var isDisplayOrLabel = (e.target === startDateDisplay) || (e.target.matches('label[for="startDate"]'));
+                if (isDisplayOrLabel && e.target !== startDateInput) {
                     if (typeof startDateInput.showPicker === 'function') {
                         startDateInput.showPicker();
                     } else {
@@ -4733,7 +4734,8 @@ function initMobileDateDisplay() {
                 // #region agent log
                 fetch('http://127.0.0.1:7907/ingest/5d8741d3-3489-4f86-b195-36ed376ce6aa',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'1296d6'},body:JSON.stringify({sessionId:'1296d6',location:'app.js:endDateGroup',message:'endDateGroup click',data:{targetId:e.target.id,targetTag:e.target.tagName,targetClass:(e.target.className||'').slice(0,80)},hypothesisId:'H4',timestamp:Date.now()})}).catch(function(){});
                 // #endregion
-                if (e.target !== endDateInput && !e.target.matches('label')) {
+                var isDisplayOrLabel = (e.target === endDateDisplay) || (e.target.matches('label[for="endDate"]'));
+                if (isDisplayOrLabel && e.target !== endDateInput) {
                     if (typeof endDateInput.showPicker === 'function') {
                         endDateInput.showPicker();
                     } else {
