@@ -967,7 +967,8 @@ function populateCategorySelect(selectElement, person) {
         } else if (bal > 0.01) {
             statusText = ` (+${formatAmount(bal)})`;
         }
-        html += `<option value="${c}">${c}${statusText}</option>`;
+        const safeCVal = String(c).replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&/g, '&amp;');
+        html += `<option value="${safeCVal}">${sanitizeHTML(c)}${statusText}</option>`;
     });
     
     selectElement.innerHTML = html;

@@ -178,13 +178,16 @@ kasaData.islemler.forEach(i => {
 
 const giderKat = kasaData.kategoriler.filter(k => k !== 'Kasa');
 
-grid.innerHTML = giderKat.map(k => `
-    <div class="kategori-card" data-kategori="${k}">
+grid.innerHTML = giderKat.map(k => {
+    const safeK = sanitizeHTML(k);
+    const shortK = safeK.length > 12 ? safeK.substring(0, 10) + '..' : safeK;
+    return `
+    <div class="kategori-card" data-kategori="${safeK}">
         <div class="kat-icon">${katIkonlar[k] || '📁'}</div>
-        <div class="kat-ad">${k.length > 12 ? k.substring(0,10) + '..' : k}</div>
+        <div class="kat-ad">${shortK}</div>
         <div class="kat-tutar">${formatMoney(toplamlar[k] || 0)}</div>
     </div>
-`).join('');
+`}).join('');
 
 }
 
@@ -214,7 +217,10 @@ if (currentIslemTip === 'giris') {
     sel.disabled = true;
 } else {
     sel.disabled = false;
-    sel.innerHTML = '<option value="">Kategori Seçin</option>' + giderKat.map(k => `<option value="${k}">${k}</option>`).join('');
+    sel.innerHTML = '<option value="">Kategori Seçin</option>' + giderKat.map(k => {
+        const safeK = sanitizeHTML(k);
+        return `<option value="${safeK}">${safeK}</option>`;
+    }).join('');
 }
 
 }
@@ -225,12 +231,14 @@ if (!list) return;
 bindKategoriListClickOnce();
 
 const giderKat = kasaData.kategoriler.filter(k => k !== 'Kasa');
-list.innerHTML = giderKat.map(k => `
+list.innerHTML = giderKat.map(k => {
+    const safeK = sanitizeHTML(k);
+    return `
     <div class="kategori-yonetim-item">
-        <span>${katIkonlar[k] || '📁'} ${k}</span>
-        <button class="kategori-sil-btn" data-kategori="${k}">🗑️</button>
+        <span>${katIkonlar[k] || '📁'} ${safeK}</span>
+        <button class="kategori-sil-btn" data-kategori="${safeK}">🗑️</button>
     </div>
-`).join('');
+`}).join('');
 
 }
 
@@ -342,7 +350,10 @@ if (!i) return;
 
 const katOptions = kasaData.kategoriler
     .filter(k => i.tip === 'giris' ? k === 'Kasa' : k !== 'Kasa')
-    .map(k => `<option value="${k}" ${i.kategori === k ? 'selected' : ''}>${k}</option>`)
+    .map(k => {
+        const safeK = sanitizeHTML(k);
+        return `<option value="${safeK}" ${i.kategori === k ? 'selected' : ''}>${safeK}</option>`;
+    })
     .join('');
 
 const editModalContent = document.getElementById('editModalContent');
@@ -363,7 +374,7 @@ editModalContent.innerHTML = `
     </div>
     <div class="edit-form-group">
         <label>Açıklama</label>
-        <input id="editAciklama" class="edit-input" type="text" value="${i.aciklama || ''}">
+        <input id="editAciklama" class="edit-input" type="text" value="${sanitizeHTML(i.aciklama || '')}">
     </div>
     
     <div style="display:flex; gap:10px; margin-top:15px;">
@@ -493,7 +504,7 @@ const modal = document.getElementById('kasaCategoryDetailModal');
 const title = document.getElementById('kasaCategoryTitle');
 const content = document.getElementById('kasaCategoryDetailContent');
 
-title.innerHTML = `${katIkonlar[kategoriAdi] || '📂'} ${kategoriAdi}`;
+title.innerHTML = `${katIkonlar[kategoriAdi] || '📂'} ${sanitizeHTML(kategoriAdi)}`;
 
 let islemListesi = kasaData.islemler.filter(i => i.kategori === kategoriAdi);
 islemListesi.sort((a, b) => new Date(b.tarih) - new Date(a.tarih));
@@ -526,7 +537,7 @@ if (islemListesi.length === 0) {
                 <td style="padding:8px; text-align:right; color:${colorClass}; font-weight:bold;">
                     ${formatMoney(t.tutar)}
                 </td>
-                <td style="padding:8px; color:#90a4ae;">${t.aciklama || '-'}</td>
+                <td style="padding:8px; color:#90a4ae;">${sanitizeHTML(t.aciklama || '-')}</td>
             </tr>
         `;
     });
