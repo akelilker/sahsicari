@@ -77,6 +77,8 @@
   --blue-30: rgba(66, 165, 245, 0.3);
   --blue-20: rgba(66, 165, 245, 0.2);
   --red-30: rgba(255, 23, 68, 0.3);
+  /* İşlem geçmişi ile aynı borç/expense kırmızısı (tek ton) */
+  --expense-red: #ff1744;
   --green-30: rgba(0, 230, 118, 0.3);
   --tab-purple: rgba(98, 0, 234, 0.6);
   --dark-bg: rgba(20, 30, 60, 0.95);
@@ -2121,7 +2123,7 @@ select option {
 }
 
 .history-type.giden {
-    color: #ff1744;
+    color: var(--expense-red);
     text-shadow: 0 0 8px rgba(255, 23, 68, 0.4);
 }
 
@@ -2201,7 +2203,7 @@ select option {
 }
 
 .delete-transaction-btn {
-    color: #ff1744;
+    color: var(--expense-red);
     margin-left: 2px;
 }
 
@@ -2303,8 +2305,8 @@ select option {
 #personManagementList .management-actions .mgmt-btn:nth-child(3)::before,
 #categoryManagementList .management-actions .mgmt-btn:nth-child(2)::before {
     content: '\2716';
-    color: #ff3355 !important;
-    text-shadow: 0 0 10px rgba(255, 23, 68, 0.65);
+    color: var(--expense-red) !important;
+    text-shadow: 0 0 8px rgba(255, 23, 68, 0.4);
 }
 
 .detail-table {
@@ -3021,7 +3023,7 @@ select option {
 }
 
 .val-red {
-    color: #ff1744;
+    color: var(--expense-red);
     text-shadow: 0 0 8px rgba(255, 23, 68, 0.4);
 }
 .val-green {
@@ -4565,9 +4567,9 @@ label[for="editDateInput"] {
 
 }
 
-/* Minimal Utility Classes */
+/* Minimal Utility Classes - borç/expense rengi İşlem geçmişi ile aynı */
 .text-expense {
-    color: #ff1744;
+    color: var(--expense-red);
     text-shadow: 0 0 8px rgba(255, 23, 68, 0.4);
 }
 .text-income {
