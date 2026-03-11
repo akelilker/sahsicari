@@ -5,7 +5,7 @@ function formatDateTR(dateObj) {
     const y = dateObj.getFullYear();
     return `${d}.${m}.${y}`;
 }
-const APP_VERSION = '78.34';
+const APP_VERSION = '78.36';
 
 const safeStorage = {
     getItem: function(key) {
@@ -1282,7 +1282,7 @@ function updatePersonTotalInfo(person) {
         breakdown.innerHTML = `
             <div class="info-col left-side">
                 <div class="balance-row">
-                    <span class="info-label">${person} Borcu:</span>
+                    <span class="info-label">${sanitizeHTML(person)} Borcu:</span>
                     <span class="info-amount text-income">${formatAmount(rx)}</span>
                 </div>
                 <div class="balance-row">
@@ -1293,7 +1293,7 @@ function updatePersonTotalInfo(person) {
             
             <div class="info-col right-side">
                 <div class="balance-row">
-                    <span class="info-label">${netLabel}:</span>
+                    <span class="info-label">${sanitizeHTML(netLabel)}:</span>
                     <span class="info-amount ${netClass}">${formatAmount(Math.abs(net))}</span>
                 </div>
             </div>
@@ -1468,7 +1468,7 @@ let status = b > 0 ? 'Borçlu' : (b < 0 ? 'Alacaklı' : '');
         
         html += `
         <div class="category-item ${b > 0 ? 'positive-balance' : 'negative-balance'}" onclick="showCategoryDetails('${safeCat}')">
-            <span class="category-name">${c}</span>
+            <span class="category-name">${sanitizeHTML(c)}</span>
             <span class="category-balance" style="color:${color}">${formatAmount(Math.abs(b))}</span>
             <span>${status}</span>
         </div>`;
@@ -3706,7 +3706,7 @@ function showGeneralStatusReport() {
     html += '<div class="report-list">';
     creditors.forEach(c => {
         html += `<div class="report-item">
-            <span class="report-name">${c.name}</span>
+            <span class="report-name">${sanitizeHTML(c.name)}</span>
             <span class="report-val val-red">${formatAmount(c.amount)}</span>
         </div>`;
     });
@@ -3719,7 +3719,7 @@ function showGeneralStatusReport() {
     html += '<div class="report-list">';
     debtors.forEach(d => {
         html += `<div class="report-item">
-            <span class="report-name">${d.name}</span>
+            <span class="report-name">${sanitizeHTML(d.name)}</span>
             <span class="report-val val-green">${formatAmount(d.amount)}</span>
         </div>`;
     });
@@ -4672,7 +4672,7 @@ function showSiriConfirmModal(person, amount, type, desc) {
                 const display = document.getElementById('siriPersonDisplay');
                 if (this.value) {
                     btn.onclick = () => confirmSiriTransaction(this.value, parseFloat(amount) || 0, type, desc);
-                    display.innerHTML = `<span style="color:#00e676;">${this.value}</span>`;
+                    display.innerHTML = `<span style="color:#00e676;">${sanitizeHTML(this.value)}</span>`;
                 }
             });
         }
