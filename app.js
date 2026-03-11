@@ -408,10 +408,92 @@ function bindPageEvents() {
     if (confirmAllocationBtn) confirmAllocationBtn.addEventListener('click', confirmAllocation);
 }
 
+function bindModalEvents() {
+    document.addEventListener('click', function(e) {
+        const closeBtn = e.target.closest('.close-modal-btn');
+        if (closeBtn) { closeCurrentModal(closeBtn); return; }
+        const tabBtn = e.target.closest('.tab-btn[data-tab]');
+        if (tabBtn) { openTab(e, tabBtn.getAttribute('data-tab')); return; }
+        const filterBtn = e.target.closest('[data-report-filter]');
+        if (filterBtn) { setReportFilterType(filterBtn.getAttribute('data-report-filter')); return; }
+        const cancelBtn = e.target.closest('.btn-cancel-person');
+        if (cancelBtn) { closeCurrentModal(cancelBtn); return; }
+    });
+
+    const recalcBalanceBtn = document.getElementById('recalcBalanceBtn');
+    if (recalcBalanceBtn) recalcBalanceBtn.addEventListener('click', recalculateAllBalancesFromTransactions);
+    const gidenBtn = document.getElementById('gidenBtn');
+    if (gidenBtn) gidenBtn.addEventListener('click', function() { setTransactionType('giden'); });
+    const gelenBtn = document.getElementById('gelenBtn');
+    if (gelenBtn) gelenBtn.addEventListener('click', function() { setTransactionType('gelen'); });
+    const amountEl = document.getElementById('amount');
+    if (amountEl) amountEl.addEventListener('input', function() { formatCurrency(this); });
+    const dateInputEl = document.getElementById('dateInput');
+    if (dateInputEl) dateInputEl.addEventListener('change', handleDateChange);
+    const addTransactionBtn = document.getElementById('addTransactionBtn');
+    if (addTransactionBtn) addTransactionBtn.addEventListener('click', processSingleTransaction);
+    const showZeroBalanceToggle = document.getElementById('showZeroBalanceToggle');
+    if (showZeroBalanceToggle) showZeroBalanceToggle.addEventListener('change', function() { updateCategoryBalanceDisplay(currentPerson); });
+    const toggleShareOptionsBtn = document.getElementById('toggleShareOptionsBtn');
+    if (toggleShareOptionsBtn) toggleShareOptionsBtn.addEventListener('click', toggleShareOptions);
+    const exportSummaryExcelBtn = document.getElementById('exportSummaryExcelBtn');
+    if (exportSummaryExcelBtn) exportSummaryExcelBtn.addEventListener('click', exportSummaryExcel);
+    const copySummaryTextBtn = document.getElementById('copySummaryTextBtn');
+    if (copySummaryTextBtn) copySummaryTextBtn.addEventListener('click', copySummaryText);
+    const monthlyReportButton = document.getElementById('monthlyReportButton');
+    if (monthlyReportButton) monthlyReportButton.addEventListener('click', showMonthlySummaryModal);
+    const excelReportButton = document.getElementById('excelReportButton');
+    if (excelReportButton) excelReportButton.addEventListener('click', exportToExcel);
+
+    const addNewPersonBtn = document.getElementById('addNewPersonBtn');
+    if (addNewPersonBtn) addNewPersonBtn.addEventListener('click', addNewPerson);
+    const newPersonName = document.getElementById('newPersonName');
+    if (newPersonName) {
+        newPersonName.addEventListener('keypress', handlePersonNameEnter);
+    }
+    const personMgmtAddPersonBtn = document.getElementById('personMgmtAddPersonBtn');
+    if (personMgmtAddPersonBtn) personMgmtAddPersonBtn.addEventListener('click', showAddPersonModal);
+    const categoryManagementPersonSelect = document.getElementById('categoryManagementPersonSelect');
+    if (categoryManagementPersonSelect) categoryManagementPersonSelect.addEventListener('change', function() { populateCategoryEditor(this.value); });
+    const newManagedCategoryInput = document.getElementById('newManagedCategoryInput');
+    if (newManagedCategoryInput) newManagedCategoryInput.addEventListener('keypress', handleCategoryInputEnter);
+    const addCategoryFromManagerBtn = document.getElementById('addCategoryFromManagerBtn');
+    if (addCategoryFromManagerBtn) addCategoryFromManagerBtn.addEventListener('click', addCategoryFromManager);
+    const generateReportBtn = document.getElementById('generateReportBtn');
+    if (generateReportBtn) generateReportBtn.addEventListener('click', exportMonthlySummary);
+    const syncHelpCloseBtn = document.getElementById('syncHelpCloseBtn');
+    if (syncHelpCloseBtn) syncHelpCloseBtn.addEventListener('click', function() { closeCurrentModal(syncHelpCloseBtn); });
+    const editGidenBtn = document.getElementById('editGidenBtn');
+    if (editGidenBtn) editGidenBtn.addEventListener('click', function() { setEditTransactionType('giden'); });
+    const editGelenBtn = document.getElementById('editGelenBtn');
+    if (editGelenBtn) editGelenBtn.addEventListener('click', function() { setEditTransactionType('gelen'); });
+    const editAmount = document.getElementById('editAmount');
+    if (editAmount) editAmount.addEventListener('input', function() { formatCurrency(this); });
+    const saveEditedTransactionBtn = document.getElementById('saveEditedTransactionBtn');
+    if (saveEditedTransactionBtn) saveEditedTransactionBtn.addEventListener('click', saveEditedTransaction);
+    const memoryOverlayNoBtn = document.getElementById('memoryOverlayNoBtn');
+    if (memoryOverlayNoBtn) memoryOverlayNoBtn.addEventListener('click', closeMemoryOverlay);
+
+    const colorSelectionMenu = document.getElementById('colorSelectionMenu');
+    if (colorSelectionMenu) {
+        colorSelectionMenu.addEventListener('click', function(e) {
+            if (e.target === colorSelectionMenu) colorSelectionMenu.style.display = 'none';
+        });
+    }
+    const colorBubbles = document.getElementById('colorBubbles');
+    if (colorBubbles) {
+        colorBubbles.addEventListener('click', function(e) {
+            const btn = e.target.closest('button[data-glow]');
+            if (btn) changeGlowTheme(btn.getAttribute('data-glow'));
+        });
+    }
+}
+
 window.addEventListener('load', async function() {
     initDOMCache();
     bindMenuEvents();
     bindPageEvents();
+    bindModalEvents();
     updateVersionDisplay();
     await loadGlowTheme();
     updateServerStatus('', '📡 Veriler yükleniyor...');

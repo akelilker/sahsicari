@@ -211,7 +211,7 @@
         <div class="modal-header">
             <div class="header-top-row">
                 <h2 id="modalPersonName"> 👤 Kişi Detayı</h2>
-                <button class="close-modal-btn" onclick="closeCurrentModal(this)" title="Kapat" type="button">✖</button>
+                <button class="close-modal-btn" title="Kapat" type="button">✖</button>
             </div>
             <div class="person-total-info" id="personTotalInfo">
                 <div class="balance-breakdown">
@@ -219,10 +219,10 @@
             </div>
             
             <div class="tab-buttons">
-                <button class="tab-btn active" onclick="openTab(event, 'yeniIslem')">Yeni İşlem</button>
-                <button class="tab-btn" onclick="openTab(event, 'islemGecmisi')">İşlem Geçmişi</button>
-                <button class="tab-btn" onclick="openTab(event, 'kategoriDurumu')">Kategori Durumu</button>
-                <button class="tab-btn" onclick="openTab(event, 'raporlar')">Raporlar</button>
+                <button type="button" class="tab-btn active" data-tab="yeniIslem">Yeni İşlem</button>
+                <button type="button" class="tab-btn" data-tab="islemGecmisi">İşlem Geçmişi</button>
+                <button type="button" class="tab-btn" data-tab="kategoriDurumu">Kategori Durumu</button>
+                <button type="button" class="tab-btn" data-tab="raporlar">Raporlar</button>
             </div>
             
         </div> <div class="modal-body">
@@ -230,20 +230,18 @@
                 <div class="form-group">
                     <div class="transaction-type-header">
                         <label>İşlem Tipi</label>
-                        <button type="button" class="recalc-balance-icon" onclick="recalculateAllBalancesFromTransactions()" title="Bakiyeleri yeniden hesapla" aria-label="Bakiyeleri yeniden hesapla"></button>
+                        <button type="button" class="recalc-balance-icon" id="recalcBalanceBtn" title="Bakiyeleri yeniden hesapla" aria-label="Bakiyeleri yeniden hesapla"></button>
                     </div>
                     <div class="transaction-type-buttons">
-                        <button class="type-btn giden" id="gidenBtn" onclick="setTransactionType('giden')" type="button">Giden TL</button>
-                        <button class="type-btn gelen" id="gelenBtn" onclick="setTransactionType('gelen')" type="button">Gelen TL</button>
+                        <button class="type-btn giden" id="gidenBtn" type="button">Giden TL</button>
+                        <button class="type-btn gelen" id="gelenBtn" type="button">Gelen TL</button>
                     </div>
                     <input id="transactionType" type="hidden" value=""/>
                 </div>
                 
                 <div class="form-group">
                     <label for="amount">Tutar (₺)</label>
-                    <input id="amount" type="text" inputmode="decimal" 
-                           oninput="formatCurrency(this)" 
-                           placeholder="150,00" />
+                    <input id="amount" type="text" inputmode="decimal" placeholder="150,00" />
                 </div>
                 
                 <div class="form-group">
@@ -259,12 +257,12 @@
                     <label for="dateInput" style="color:#aaa; font-size:0.8em; margin-bottom:0;">Tarih</label>
                     <div class="date-row-transparent">
                         <span class="current-date-display mobile-date-display" aria-hidden="true"></span>
-                        <input id="dateInput" class="transparent-date-input" onchange="handleDateChange(event)" type="date"/>
+                        <input id="dateInput" class="transparent-date-input" type="date"/>
                     </div>
                 </div>
                 
                 <div class="form-group" style="display:flex; gap:8px; flex-wrap:wrap;">
-                    <button class="btn btn-success" id="addTransactionBtn" onclick="processSingleTransaction()">Kaydet</button>
+                    <button type="button" class="btn btn-success" id="addTransactionBtn">Kaydet</button>
                 </div>
             </div>
             <div class="tab-content" id="islemGecmisi">
@@ -278,14 +276,14 @@
                 <div class="category-balance-section" id="categoryBalanceSection">
                     <div style="display: flex; align-items: center; justify-content: flex-end; margin-bottom: 10px; font-size: 0.8em;">
                         <label id="showZeroBalanceToggleBtn" for="showZeroBalanceToggle" style="margin-right: 0; cursor: pointer;">Sıfır Bakiyeleri Göster</label>
-                        <input type="checkbox" id="showZeroBalanceToggle" onchange="updateCategoryBalanceDisplay(currentPerson)">
+                        <input type="checkbox" id="showZeroBalanceToggle">
                     </div>
                     <div class="category-balance-grid" id="categoryBalanceGrid"></div>
                     
-                    <button class="btn share-btn" onclick="toggleShareOptions()" style="width:100%; margin-top: 12px;">📋 Özeti Paylaş</button>
+                    <button type="button" class="btn share-btn" id="toggleShareOptionsBtn" style="width:100%; margin-top: 12px;">📋 Özeti Paylaş</button>
                     <div id="shareOptions" style="display: none; justify-content: center; gap: 30px; margin-top: 15px;">
-                        <span onclick="exportSummaryExcel()" style="cursor: pointer; color: #66bb6a; font-weight: 700; font-size: 0.95em;">Excel</span>
-                        <span onclick="copySummaryText()" style="cursor: pointer; color: #cfd8dc; font-weight: 700; font-size: 0.95em;">Kopyala</span>
+                        <span role="button" tabindex="0" id="exportSummaryExcelBtn" style="cursor: pointer; color: #66bb6a; font-weight: 700; font-size: 0.95em;">Excel</span>
+                        <span role="button" tabindex="0" id="copySummaryTextBtn" style="cursor: pointer; color: #cfd8dc; font-weight: 700; font-size: 0.95em;">Kopyala</span>
                     </div>
 
                 </div>
@@ -310,9 +308,9 @@
                     <h4 class="rd-header orange area-title-adv">Gelişmiş</h4>
 
                     <div class="rd-toggles area-toggles">
-                        <span class="rd-toggle-btn active" id="filterBtn-all" onclick="setReportFilterType('all')">Tümü</span>
-                        <span class="rd-toggle-btn" id="filterBtn-gelen" onclick="setReportFilterType('gelen')">Gelen</span>
-                        <span class="rd-toggle-btn" id="filterBtn-giden" onclick="setReportFilterType('giden')">Giden</span>
+                        <span role="button" tabindex="0" class="rd-toggle-btn active" id="filterBtn-all" data-report-filter="all">Tümü</span>
+                        <span role="button" tabindex="0" class="rd-toggle-btn" id="filterBtn-gelen" data-report-filter="gelen">Gelen</span>
+                        <span role="button" tabindex="0" class="rd-toggle-btn" id="filterBtn-giden" data-report-filter="giden">Giden</span>
                     </div>
 
                     <div class="rd-search area-search">
@@ -322,8 +320,8 @@
                     </div>
                 </div>
                 <div class="rd-buttons-row">
-                    <button class="rd-btn orange-line" id="monthlyReportButton" onclick="showMonthlySummaryModal()">Aylık Rapor</button>
-                    <button class="rd-btn green-line" id="excelReportButton" onclick="exportToExcel()">Excel Raporu</button>
+                    <button type="button" class="rd-btn orange-line" id="monthlyReportButton">Aylık Rapor</button>
+                    <button type="button" class="rd-btn green-line" id="excelReportButton">Excel Raporu</button>
                 </div>
 
                 <div id="reportPreviewContainer" class="report-preview-container">
@@ -344,17 +342,17 @@
         <div class="modal-header">
             <div class="header-top-row">
                 <h2> 🆕 Yeni Kişi Ekle</h2>
-                <button class="close-modal-btn" onclick="closeCurrentModal(this)" title="Kapat" type="button">✖</button>
+                <button class="close-modal-btn" title="Kapat" type="button">✖</button>
             </div>
         </div>
         <div class="modal-body">
             <div class="form-group">
                 <label for="newPersonName">Kişi Adı</label>
-                <input id="newPersonName" onkeypress="handlePersonNameEnter(event)" placeholder="Örn: Ahmet, Ayşe..." type="text"/>
+                <input id="newPersonName" placeholder="Örn: Ahmet, Ayşe..." type="text"/>
             </div>
             <div class="add-person-actions">
-                <button class="btn btn-save-person" onclick="addNewPerson()" type="button">✓ Kaydet</button>
-                <button class="btn btn-cancel-person" onclick="closeCurrentModal(this)" type="button">✕ Vazgeç</button>
+                <button type="button" class="btn btn-save-person" id="addNewPersonBtn">✓ Kaydet</button>
+                <button type="button" class="btn btn-cancel-person">✕ Vazgeç</button>
             </div>
         </div>
     </div>
@@ -365,7 +363,7 @@
         <div class="modal-header">
             <div class="header-top-row">
                 <h2>Genel Durum</h2>
-                <button class="close-modal-btn" onclick="closeCurrentModal(this)" title="Kapat" type="button">✖</button>
+                <button class="close-modal-btn" title="Kapat" type="button">✖</button>
             </div>
         </div>
         <div class="modal-body">
@@ -379,11 +377,11 @@
         <div class="modal-header">
             <div class="header-top-row">
                 <h2> 👥 Kişi Yönetimi</h2>
-                <button class="close-modal-btn" onclick="closeCurrentModal(this)" title="Kapat" type="button">✖</button>
+                <button class="close-modal-btn" title="Kapat" type="button">✖</button>
             </div>
         </div>
         <div class="modal-body">
-            <button class="btn btn-success" onclick="showAddPersonModal()" style="width:100%; margin-bottom: 12px;">+ Yeni Kişi Ekle</button>
+            <button type="button" class="btn btn-success" id="personMgmtAddPersonBtn" style="width:100%; margin-bottom: 12px;">+ Yeni Kişi Ekle</button>
             <div id="personManagementList"></div>
         </div>
     </div>
@@ -394,13 +392,13 @@
         <div class="modal-header">
             <div class="header-top-row">
                 <h2> 🏷️ Kategori Yönetimi</h2>
-                <button class="close-modal-btn" onclick="closeCurrentModal(this)" title="Kapat" type="button">✖</button>
+                <button class="close-modal-btn" title="Kapat" type="button">✖</button>
             </div>
         </div>
         <div class="modal-body">
             <div class="form-group">
                 <label for="categoryManagementPersonSelect">Kişi Seçiniz:</label>
-                <select id="categoryManagementPersonSelect" onchange="populateCategoryEditor(this.value)" style="width: 100%; padding: 8px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #e0e0e0; font-size: 13px;">
+                <select id="categoryManagementPersonSelect" style="width: 100%; padding: 8px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #e0e0e0; font-size: 13px;">
                     <option value="">Kişi Seçin...</option>
                 </select>
             </div>
@@ -408,8 +406,8 @@
                 <h4 style="color: #ff9800; text-align: center; margin-bottom: 8px;">Mevcut Kategoriler</h4>
                 <div id="categoryManagementList" style="max-height: 40dvh; overflow-y: auto; margin-bottom: 12px;"></div>
                 <div style="display: flex; gap: 8px;">
-                    <input id="newManagedCategoryInput" onkeypress="handleCategoryInputEnter(event)" placeholder="Yeni kategori adı..." style="flex: 1; padding: 8px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #e0e0e0; font-size: 13px;" type="text"/>
-                    <button class="btn btn-success" onclick="addCategoryFromManager()">Ekle</button>
+                    <input id="newManagedCategoryInput" placeholder="Yeni kategori adı..." style="flex: 1; padding: 8px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #e0e0e0; font-size: 13px;" type="text"/>
+                    <button type="button" class="btn btn-success" id="addCategoryFromManagerBtn">Ekle</button>
                 </div>
             </div>
         </div>
@@ -421,7 +419,7 @@
         <div class="modal-header">
             <div class="header-top-row">
                 <h2> 🗓️ Aylık Rapor</h2>
-                <button class="close-modal-btn" onclick="closeCurrentModal(this)" title="Kapat" type="button">✖</button>
+                <button class="close-modal-btn" title="Kapat" type="button">✖</button>
             </div>
         </div>
         <div class="modal-body">
@@ -434,7 +432,7 @@
                 <label for="summaryMonthSelect">Ay</label>
                 <select id="summaryMonthSelect"></select>
             </div>
-            <button class="btn btn-success" id="generateReportBtn" onclick="exportMonthlySummary()" style="margin-top:20px;">Rapor Oluştur</button>
+            <button type="button" class="btn btn-success" id="generateReportBtn" style="margin-top:20px;">Rapor Oluştur</button>
         </div>
     </div>
 </div>
@@ -444,7 +442,7 @@
         <div class="modal-header">
             <div class="header-top-row">
                 <h2> ℹ️ Uygulama Rehberi</h2>
-                <button class="close-modal-btn" onclick="closeCurrentModal(this)" title="Kapat" type="button">✖</button>
+                <button class="close-modal-btn" title="Kapat" type="button">✖</button>
             </div>
         </div>
         <div class="modal-body">
@@ -463,7 +461,7 @@
             <h4 style="color:#42a5f5;margin-bottom:12px;"> 🎤 Sesli / URL ile Hızlı Kayıt:</h4>
             <p style="margin-bottom:18px;line-height:1.5;font-size:0.95em;">Sayfayı <code>?siri=1&amp;person=KişiAdı&amp;amount=100&amp;type=gelen</code> parametreleriyle açarak işlem onay ekranını açabilirsiniz (type: gelen veya giden).</p>
             <div style="text-align:center;margin-top:18px;">
-                <button class="btn btn-cloud" onclick="closeCurrentModal(this)">Anladım ✅ </button>
+                <button type="button" class="btn btn-cloud" id="syncHelpCloseBtn">Anladım ✅ </button>
             </div>
         </div>
     </div>
@@ -474,21 +472,21 @@
         <div class="modal-header">
             <div class="header-top-row">
                 <h2> ✏️ İşlem Düzenle</h2>
-                <button class="close-modal-btn" onclick="closeCurrentModal(this)" title="Kapat" type="button">✖</button>
+                <button class="close-modal-btn" title="Kapat" type="button">✖</button>
             </div>
         </div>
         <div class="modal-body">
             <div class="form-group">
                 <label>İşlem Tipi</label>
                 <div class="transaction-type-buttons">
-                    <button class="type-btn giden active" id="editGidenBtn" onclick="setEditTransactionType('giden')" type="button">Giden TL</button>
-                    <button class="type-btn gelen" id="editGelenBtn" onclick="setEditTransactionType('gelen')" type="button">Gelen TL</button>
+                    <button class="type-btn giden active" id="editGidenBtn" type="button">Giden TL</button>
+                    <button class="type-btn gelen" id="editGelenBtn" type="button">Gelen TL</button>
                 </div>
                 <input id="editTransactionType" type="hidden" value="giden"/>
             </div>
             <div class="form-group">
                 <label for="editAmount">Tutar (₺)</label>
-                <input id="editAmount" type="text" inputmode="decimal" oninput="formatCurrency(this)" placeholder="150,00" />
+                <input id="editAmount" type="text" inputmode="decimal" placeholder="150,00" />
             </div>
             <div class="form-group">
                 <label for="editCategory">Kategori</label>
@@ -505,7 +503,7 @@
                     <input class="date-picker-simple" id="editDateInput" type="date"/>
                 </div>
             </div>
-            <button class="btn btn-success" onclick="saveEditedTransaction()"> ✅ Değişiklikleri Kaydet</button>
+            <button type="button" class="btn btn-success" id="saveEditedTransactionBtn"> ✅ Değişiklikleri Kaydet</button>
         </div>
     </div>
 </div>
@@ -515,7 +513,7 @@
         <div class="modal-header"> 
             <div class="header-top-row">
                 <h2 id="categoryDetailTitle">Kategori Detayı</h2>
-                <button class="close-modal-btn" onclick="closeCurrentModal(this)" title="Kapat" type="button">✖</button>
+                <button class="close-modal-btn" title="Kapat" type="button">✖</button>
             </div>
         </div>
         <div class="modal-body">
@@ -536,12 +534,12 @@
         
         <div class="alert-buttons">
             <button class="alert-btn btn-yes">EVET</button>
-            <button class="alert-btn btn-no" onclick="closeMemoryOverlay()">HAYIR</button>
+            <button type="button" class="alert-btn btn-no" id="memoryOverlayNoBtn">HAYIR</button>
         </div>
     </div>
 </div>
   
-<div id="colorSelectionMenu" onclick="if(event.target === this) this.style.display='none';" style="
+<div id="colorSelectionMenu" style="
     display: none; 
     position: fixed;
     top: 0;
@@ -559,14 +557,14 @@
         align-items: center;
         gap: 15px;
     ">
-        <button type="button" class="neon-btn neon-btn-white" onclick="changeGlowTheme('white')"></button>
-        <button type="button" class="neon-btn neon-btn-blue" onclick="changeGlowTheme('blue')"></button>
-        <button type="button" class="neon-btn neon-btn-lila" onclick="changeGlowTheme('lila')"></button>
-        <button type="button" class="neon-btn neon-btn-green" onclick="changeGlowTheme('green')"></button>
-        <button type="button" class="neon-btn neon-btn-red" onclick="changeGlowTheme('red')"></button>
-        <button type="button" class="neon-btn neon-btn-gold" onclick="changeGlowTheme('gold')"></button>
-        <button type="button" class="neon-btn neon-btn-cyan" onclick="changeGlowTheme('cyan')"></button>
-        <button type="button" class="neon-btn-off" onclick="changeGlowTheme('none')">Kapalı</button>
+        <button type="button" class="neon-btn neon-btn-white" data-glow="white"></button>
+        <button type="button" class="neon-btn neon-btn-blue" data-glow="blue"></button>
+        <button type="button" class="neon-btn neon-btn-lila" data-glow="lila"></button>
+        <button type="button" class="neon-btn neon-btn-green" data-glow="green"></button>
+        <button type="button" class="neon-btn neon-btn-red" data-glow="red"></button>
+        <button type="button" class="neon-btn neon-btn-gold" data-glow="gold"></button>
+        <button type="button" class="neon-btn neon-btn-cyan" data-glow="cyan"></button>
+        <button type="button" class="neon-btn-off" data-glow="none">Kapalı</button>
     </div>
 </div>
 
