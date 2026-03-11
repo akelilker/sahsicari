@@ -88,15 +88,15 @@
             <h3>CARİ KAYIT İŞLEMLERİ</h3>
             <div class="debt-controls">
                 <label for="personSelect" class="sr-only">Kişi</label>
-                <select id="personSelect" onchange="selectPerson()" onclick="openSelectedPersonIfAny()">
+                <select id="personSelect">
                     <option value=""> Kişi Seçiniz...</option>
                 </select>
-                <button class="add-person-btn" onclick="showAddPersonModal()">+</button>
+                <button type="button" class="add-person-btn" id="addPersonBtn">+</button>
             </div>
         </div>
 
         <div class="quick-transaction-area">
-            <button class="quick-action-main-btn" onclick="showQuickTransactionOverlay()"> 
+            <button type="button" class="quick-action-main-btn" id="quickActionMainBtn"> 
                 ⚡ Hızlı İşlem
             </button>
 
@@ -108,12 +108,12 @@
         <div class="control-panel">
             <h3>VERİLER</h3>
             
-            <button class="btn btn-cloud general-status-btn" onclick="showGeneralStatusReport()">Genel Durum</button>
+            <button type="button" class="btn btn-cloud general-status-btn" id="generalStatusBtn">Genel Durum</button>
 
             <div class="control-panel-grid">
-                <button class="btn btn-success" onclick="exportSystemToJSON()">💾 Yedek Al</button>
+                <button type="button" class="btn btn-success" id="exportJsonBtn">💾 Yedek Al</button>
                 <div class="file-upload">
-                    <input accept=".json" id="systemImportFile" onchange="importSystemFromJSON(event)" type="file"/>
+                    <input accept=".json" id="systemImportFile" type="file"/>
                     <label class="file-upload-btn" for="systemImportFile">📥 Yedekten Geri Yükle</label>
                 </div>
             </div>
@@ -134,19 +134,19 @@
 </div> 
 
 <div id="quickOverlayContainer" class="quick-overlay" style="display:none;">
-    <div class="quick-overlay-backdrop" onclick="closeQuickTransactionOverlay()"></div>
+    <div class="quick-overlay-backdrop" id="quickOverlayBackdrop" role="button" tabindex="0" aria-label="Hızlı işlem panelini kapat"></div>
     
     <div class="quick-panel-content">
         <div class="quick-panel-header">
             <h3>⚡ Hızlı İşlem</h3>
-            <button class="close-overlay-btn" onclick="closeQuickTransactionOverlay()" type="button">✕</button>
+            <button class="close-overlay-btn" type="button" id="quickOverlayCloseBtn">✕</button>
         </div>
 
         <div class="quick-search-wrapper">
             <div class="search-box">
                 <span class="search-icon">🔍 </span>
                 <label for="quickSearchInput" class="sr-only">Kişi ara</label>
-                <input type="text" id="quickSearchInput" placeholder="Kişi Ara..." oninput="filterQuickPersonList()" autocomplete="off" aria-label="Kişi ara">
+                <input type="text" id="quickSearchInput" placeholder="Kişi Ara..." autocomplete="off" aria-label="Kişi ara">
             </div>
         </div>
 
@@ -160,15 +160,15 @@
             <div class="form-group">
                 <label>İşlem Tipi</label>
                 <div class="transaction-type-buttons">
-                        <button class="type-btn giden" id="quickGidenBtn" onclick="setQuickTransactionType('giden')" type="button">Giden TL</button>
-                        <button class="type-btn gelen" id="quickGelenBtn" onclick="setQuickTransactionType('gelen')" type="button">Gelen TL</button>
+                        <button class="type-btn giden" id="quickGidenBtn" type="button">Giden TL</button>
+                        <button class="type-btn gelen" id="quickGelenBtn" type="button">Gelen TL</button>
                 </div>
                 <input id="quickTransactionType" type="hidden" value=""/>
             </div>
             
             <div class="form-group">
                 <label for="quickAmount">Tutar (₺)</label>
-                <input id="quickAmount" type="text" inputmode="decimal" oninput="formatCurrency(this)" placeholder="150,00" />
+                <input id="quickAmount" type="text" inputmode="decimal" placeholder="150,00" />
             </div>
             
             <div class="form-group">
@@ -184,25 +184,25 @@
             </div>
             
             <div class="quick-actions-row">
-                <button class="btn btn-success" onclick="processQuickTransaction()">İşlemi Kaydet</button>
-                <button class="btn btn-danger" onclick="resetQuickPanel()">↩️ Listeye Dön</button>
+                <button type="button" class="btn btn-success" id="processQuickTransactionBtn">İşlemi Kaydet</button>
+                <button type="button" class="btn btn-danger" id="resetQuickPanelBtn">↩️ Listeye Dön</button>
             </div>
         </div>
     </div>
 </div>
 
 <div id="allocationOverlay" class="quick-overlay" style="display:none;">
-    <div class="quick-overlay-backdrop" onclick="closeAllocationOverlay()"></div>
+    <div class="quick-overlay-backdrop" id="allocationOverlayBackdrop" role="button" tabindex="0" aria-label="Dağıtım panelini kapat"></div>
     <div class="quick-panel-content allocation-panel">
         <div class="quick-panel-header" style="justify-content: center; position: relative; margin-bottom: 20px;">
             <h3 style="margin:0 auto; font-size: 1.1em; color: #e0e0e0;">Gelen Para Dağıtımı</h3>
-            <button class="close-overlay-btn" onclick="closeAllocationOverlay()" style="position:absolute; right:0; top: -5px;">✕</button>
+            <button type="button" class="close-overlay-btn" id="allocationOverlayCloseBtn" style="position:absolute; right:0; top: -5px;">✕</button>
         </div>
         
         <div id="allocationDynamicContent">
             </div>
 
-        <button class="btn btn-success" onclick="confirmAllocation()" style="width:100%; margin-top:20px; padding: 12px 6px; font-weight:700; font-size: 0.9em;">DAĞITIMI ONAYLA</button>
+        <button type="button" class="btn btn-success" id="confirmAllocationBtn" style="width:100%; margin-top:20px; padding: 12px 6px; font-weight:700; font-size: 0.9em;">DAĞITIMI ONAYLA</button>
     </div>
 </div>
 

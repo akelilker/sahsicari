@@ -356,9 +356,62 @@ function bindMenuEvents() {
     }
 }
 
+function bindPageEvents() {
+    const personSelect = document.getElementById('personSelect');
+    if (personSelect) {
+        personSelect.addEventListener('change', selectPerson);
+        personSelect.addEventListener('click', openSelectedPersonIfAny);
+    }
+    const addPersonBtn = document.getElementById('addPersonBtn');
+    if (addPersonBtn) addPersonBtn.addEventListener('click', showAddPersonModal);
+    const quickActionMainBtn = document.getElementById('quickActionMainBtn');
+    if (quickActionMainBtn) quickActionMainBtn.addEventListener('click', showQuickTransactionOverlay);
+    const generalStatusBtn = document.getElementById('generalStatusBtn');
+    if (generalStatusBtn) generalStatusBtn.addEventListener('click', showGeneralStatusReport);
+    const exportJsonBtn = document.getElementById('exportJsonBtn');
+    if (exportJsonBtn) exportJsonBtn.addEventListener('click', exportSystemToJSON);
+    const systemImportFile = document.getElementById('systemImportFile');
+    if (systemImportFile) systemImportFile.addEventListener('change', importSystemFromJSON);
+
+    const quickOverlayBackdrop = document.getElementById('quickOverlayBackdrop');
+    if (quickOverlayBackdrop) {
+        quickOverlayBackdrop.addEventListener('click', closeQuickTransactionOverlay);
+        quickOverlayBackdrop.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); closeQuickTransactionOverlay(); }
+        });
+    }
+    const quickOverlayCloseBtn = document.getElementById('quickOverlayCloseBtn');
+    if (quickOverlayCloseBtn) quickOverlayCloseBtn.addEventListener('click', closeQuickTransactionOverlay);
+    const quickSearchInput = document.getElementById('quickSearchInput');
+    if (quickSearchInput) quickSearchInput.addEventListener('input', filterQuickPersonList);
+    const quickGidenBtn = document.getElementById('quickGidenBtn');
+    if (quickGidenBtn) quickGidenBtn.addEventListener('click', function() { setQuickTransactionType('giden'); });
+    const quickGelenBtn = document.getElementById('quickGelenBtn');
+    if (quickGelenBtn) quickGelenBtn.addEventListener('click', function() { setQuickTransactionType('gelen'); });
+    const quickAmount = document.getElementById('quickAmount');
+    if (quickAmount) quickAmount.addEventListener('input', function() { formatCurrency(this); });
+    const processQuickTransactionBtn = document.getElementById('processQuickTransactionBtn');
+    if (processQuickTransactionBtn) processQuickTransactionBtn.addEventListener('click', processQuickTransaction);
+    const resetQuickPanelBtn = document.getElementById('resetQuickPanelBtn');
+    if (resetQuickPanelBtn) resetQuickPanelBtn.addEventListener('click', resetQuickPanel);
+
+    const allocationOverlayBackdrop = document.getElementById('allocationOverlayBackdrop');
+    if (allocationOverlayBackdrop) {
+        allocationOverlayBackdrop.addEventListener('click', closeAllocationOverlay);
+        allocationOverlayBackdrop.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); closeAllocationOverlay(); }
+        });
+    }
+    const allocationOverlayCloseBtn = document.getElementById('allocationOverlayCloseBtn');
+    if (allocationOverlayCloseBtn) allocationOverlayCloseBtn.addEventListener('click', closeAllocationOverlay);
+    const confirmAllocationBtn = document.getElementById('confirmAllocationBtn');
+    if (confirmAllocationBtn) confirmAllocationBtn.addEventListener('click', confirmAllocation);
+}
+
 window.addEventListener('load', async function() {
     initDOMCache();
     bindMenuEvents();
+    bindPageEvents();
     updateVersionDisplay();
     await loadGlowTheme();
     updateServerStatus('', '📡 Veriler yükleniyor...');
