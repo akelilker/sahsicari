@@ -299,14 +299,17 @@ function queueSave() {
         try {
             if (Object.keys(allData).length > 0 && navigator.onLine) {
                 await saveDataToServer(allData, false);
+                allData.metadata.unsynced = false;
                 await advancedStorage.removeItem('sahsiHesapTakibiData');
             } else {
+                allData.metadata.unsynced = true;
                 await advancedStorage.setItem('sahsiHesapTakibiData', JSON.stringify(allData));
                 await queueServerSyncPayload(allData);
             }
             await advancedStorage.setItem('sahsiHesapTakibiNotifications', JSON.stringify(notificationHistory));
         } catch (error) {
             updateServerStatus('error', 'Sunucuya kaydedilemedi, yerelde bekliyor');
+            allData.metadata.unsynced = true;
             await advancedStorage.setItem('sahsiHesapTakibiData', JSON.stringify(allData));
             await queueServerSyncPayload(allData);
         }
@@ -490,29 +493,46 @@ function loadDataFromServer() {
 }
 
 async function loadData() {
+    let localData = null;
+    try {
+        const savedData = await advancedStorage.getItem('sahsiHesapTakibiData');
+        if (savedData) localData = JSON.parse(savedData);
+    } catch (_) {}
+
     try {
         const serverData = await loadDataFromServer();
         if (serverData && Object.keys(serverData).length > 0) {
+            if (localData && localData.metadata && localData.metadata.unsynced === true) {
+                allData = localData;
+                hasLoadedServerData = false;
+                updateServerStatus('', '🔄 Yerel değişiklikler korunuyor, sunucuya gönderiliyor...');
+                try {
+                    await saveDataToServer(localData, false);
+                    allData.metadata.unsynced = false;
+                    await advancedStorage.removeItem('sahsiHesapTakibiData');
+                    updateServerStatus('success', '✅ Yerel veri sunucuya gönderildi');
+                } catch (pushErr) {
+                    updateServerStatus('error', '❌ Yerel veri sunucuya gönderilemedi');
+                }
+                return true;
+            }
             allData = serverData;
             hasLoadedServerData = true;
             updateServerStatus('success', '✅ Sunucudan yüklendi');
             return true;
-        } else {
-            const savedData = await advancedStorage.getItem('sahsiHesapTakibiData');
-            if (savedData) {
-                allData = JSON.parse(savedData);
-                hasLoadedServerData = false;
-                updateServerStatus('success', '✅ Yerel veri yüklendi');
-            } else {
-                hasLoadedServerData = false;
-                updateServerStatus('success', '✅ Yeni sistem hazır');
-            }
-            return true;
         }
+        if (localData) {
+            allData = localData;
+            hasLoadedServerData = false;
+            updateServerStatus('success', '✅ Yerel veri yüklendi');
+        } else {
+            hasLoadedServerData = false;
+            updateServerStatus('success', '✅ Yeni sistem hazır');
+        }
+        return true;
     } catch (error) {
         updateServerStatus('error', '❌ Bağlantı hatası');
-        const savedData = await advancedStorage.getItem('sahsiHesapTakibiData');
-        if (savedData) allData = JSON.parse(savedData);
+        if (localData) allData = localData;
         return false;
     }
 }
