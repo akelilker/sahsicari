@@ -2422,6 +2422,43 @@ select option {
     min-width: 1px;
 }
 
+/* Masaüstü: Kategori detay hesap hareketleri – Açıklama sütununa daha geniş alan */
+@media screen and (min-width: 769px) {
+    #categoryDetailContent .detail-table {
+        table-layout: fixed;
+        width: 100%;
+    }
+    #categoryDetailContent .detail-table th:nth-child(1),
+    #categoryDetailContent .detail-table td:nth-child(1) {
+        width: 72px;
+        min-width: 72px;
+    }
+    #categoryDetailContent .detail-table th:nth-child(2),
+    #categoryDetailContent .detail-table td:nth-child(2),
+    #categoryDetailContent .detail-table th:nth-child(3),
+    #categoryDetailContent .detail-table td:nth-child(3),
+    #categoryDetailContent .detail-table th:nth-child(4),
+    #categoryDetailContent .detail-table td:nth-child(4) {
+        width: 78px;
+        min-width: 78px;
+    }
+    #categoryDetailContent .detail-table th:nth-child(5),
+    #categoryDetailContent .detail-table td:nth-child(5) {
+        width: auto;
+        min-width: 200px;
+        max-width: none;
+    }
+    #categoryDetailContent .detail-table tbody td:last-child {
+        display: block;
+        -webkit-line-clamp: unset;
+        line-clamp: unset;
+        -webkit-box-orient: unset;
+        overflow: visible;
+        text-overflow: clip;
+        white-space: normal;
+    }
+}
+
 @media screen and (max-width: 480px) and (orientation: portrait) {
     #categoryDetailContent .detail-table {
         font-size: 9px;
