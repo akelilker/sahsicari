@@ -4275,7 +4275,10 @@ label[for="editDateInput"] {
 }
 
 /* Aylık Rapor + Excel: her zaman yatay, tam genişlik, ortalı */
+/* Invisible date input (z-index:10) butonların üstüne biniyordu; buton satırı üste alındı */
 .rd-buttons-row {
+    position: relative;
+    z-index: 20;
     display: flex;
     flex-direction: row;
     justify-content: center;

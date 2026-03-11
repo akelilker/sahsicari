@@ -443,12 +443,7 @@ function bindModalEvents() {
     const monthlyReportButton = document.getElementById('monthlyReportButton');
     if (monthlyReportButton) monthlyReportButton.addEventListener('click', showMonthlySummaryModal);
     const excelReportButton = document.getElementById('excelReportButton');
-    if (excelReportButton) excelReportButton.addEventListener('click', function(e) {
-        // #region agent log
-        fetch('http://127.0.0.1:7907/ingest/5d8741d3-3489-4f86-b195-36ed376ce6aa',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'1296d6'},body:JSON.stringify({sessionId:'1296d6',location:'app.js:excelReportButton',message:'excel click',data:{targetId:e.target.id,targetTag:e.target.tagName,targetClass:(e.target.className||'').slice(0,80),insideDateGroup:!!e.target.closest('.rd-date-group'),currentTargetId:e.currentTarget.id},hypothesisId:'H1',timestamp:Date.now()})}).catch(function(){});
-        // #endregion
-        exportToExcel();
-    });
+    if (excelReportButton) excelReportButton.addEventListener('click', exportToExcel);
 
     const addNewPersonBtn = document.getElementById('addNewPersonBtn');
     if (addNewPersonBtn) addNewPersonBtn.addEventListener('click', addNewPerson);
