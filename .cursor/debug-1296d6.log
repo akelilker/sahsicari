@@ -3,3 +3,4 @@
 {"sessionId":"1296d6","location":"app.js:endDateGroup","message":"endDateGroup click","data":{"targetId":"endDate","targetTag":"INPUT","targetClass":"rd-date-input"},"hypothesisId":"H4","timestamp":1773259162043}
 {"sessionId":"1296d6","location":"app.js:excelReportButton","message":"excel click","data":{"targetId":"excelReportButton","targetTag":"BUTTON","targetClass":"rd-btn green-line","insideDateGroup":false,"currentTargetId":"excelReportButton"},"hypothesisId":"H1","timestamp":1773259546394}
 {"sessionId":"1296d6","location":"app.js:exportToExcel","message":"exportToExcel called","data":{},"hypothesisId":"H3","timestamp":1773259546394}
+{"sessionId":"1296d6","location":"app.js:exportToExcel","message":"exportToExcel called","data":{},"hypothesisId":"H3","timestamp":1773263130424}

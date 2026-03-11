@@ -647,8 +647,8 @@ body.ios-pwa .history-item .description {
 }
 
 .summary-card.debt h3 {
-    color: #ff1744;
-    text-shadow: 0 0 8px rgba(255, 23, 68, 0.4);
+    color: var(--expense-red);
+    text-shadow: none;
 }
 .summary-card:nth-child(3) h3 { color: #b0bec5; }
 .summary-card:nth-child(3) { flex: 0.4; min-width: 50px; }
@@ -934,9 +934,9 @@ body.ios-pwa .history-item .description {
     text-shadow: 0 0 8px rgba(66, 165, 245, 0.4);
 }
 .btn-danger {
-    color: #ff1744;
+    color: var(--expense-red);
     border-color: rgba(255, 23, 68, 0.25);
-    text-shadow: 0 0 8px rgba(255, 23, 68, 0.4);
+    text-shadow: none;
 }
 
 /* Genel Durum Butonu */
@@ -948,9 +948,9 @@ body.ios-pwa .history-item .description {
 .btn-memory-clear,
 .dropdown-menu .btn-memory-clear,
 .dropdown-menu .btn.btn-memory-clear {
-    color: #ff1744;
+    color: var(--expense-red);
     border: 1px solid rgba(255, 23, 68, 0.5);
-    text-shadow: 0 0 8px rgba(255, 23, 68, 0.4);
+    text-shadow: none;
 }
 
 .file-upload {
@@ -1118,8 +1118,8 @@ body.ios-pwa .history-item .description {
 }
 
 .notification.error {
-    color: #ff1744;
-    text-shadow: 0 0 8px rgba(255, 23, 68, 0.4);
+    color: var(--expense-red);
+    text-shadow: none;
     border-color: var(--white-30);
 }
 
@@ -1195,8 +1195,8 @@ body.modal-open-ios .global-status-bar {
 }
 
 .status-dot.offline {
-    color: #ff1744;
-    text-shadow: 0 0 8px rgba(255, 23, 68, 0.5);
+    color: var(--expense-red);
+    text-shadow: none;
     animation: statusDim 4s forwards;
     opacity: 1;
 }
@@ -1460,8 +1460,8 @@ overflow: hidden;
     flex: 1;
     background: transparent;
     border: 1px solid rgba(255, 23, 68, 0.5);
-    color: #ff1744;
-    text-shadow: 0 0 6px rgba(255, 23, 68, 0.3);
+    color: var(--expense-red);
+    text-shadow: none;
     font-size: 11px;
     padding: 4px 8px;
     min-height: unset;
@@ -1775,7 +1775,7 @@ select option {
 .type-btn.active.giden {
     background: rgba(255, 23, 68, 0.25);
     border: 1px solid rgba(255, 23, 68, 0.8);
-    text-shadow: 0 0 8px rgba(255, 23, 68, 0.4);
+    text-shadow: none;
 }
 .type-btn.active.gelen {
     background: rgba(0, 255, 0, 0.2);
@@ -2124,7 +2124,7 @@ select option {
 
 .history-type.giden {
     color: var(--expense-red);
-    text-shadow: 0 0 8px rgba(255, 23, 68, 0.4);
+    text-shadow: none;
 }
 
 .history-type.gelen {
@@ -2306,7 +2306,7 @@ select option {
 #categoryManagementList .management-actions .mgmt-btn:nth-child(2)::before {
     content: '\2716';
     color: var(--expense-red) !important;
-    text-shadow: 0 0 8px rgba(255, 23, 68, 0.4);
+    text-shadow: none;
 }
 
 .detail-table {
@@ -2383,9 +2383,9 @@ select option {
 .detail-table td:nth-child(3) {
     width: 90px;
     min-width: 90px;
-    color: #ff1744;
+    color: var(--expense-red);
     font-weight: 700;
-    text-shadow: 0 0 8px rgba(255, 23, 68, 0.4);
+    text-shadow: none;
 }
 
 .detail-table th:nth-child(4),
@@ -3024,7 +3024,7 @@ select option {
 
 .val-red {
     color: var(--expense-red);
-    text-shadow: 0 0 8px rgba(255, 23, 68, 0.4);
+    text-shadow: none;
 }
 .val-green {
     color: #00e676;
@@ -3940,10 +3940,10 @@ label[for="editDateInput"] {
 }
 
 .allocation-item-header .debt-amount {
-    color: #ff1744;
+    color: var(--expense-red);
     font-weight: 700;
     font-size: 0.95em;
-    text-shadow: 0 0 8px rgba(255, 23, 68, 0.4);
+    text-shadow: none;
 }
 
 .allocation-item-controls {
@@ -4232,10 +4232,10 @@ label[for="editDateInput"] {
 
 #filterBtn-giden.active {
     background: rgba(255, 23, 68, 0.2);
-    color: #ff1744;
+    color: var(--expense-red);
     box-shadow: 0 0 10px rgba(255, 23, 68, 0.2);
     font-weight: 700;
-    text-shadow: 0 0 8px rgba(255, 23, 68, 0.4);
+    text-shadow: none;
 }
 
 .rd-search {
@@ -4461,10 +4461,10 @@ label[for="editDateInput"] {
 
 .btn-yes {
     background: rgba(255, 23, 68, 0.2);
-    color: #ff1744;
+    color: var(--expense-red);
     border: 1px solid rgba(255, 23, 68, 0.5);
     box-shadow: 0 0 15px rgba(255, 23, 68, 0.1);
-    text-shadow: 0 0 8px rgba(255, 23, 68, 0.4);
+    text-shadow: none;
 }
 
 .custom-alert-overlay.error-state .btn-yes {
@@ -4570,7 +4570,7 @@ label[for="editDateInput"] {
 /* Minimal Utility Classes - borç/expense rengi İşlem geçmişi ile aynı */
 .text-expense {
     color: var(--expense-red);
-    text-shadow: 0 0 8px rgba(255, 23, 68, 0.4);
+    text-shadow: none;
 }
 .text-income {
     color: #00e676;
