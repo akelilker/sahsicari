@@ -217,6 +217,39 @@ body.ios-pwa .history-item .description {
     font-size: 0.88em;
 }
 
+/* iOS PWA UI ayarları (plan 1–5, 7–8) */
+body.ios-pwa .header h1 {
+    padding: 4px 2px 15px 2px;
+}
+body.ios-pwa .header h1 .title-text {
+    font-size: calc(0.8em + 0.7pt);
+}
+body.ios-pwa .quick-transaction-area {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+body.ios-pwa .top-controls {
+    margin-top: 3px;
+    margin-bottom: 0;
+}
+body.ios-pwa .notification-icon-btn {
+    padding: 4px 0;
+    margin-bottom: 0;
+}
+body.ios-pwa .tab-btn.active::after {
+    width: 80%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--tab-purple);
+    box-shadow: 0 0 10px var(--tab-purple);
+}
+body.ios-pwa #yeniIslem .form-group:nth-last-child(2) {
+    margin-bottom: 8px;
+}
+body.ios-pwa .category-item {
+    border-color: rgba(98, 0, 234, 0.85);
+}
+
 /* 2. ANA MİMARİ */
 
 .container {
