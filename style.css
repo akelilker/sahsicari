@@ -4314,7 +4314,7 @@ label[for="editDateInput"] {
 
 .rd-btn {
     flex: 1;
-    padding: 0 px;
+    padding: 0;
     background: transparent;
     border: 1px solid transparent;
     border-radius: 10px;

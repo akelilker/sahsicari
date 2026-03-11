@@ -7,38 +7,6 @@ function formatDateTR(dateObj) {
 }
 const APP_VERSION = '78.34';
 
-const safeStorage = {
-    getItem: function(key) {
-        try {
-            return localStorage.getItem(key);
-        } catch (e) {
-            console.warn('Storage erişimi engellendi (Okuma):', e);
-            return null;
-        }
-    },
-    setItem: function(key, value) {
-        try {
-            localStorage.setItem(key, value);
-        } catch (e) {
-            console.warn('Storage erişimi engellendi (Yazma):', e);
-        }
-    },
-    removeItem: function(key) {
-        try {
-            localStorage.removeItem(key);
-        } catch (e) {
-            console.warn('Storage erişimi engellendi (Silme):', e);
-        }
-    },
-    clear: function() {
-        try {
-            localStorage.clear();
-        } catch (e) {
-            console.warn('Storage erişimi engellendi (Temizleme):', e);
-        }
-    }
-};
-
 function setVh() {
     const vh = window.innerHeight * 0.01;
     document.documentElement.style.setProperty('--vh', `${vh}px`);
@@ -879,7 +847,6 @@ function updateMainDisplay() {
     updateQuickGrid();
 }
 
-let draggedElement = null;
 let draggedIndex = null;
 
 function safeDisplayName(name) {
