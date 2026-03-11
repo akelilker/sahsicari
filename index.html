@@ -87,6 +87,7 @@
         <div class="debt-status-section">
             <h3>CARİ KAYIT İŞLEMLERİ</h3>
             <div class="debt-controls">
+                <label for="personSelect" class="sr-only">Kişi</label>
                 <select id="personSelect" onchange="selectPerson()" onclick="openSelectedPersonIfAny()">
                     <option value=""> Kişi Seçiniz...</option>
                 </select>
@@ -144,7 +145,8 @@
         <div class="quick-search-wrapper">
             <div class="search-box">
                 <span class="search-icon">🔍 </span>
-                <input type="text" id="quickSearchInput" placeholder="Kişi Ara..." oninput="filterQuickPersonList()" autocomplete="off">
+                <label for="quickSearchInput" class="sr-only">Kişi ara</label>
+                <input type="text" id="quickSearchInput" placeholder="Kişi Ara..." oninput="filterQuickPersonList()" autocomplete="off" aria-label="Kişi ara">
             </div>
         </div>
 
@@ -254,7 +256,7 @@
                 </div>
                 
                 <div class="form-group">
-                    <label style="color:#aaa; font-size:0.8em; margin-bottom:0;">Tarih</label>
+                    <label for="dateInput" style="color:#aaa; font-size:0.8em; margin-bottom:0;">Tarih</label>
                     <div class="date-row-transparent">
                         <span class="current-date-display mobile-date-display" aria-hidden="true"></span>
                         <input id="dateInput" class="transparent-date-input" onchange="handleDateChange(event)" type="date"/>
@@ -294,13 +296,13 @@
                     <h4 class="rd-header white area-title-filter">Filtreleme</h4>
 
                     <div class="rd-date-group area-date-start">
-                        <label class="rd-date-label">Başlangıç</label>
+                        <label class="rd-date-label" for="startDate">Başlangıç</label>
                         <span class="rd-mobile-date-display" id="startDateDisplay" aria-hidden="true"></span>
                         <input class="rd-date-input" id="startDate" type="date">
                     </div>
 
                     <div class="rd-date-group area-date-end">
-                        <label class="rd-date-label">Bitiş</label>
+                        <label class="rd-date-label" for="endDate">Bitiş</label>
                         <span class="rd-mobile-date-display" id="endDateDisplay" aria-hidden="true"></span>
                         <input class="rd-date-input" id="endDate" type="date">
                     </div>
