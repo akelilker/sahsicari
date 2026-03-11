@@ -3760,6 +3760,7 @@ label[for="editDateInput"] {
         background: transparent;
         margin: 0;
         padding: 0;
+        pointer-events: none;
     }
 
     .rd-date-input::-webkit-calendar-picker-indicator {
@@ -3796,7 +3797,10 @@ label[for="editDateInput"] {
         min-height: 25px;
     }
 
-    /* Rapor span - tarih görünür */
+    /* Rapor span - tarih görünür; tıklanabilir (takvim sadece buna veya label'a tıklanınca açılsın) */
+    .rd-date-group .rd-mobile-date-display {
+        pointer-events: auto !important;
+    }
     .rd-mobile-date-display {
         position: relative;
         left: 0;
@@ -4133,6 +4137,14 @@ label[for="editDateInput"] {
     display: flex;
     flex-direction: column;
     margin-bottom: 2px;
+}
+
+/* Raporlar: takvim sadece tarih span/label tıklanınca açılsın; input tıklamayı yutmasın */
+#raporlar .rd-date-input {
+    pointer-events: none;
+}
+#raporlar .rd-date-group .rd-mobile-date-display {
+    pointer-events: auto !important;
 }
 
 .rd-date-label {
