@@ -1520,6 +1520,18 @@ function closeCurrentModal(el) {
             }
             return;
         }
+        if (modalId === 'monthlySummaryModal' && currentPerson) {
+            const personModal = document.getElementById('personModal');
+            if (personModal) {
+                personModal.style.display = 'block';
+                personModal.classList.add('show');
+                DOM.mainAppContainer?.classList.add('disable-events');
+                document.body.classList.add("disable-events");
+                var raporlarBtn = document.querySelector('#personModal .tab-btn[data-tab="raporlar"]');
+                if (raporlarBtn) openTab(null, 'raporlar', raporlarBtn);
+            }
+            return;
+        }
         
         if (!checkAnyMenuOpen()) {
             DOM.mainAppContainer?.classList.remove('disable-events');
