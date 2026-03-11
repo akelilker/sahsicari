@@ -413,7 +413,7 @@ function bindModalEvents() {
         const closeBtn = e.target.closest('.close-modal-btn');
         if (closeBtn) { closeCurrentModal(closeBtn); return; }
         const tabBtn = e.target.closest('.tab-btn[data-tab]');
-        if (tabBtn) { openTab(e, tabBtn.getAttribute('data-tab')); return; }
+        if (tabBtn) { openTab(e, tabBtn.getAttribute('data-tab'), tabBtn); return; }
         const filterBtn = e.target.closest('[data-report-filter]');
         if (filterBtn) { setReportFilterType(filterBtn.getAttribute('data-report-filter')); return; }
         const cancelBtn = e.target.closest('.btn-cancel-person');
@@ -1563,12 +1563,13 @@ if(DOM.settingsMenu) DOM.settingsMenu.style.display = 'none';
     if(DOM.personSelect) DOM.personSelect.value = '';
 }
 
-function openTab(e, id) {
+function openTab(e, id, activeBtn) {
     document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById(id).style.display = 'block';
-    e.currentTarget.classList.add('active');
-    
+    const panel = document.getElementById(id);
+    if (panel) panel.style.display = 'block';
+    const btn = activeBtn || (e && e.currentTarget);
+    if (btn) btn.classList.add('active');
     if (id === 'kategoriDurumu') updateCategoryBalanceDisplay(currentPerson);
     if (id === 'raporlar') renderReportPreview();
 }
