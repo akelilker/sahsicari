@@ -443,7 +443,12 @@ function bindModalEvents() {
     const monthlyReportButton = document.getElementById('monthlyReportButton');
     if (monthlyReportButton) monthlyReportButton.addEventListener('click', showMonthlySummaryModal);
     const excelReportButton = document.getElementById('excelReportButton');
-    if (excelReportButton) excelReportButton.addEventListener('click', exportToExcel);
+    if (excelReportButton) excelReportButton.addEventListener('click', function(e) {
+        // #region agent log
+        fetch('http://127.0.0.1:7907/ingest/5d8741d3-3489-4f86-b195-36ed376ce6aa',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'1296d6'},body:JSON.stringify({sessionId:'1296d6',location:'app.js:excelReportButton',message:'excel click',data:{targetId:e.target.id,targetTag:e.target.tagName,targetClass:(e.target.className||'').slice(0,80),insideDateGroup:!!e.target.closest('.rd-date-group'),currentTargetId:e.currentTarget.id},hypothesisId:'H1',timestamp:Date.now()})}).catch(function(){});
+        // #endregion
+        exportToExcel();
+    });
 
     const addNewPersonBtn = document.getElementById('addNewPersonBtn');
     if (addNewPersonBtn) addNewPersonBtn.addEventListener('click', addNewPerson);
@@ -2861,6 +2866,9 @@ function createCategorySummaryData(person, allTransactions, periodTransactions, 
 }
 
 function exportToExcel() {
+    // #region agent log
+    fetch('http://127.0.0.1:7907/ingest/5d8741d3-3489-4f86-b195-36ed376ce6aa',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'1296d6'},body:JSON.stringify({sessionId:'1296d6',location:'app.js:exportToExcel',message:'exportToExcel called',data:{},hypothesisId:'H3',timestamp:Date.now()})}).catch(function(){});
+    // #endregion
     if (exportInProgress) return showNotification("⚠️ Rapor hazırlanıyor...", "warning");
     const person = currentPerson;
     if (!person) return showNotification('Önce kişi seçmelisiniz.', 'error');
@@ -4694,6 +4702,9 @@ function initMobileDateDisplay() {
         const startDateGroup = startDateInput.closest('.rd-date-group');
         if (startDateGroup) {
             startDateGroup.addEventListener('click', (e) => {
+                // #region agent log
+                fetch('http://127.0.0.1:7907/ingest/5d8741d3-3489-4f86-b195-36ed376ce6aa',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'1296d6'},body:JSON.stringify({sessionId:'1296d6',location:'app.js:startDateGroup',message:'startDateGroup click',data:{targetId:e.target.id,targetTag:e.target.tagName,targetClass:(e.target.className||'').slice(0,80)},hypothesisId:'H2',timestamp:Date.now()})}).catch(function(){});
+                // #endregion
                 if (e.target !== startDateInput && !e.target.matches('label')) {
                     if (typeof startDateInput.showPicker === 'function') {
                         startDateInput.showPicker();
@@ -4719,6 +4730,9 @@ function initMobileDateDisplay() {
         const endDateGroup = endDateInput.closest('.rd-date-group');
         if (endDateGroup) {
             endDateGroup.addEventListener('click', (e) => {
+                // #region agent log
+                fetch('http://127.0.0.1:7907/ingest/5d8741d3-3489-4f86-b195-36ed376ce6aa',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'1296d6'},body:JSON.stringify({sessionId:'1296d6',location:'app.js:endDateGroup',message:'endDateGroup click',data:{targetId:e.target.id,targetTag:e.target.tagName,targetClass:(e.target.className||'').slice(0,80)},hypothesisId:'H4',timestamp:Date.now()})}).catch(function(){});
+                // #endregion
                 if (e.target !== endDateInput && !e.target.matches('label')) {
                     if (typeof endDateInput.showPicker === 'function') {
                         endDateInput.showPicker();
