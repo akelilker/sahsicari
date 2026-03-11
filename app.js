@@ -328,8 +328,37 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     navigator.serviceWorker.register('service_worker.js?v=' + APP_VERSION).catch(console.error);
 }
 
+function bindMenuEvents() {
+    const menuBackdrop = document.getElementById('menuBackdrop');
+    if (menuBackdrop) {
+        menuBackdrop.addEventListener('click', closeAllMenus);
+        menuBackdrop.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); closeAllMenus(); }
+        });
+    }
+    const settingsIcon = document.getElementById('settingsIcon');
+    if (settingsIcon) settingsIcon.addEventListener('click', toggleSettingsMenu);
+    const notificationIcon = document.getElementById('notificationIcon');
+    if (notificationIcon) notificationIcon.addEventListener('click', toggleNotificationMenu);
+    const settingsMenu = document.getElementById('settingsMenu');
+    if (settingsMenu) {
+        settingsMenu.addEventListener('click', function(e) {
+            const btn = e.target.closest('button[data-action]');
+            if (!btn) return;
+            const action = btn.getAttribute('data-action');
+            if (action === 'person-mgmt') showPersonManagementModal();
+            else if (action === 'category-mgmt') showCategoryManagementModal();
+            else if (action === 'color-menu') showColorSelectionMenu();
+            else if (action === 'server-test') testServerConnection();
+            else if (action === 'sync-help') showSyncHelp();
+            else if (action === 'memory-clear') initiateMemoryClear();
+        });
+    }
+}
+
 window.addEventListener('load', async function() {
     initDOMCache();
+    bindMenuEvents();
     updateVersionDisplay();
     await loadGlowTheme();
     updateServerStatus('', '📡 Veriler yükleniyor...');
@@ -2061,7 +2090,7 @@ function toggleSettingsMenu() {
             DOM.mainAppContainer?.classList.remove('disable-events');
             document.body.classList.remove("disable-events");
         } else {
-            const __icon = document.querySelector('.notification-icon-btn[onclick*="toggleSettingsMenu"]');
+            const __icon = document.getElementById('settingsIcon');
             if (__icon) {
                 const r = __icon.getBoundingClientRect();
                 const isMobile = window.innerWidth <= 768;
@@ -2174,7 +2203,7 @@ function showColorSelectionMenu() {
 document.addEventListener('click', function(e) {
     const colorMenu = document.getElementById('colorSelectionMenu');
     if(colorMenu && (colorMenu.style.display === 'block' || colorMenu.style.display === 'flex')) {
-        if(!e.target.closest('#colorBubbles') && !e.target.closest('[onclick*="showColorSelectionMenu"]')) {
+        if(!e.target.closest('#colorBubbles') && !e.target.closest('[data-action="color-menu"]')) {
             colorMenu.style.display = 'none';
         }
     }
@@ -2220,7 +2249,7 @@ function toggleNotificationMenu() {
             DOM.mainAppContainer?.classList.remove('disable-events');
             document.body.classList.remove("disable-events"); 
         } else {
-            const __icon = document.querySelector('.notification-icon-btn[onclick*="toggleNotificationMenu"]');
+            const __icon = document.getElementById('notificationIcon');
             if (__icon) {
                 const r = __icon.getBoundingClientRect();
                 const isMobile = window.innerWidth <= 768;
@@ -2242,8 +2271,8 @@ function toggleNotificationMenu() {
 }
 
 document.addEventListener('click', function(e) {
-    const settingsBtn = document.querySelector('.notification-icon-btn[onclick*="toggleSettingsMenu"]');
-    const notifBtn = document.querySelector('.notification-icon-btn[onclick*="toggleNotificationMenu"]');
+    const settingsBtn = document.getElementById('settingsIcon');
+    const notifBtn = document.getElementById('notificationIcon');
     const backdrop = document.getElementById('menuBackdrop');
     
     const openMenus = document.querySelectorAll('.dropdown-menu[style*="display: block"]');

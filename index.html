@@ -33,7 +33,7 @@
     <div class="header">
         <h1><span class="title-text">ŞAHSİ HESAP TAKİBİ</span></h1>
         
-        <div id="menuBackdrop" class="menu-backdrop-overlay" onclick="closeAllMenus()"></div>
+        <div id="menuBackdrop" class="menu-backdrop-overlay" role="button" tabindex="0" aria-label="Menüyü kapat"></div>
         
         <div class="top-controls">
             <div id="pwaInstallBanner" class="pwa-install-banner" style="display: none;">
@@ -43,18 +43,18 @@
                     <button id="pwaInstallClose" class="pwa-install-close" title="Kapat">✕</button>
                 </div>
             </div>
-            <div class="pos-rel"><button id="settingsIcon" class="notification-icon-btn" onclick="toggleSettingsMenu()" title="Ayarlar"> ⚙️  </button>
+            <div class="pos-rel"><button id="settingsIcon" class="notification-icon-btn" title="Ayarlar"> ⚙️  </button>
                 <div class="dropdown-menu" id="settingsMenu">
-                    <button class="btn" onclick="showPersonManagementModal()">Kişi Yönetimi</button>
-                    <button class="btn" onclick="showCategoryManagementModal()">Kategori Yönetimi</button>
-                    <button class="btn" onclick="showColorSelectionMenu()">Neon Işık Rengi</button>
-                    <button class="btn btn-server-test" onclick="testServerConnection()">Sunucu Testi</button>
-                    <button class="btn" onclick="showSyncHelp()">Rehber</button>
-                    <button class="btn btn-memory-clear" onclick="initiateMemoryClear()">🧹 Bellek Temizle</button>
+                    <button type="button" class="btn" data-action="person-mgmt">Kişi Yönetimi</button>
+                    <button type="button" class="btn" data-action="category-mgmt">Kategori Yönetimi</button>
+                    <button type="button" class="btn" data-action="color-menu">Neon Işık Rengi</button>
+                    <button type="button" class="btn btn-server-test" data-action="server-test">Sunucu Testi</button>
+                    <button type="button" class="btn" data-action="sync-help">Rehber</button>
+                    <button type="button" class="btn btn-memory-clear" data-action="memory-clear">🧹 Bellek Temizle</button>
                 </div>
             </div>
 
-            <div class="pos-rel"><button id="notificationIcon" class="notification-icon-btn" onclick="toggleNotificationMenu()" title="Bildirimler"> 🔔 </button>
+            <div class="pos-rel"><button id="notificationIcon" class="notification-icon-btn" title="Bildirimler"> 🔔 </button>
                 <div class="dropdown-menu notification-menu" id="notificationMenu">
                     <div style="padding:10px; text-align:center; color:#78909c;">Yükleniyor...</div>
                 </div>
