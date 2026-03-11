@@ -4623,8 +4623,9 @@ function updateVersionDisplay() {
   window.__karmotors_forceFixNames = fixAll;
 })();
 function initMobileDateDisplay() {
-    if (window.innerWidth > 800) return;
+    var isNarrow = window.innerWidth <= 800;
     
+    if (isNarrow) {
     const dateInput = document.getElementById('dateInput');
     const dateDisplay = document.querySelector('.mobile-date-display') || document.querySelector('.current-date-display');
     
@@ -4683,7 +4684,9 @@ function initMobileDateDisplay() {
             });
         }
     }
+    }
     
+    /* Rapor tarihleri: her viewport'ta; takvim SADECE span veya label tıklanınca açılsın (grup listener yok) */
     const startDateInput = document.getElementById('startDate');
     const startDateDisplay = document.getElementById('startDateDisplay');
     const endDateInput = document.getElementById('endDate');
@@ -4696,26 +4699,19 @@ function initMobileDateDisplay() {
                 startDateDisplay.textContent = formatDateTR(new Date(value));
             }
         }
-        
         startDateInput.addEventListener('change', updateStartDateDisplay);
-        
-        const startDateGroup = startDateInput.closest('.rd-date-group');
-        if (startDateGroup) {
-            startDateGroup.addEventListener('click', (e) => {
-                // #region agent log
-                fetch('http://127.0.0.1:7907/ingest/5d8741d3-3489-4f86-b195-36ed376ce6aa',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'1296d6'},body:JSON.stringify({sessionId:'1296d6',location:'app.js:startDateGroup',message:'startDateGroup click',data:{targetId:e.target.id,targetTag:e.target.tagName,targetClass:(e.target.className||'').slice(0,80)},hypothesisId:'H2',timestamp:Date.now()})}).catch(function(){});
-                // #endregion
-                var isDisplayOrLabel = (e.target === startDateDisplay) || (e.target.matches('label[for="startDate"]'));
-                if (isDisplayOrLabel && e.target !== startDateInput) {
-                    if (typeof startDateInput.showPicker === 'function') {
-                        startDateInput.showPicker();
-                    } else {
-                        startDateInput.focus();
-                        startDateInput.click();
-                    }
-                }
-            });
+        function openStartPicker(e) {
+            e.preventDefault();
+            if (typeof startDateInput.showPicker === 'function') {
+                startDateInput.showPicker();
+            } else {
+                startDateInput.focus();
+                startDateInput.click();
+            }
         }
+        startDateDisplay.addEventListener('click', openStartPicker);
+        var startLabel = document.querySelector('label[for="startDate"]');
+        if (startLabel) startLabel.addEventListener('click', openStartPicker);
     }
     
     if (endDateInput && endDateDisplay) {
@@ -4725,26 +4721,19 @@ function initMobileDateDisplay() {
                 endDateDisplay.textContent = formatDateTR(new Date(value));
             }
         }
-        
         endDateInput.addEventListener('change', updateEndDateDisplay);
-        
-        const endDateGroup = endDateInput.closest('.rd-date-group');
-        if (endDateGroup) {
-            endDateGroup.addEventListener('click', (e) => {
-                // #region agent log
-                fetch('http://127.0.0.1:7907/ingest/5d8741d3-3489-4f86-b195-36ed376ce6aa',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'1296d6'},body:JSON.stringify({sessionId:'1296d6',location:'app.js:endDateGroup',message:'endDateGroup click',data:{targetId:e.target.id,targetTag:e.target.tagName,targetClass:(e.target.className||'').slice(0,80)},hypothesisId:'H4',timestamp:Date.now()})}).catch(function(){});
-                // #endregion
-                var isDisplayOrLabel = (e.target === endDateDisplay) || (e.target.matches('label[for="endDate"]'));
-                if (isDisplayOrLabel && e.target !== endDateInput) {
-                    if (typeof endDateInput.showPicker === 'function') {
-                        endDateInput.showPicker();
-                    } else {
-                        endDateInput.focus();
-                        endDateInput.click();
-                    }
-                }
-            });
+        function openEndPicker(e) {
+            e.preventDefault();
+            if (typeof endDateInput.showPicker === 'function') {
+                endDateInput.showPicker();
+            } else {
+                endDateInput.focus();
+                endDateInput.click();
+            }
         }
+        endDateDisplay.addEventListener('click', openEndPicker);
+        var endLabel = document.querySelector('label[for="endDate"]');
+        if (endLabel) endLabel.addEventListener('click', openEndPicker);
     }
 }
 
