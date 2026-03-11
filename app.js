@@ -1623,7 +1623,7 @@ function updateCategoryBalanceDisplay(person) {
             if(Math.abs(b) < 0.01) return;
         }
         
-        const color = b > 0 ? '#ef5350' : (b < 0 ? '#81c784' : '#ffd54f');
+        const color = b > 0 ? '#ff1744' : (b < 0 ? '#81c784' : '#ffd54f');
 let status = b > 0 ? 'Borçlu' : (b < 0 ? 'Alacaklı' : '');
         if (c === 'Avans' && b < 0) {
             status = 'Avans';
