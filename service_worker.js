@@ -9,6 +9,7 @@ const urlsToCache = [
     '/kasa.html',
     '/offline.html',
     '/storage.js?v=1.0',
+    '/js/utils.js?v=78.34',
     '/style.css?v=78.34',
     '/app.js?v=78.34',
     '/kasa.css?v=1.11',

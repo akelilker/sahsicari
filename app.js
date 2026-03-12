@@ -40,46 +40,7 @@ function getLocalTimeISO() {
     return d.toISOString();
 }
 
-/* XSS: Kullanıcı/veri katmanından gelen metin innerHTML veya attribute'a yazılmadan önce
- * mutlaka sanitizeHTML (HTML içeriği) veya safeAttr (attribute değeri) ile kaçışlanmalı.
- * Sadece metin basacaksan setText kullan (güvenli). */
-function sanitizeHTML(str) {
-    if (str === null || str === undefined) return '';
-    const strValue = String(str);
-    return strValue
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#39;");
-}
-
-/** Attribute değeri için güvenli kaçış (id, title, data-* vb.). */
-function safeAttr(str) {
-    if (str === null || str === undefined) return '';
-    return String(str)
-        .replace(/&/g, "&amp;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#39;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
-}
-
-/** Elemente sadece metin yazar (XSS riski yok). */
-function setText(el, text) {
-    if (el) el.textContent = text == null ? '' : String(text);
-}
-
-/** Element içeriğini temizler (child node'ları kaldırır). */
-function clearElement(el) {
-    if (!el) return;
-    while (el.firstChild) el.removeChild(el.firstChild);
-}
-
-/** Boş liste/alan için tek tip empty-state HTML (metin güvenli basılır). */
-function renderEmptyState(message) {
-    return '<div class="empty-state">' + sanitizeHTML(message) + '</div>';
-}
+/* XSS/render helpers: sanitizeHTML, safeAttr, setText, clearElement, renderEmptyState → js/utils.js */
 
 function formatTitleCase(str) {
     if (!str) return "";
