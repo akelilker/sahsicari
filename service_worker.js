@@ -172,7 +172,7 @@ async function syncPendingData() {
 
         DEBUG && console.log('[SW] Syncing', syncQueue.length, 'pending items');
 
-        // Process each pending item
+        let syncedCount = 0;
         for (const item of syncQueue) {
             try {
                 const response = await fetch(item.url, {
@@ -182,8 +182,8 @@ async function syncPendingData() {
                 });
 
                 if (response.ok) {
-                    // Remove from queue after successful sync
                     await removeFromSyncQueue(db, item.id);
+                    syncedCount++;
                     DEBUG && console.log('[SW] Synced item:', item.id);
                 } else {
                     console.error('[SW] Sync failed for item:', item.id, response.status);
@@ -193,12 +193,12 @@ async function syncPendingData() {
             }
         }
 
-        // Notify app that sync is complete
         const clients = await self.clients.matchAll();
         clients.forEach(client => {
             client.postMessage({
                 type: 'SYNC_COMPLETE',
-                syncedCount: syncQueue.length
+                syncedCount: syncedCount,
+                pendingCount: syncQueue.length
             });
         });
 
