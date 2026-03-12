@@ -457,6 +457,7 @@ function bindModalEvents() {
     }
 }
 
+/* load: DOM cache, event binding, tema, veri yükleme ve ilk render (bkz. başlatma akışı yorumu). */
 window.addEventListener('load', async function() {
     initDOMCache();
     bindMenuEvents();
@@ -3803,7 +3804,12 @@ if ('serviceWorker' in navigator) {
     });
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+/* --- Uygulama başlatma akışı ---
+ * DOMContentLoaded: safe area CSS, ios-pwa sınıfı, diğer erken DOM bağımlı init'ler.
+ * window load: DOM cache, event binding (menu, page, modal), tema, loadData → migrateOldDataSafely, updateMainDisplay, setCurrentDate.
+ * Sıra: DOM hazır (DOMContentLoaded) → stil/class ayarları; belge + kaynaklar yüklü (load) → cache, event, veri, ilk render.
+ */
+function initApp() {
     const root = document.documentElement;
     root.style.setProperty("--sa-top", "env(safe-area-inset-top)");
     root.style.setProperty("--sa-bot", "env(safe-area-inset-bottom)");
@@ -3817,7 +3823,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (isIOS && isPWA) {
         document.body.classList.add('ios-pwa');
     }
-});
+}
+
+document.addEventListener("DOMContentLoaded", initApp);
 const closeMenuOutside = (event) => {
     if (!event.target.closest('.notification-icon-btn')) {
         const dropdowns = document.querySelectorAll('.dropdown-menu');
