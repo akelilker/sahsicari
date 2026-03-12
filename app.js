@@ -3817,24 +3817,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (isIOS && isPWA) {
         document.body.classList.add('ios-pwa');
     }
-
-    // #region agent log
-    (function logLabelForMismatch() {
-        var labels = document.querySelectorAll('label[for]');
-        var mismatches = [];
-        labels.forEach(function(label) {
-            var forVal = label.getAttribute('for');
-            if (!forVal) return;
-            var target = document.getElementById(forVal);
-            if (!target) {
-                mismatches.push({ for: forVal, text: (label.textContent || '').trim().slice(0, 40), parentId: (label.closest('[id]') && label.closest('[id]').id) || null });
-            } else if (target.type === 'hidden') {
-                mismatches.push({ for: forVal, text: (label.textContent || '').trim().slice(0, 40), reason: 'targetIsHidden', tagName: target.tagName });
-            }
-        });
-        fetch('http://127.0.0.1:7907/ingest/5d8741d3-3489-4f86-b195-36ed376ce6aa',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'ef9da1'},body:JSON.stringify({sessionId:'ef9da1',location:'app.js:DOMContentLoaded',message:'label for audit',data:{totalWithFor:labels.length,mismatchCount:mismatches.length,mismatches:mismatches},timestamp:Date.now()})}).catch(function(){});
-    })();
-    // #endregion
 });
 const closeMenuOutside = (event) => {
     if (!event.target.closest('.notification-icon-btn')) {
