@@ -85,6 +85,8 @@
   --black-30: rgba(0, 0, 0, 0.3);
   --black-50: rgba(0, 0, 0, 0.5);
   --gray-40: rgba(180, 190, 200, 0.65);
+  /* Mobil / PWA: kirli görünmeyen net çerçeve rengi (nötr gri) */
+  --frame-gray: rgba(200, 208, 216, 0.82);
   /* Cari Kayıt / Veriler yeşil kutusu (tek kaynak) */
   --green-panel-rgb: 9, 138, 20;
 }
@@ -248,6 +250,19 @@ body.ios-pwa #yeniIslem .form-group:nth-last-child(2) {
 }
 body.ios-pwa .category-item {
     border-color: rgba(98, 0, 234, 0.85);
+}
+
+/* Mobil + iOS PWA: çerçeve renkleri net gri (kirli görünümü giderme) */
+body.ios-pwa .header h1,
+body.ios-pwa .summary-card,
+body.ios-pwa .debt-status-section,
+body.ios-pwa .debt-status-section h3,
+body.ios-pwa .control-panel,
+body.ios-pwa .control-panel h3,
+body.ios-pwa .control-panel .btn,
+body.ios-pwa .control-panel .file-upload-btn,
+body.ios-pwa .debt-controls select {
+    border-color: var(--frame-gray);
 }
 
 /* 2. ANA MİMARİ */
