@@ -1982,8 +1982,16 @@ select option {
     align-items: center;
     margin-bottom: 6px;
 }
-.transaction-type-header label {
+.transaction-type-header label,
+.transaction-type-header .form-label {
     margin-bottom: 0;
+}
+.form-group .form-label {
+    display: block;
+    font-size: 0.9em;
+    margin-bottom: 2px;
+    font-weight: 600;
+    color: #e0e0e0;
 }
 .recalc-balance-icon {
     width: 24px;
