@@ -2,7 +2,7 @@
 
 Kullanıcı veya veri katmanından gelen verinin DOM'a (innerHTML, insertAdjacentHTML, attribute) yazıldığı yerler. Faz 1'de işaretlenenler düzeltildi.
 
-**Yardımcılar (js/utils.js):** `sanitizeHTML(str)` HTML için; `safeAttr(str)` attribute için; `setText(el, text)` sadece metin; `clearElement(el)` içeriği temizler; `renderEmptyState(message)` boş alan HTML.
+**Yardımcılar (js/utils.js):** `sanitizeHTML`, `safeAttr`, `setText`, `clearElement`, `renderEmptyState(message)`, `renderCategoryItem(categoryName, balance, status)`, `renderTransactionHistoryItem(t)` (içeride sanitize/kaçış kullanır).
 
 ## app.js
 

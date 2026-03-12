@@ -91,6 +91,67 @@
         return '₺' + formatNumber(amount);
     }
 
+    /** Input alanına TR para formatı uygular (binlik ayırıcı, virgül). input.value güncellenir. */
+    function formatCurrency(input) {
+        if (!input) return;
+        var value = input.value;
+        if (value === '' || value === undefined || value === null) return;
+        var cleanValue = String(value).replace(/[^\d,]/g, '');
+        var parts = cleanValue.split(',');
+        var integerPart = parts[0].replace(/\D/g, '');
+        var decimalPart = parts.length > 1 ? parts[1] : undefined;
+        if (integerPart === '') integerPart = '0';
+        var formattedInteger = new Intl.NumberFormat('tr-TR').format(parseInt(integerPart, 10) || 0);
+        var newValue = formattedInteger;
+        if (decimalPart !== undefined) {
+            newValue += ',' + decimalPart.substring(0, 2);
+        } else if (String(value).includes(',')) {
+            newValue += ',';
+        }
+        input.value = newValue;
+    }
+
+    /**
+     * Kategori kartı HTML (bakiye, durum). onclick için kategori adı JS string olarak kaçışlanır.
+     * Beklenen global: showCategoryDetails(categoryName)
+     */
+    function renderCategoryItem(categoryName, balance, status) {
+        var b = Number(balance) || 0;
+        var color = b > 0 ? '#ff1744' : (b < 0 ? '#81c784' : '#ffd54f');
+        var balanceClass = b > 0 ? 'positive-balance' : 'negative-balance';
+        var safeForOnclick = String(categoryName).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+        return '<div class="category-item ' + balanceClass + '" onclick="showCategoryDetails(\'' + safeForOnclick + '\')">' +
+            '<span class="category-name">' + sanitizeHTML(categoryName) + '</span>' +
+            '<span class="category-balance" style="color:' + color + '">' + formatAmount(Math.abs(b)) + '</span>' +
+            '<span>' + sanitizeHTML(status) + '</span></div>';
+    }
+
+    /**
+     * İşlem geçmişi tek satırı (type, date, amount, category, description, edit/delete id ile).
+     * t: { id, type, date, amount, category, description }
+     */
+    function renderTransactionHistoryItem(t) {
+        var typeTxt = t.type === 'giden' ? 'Giden' : 'Gelen';
+        var typeClass = t.type === 'giden' ? 'giden' : 'gelen';
+        var dateStr = formatDateTR(new Date(t.date));
+        var desc = t.description || '';
+        var id = Number(t.id) || 0;
+        return '<div class="history-item">' +
+            '<div class="history-left">' +
+            '<div class="history-top-row">' +
+            '<span class="history-type ' + typeClass + '">' + typeTxt + '</span>' +
+            '<span class="history-date">' + dateStr + '</span>' +
+            '<span class="history-amount ' + (t.type === 'giden' ? 'text-expense' : 'text-income') + '">' + formatAmount(t.amount) + '</span>' +
+            '</div>' +
+            '<div class="history-meta">' +
+            '<span class="history-category">' + sanitizeHTML(t.category) + '</span>' + (desc ? ' - ' + sanitizeHTML(desc) : '') +
+            '</div></div>' +
+            '<div class="history-right">' +
+            '<button class="edit-transaction-btn" onclick="editTransaction(' + id + ')">✏️</button>' +
+            '<button class="delete-transaction-btn" onclick="deleteTransaction(' + id + ')">✖</button>' +
+            '</div></div>';
+    }
+
     global.sanitizeHTML = sanitizeHTML;
     global.safeAttr = safeAttr;
     global.setText = setText;
@@ -103,4 +164,7 @@
     global.deformatCurrency = deformatCurrency;
     global.formatNumber = formatNumber;
     global.formatAmount = formatAmount;
+    global.formatCurrency = formatCurrency;
+    global.renderCategoryItem = renderCategoryItem;
+    global.renderTransactionHistoryItem = renderTransactionHistoryItem;
 })(typeof window !== 'undefined' ? window : this);

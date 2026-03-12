@@ -30,26 +30,7 @@ function setCurrentDate() {
 
 /* getLocalTimeISO, formatTitleCase, debounce → js/utils.js */
 
-/* deformatCurrency, formatNumber, formatAmount → js/utils.js */
-
-function formatCurrency(input) {
-    if (!input) return;
-    let value = input.value;
-    if (value === "" || value === undefined || value === null) return;
-    let cleanValue = String(value).replace(/[^\d,]/g, '');
-    let parts = cleanValue.split(',');
-    let integerPart = parts[0].replace(/\D/g, '');
-    let decimalPart = parts.length > 1 ? parts[1] : undefined;
-    if (integerPart === "") integerPart = "0";
-    let formattedInteger = new Intl.NumberFormat('tr-TR').format(parseInt(integerPart, 10) || 0);
-    let newValue = formattedInteger;
-    if (decimalPart !== undefined) {
-        newValue += ',' + decimalPart.substring(0, 2);
-    } else if (String(value).includes(',')) {
-        newValue += ',';
-    }
-    input.value = newValue;
-}
+/* deformatCurrency, formatNumber, formatAmount, formatCurrency → js/utils.js */
 
 let allData = {};
 let hasLoadedServerData = false;
@@ -1513,30 +1494,7 @@ function updateTransactionHistory() {
 
     let html = '<h4 style="color:#b0bec5; margin-bottom:5px; font-size:0.9em; font-weight:600; padding-left:2px;">Son İşlemler</h4>';
     
-    txs.forEach(t => { 
-        const typeTxt = t.type === 'giden' ? 'Giden' : 'Gelen';
-        const typeClass = t.type === 'giden' ? 'giden' : 'gelen'; 
-        const dateStr = formatDateTR(new Date(t.date));
-        const desc = t.description || '';
-        
-        html += `
-        <div class="history-item">
-            <div class="history-left">
-                <div class="history-top-row">
-                    <span class="history-type ${typeClass}">${typeTxt}</span>
-                    <span class="history-date">${dateStr}</span>
-                    <span class="history-amount ${t.type === 'giden' ? 'text-expense' : 'text-income'}">${formatAmount(t.amount)}</span>
-                </div>
-                <div class="history-meta">
-                    <span class="history-category">${sanitizeHTML(t.category)}</span>${desc ? ' - ' + sanitizeHTML(desc) : ''}
-                </div>
-            </div>
-            <div class="history-right">
-                <button class="edit-transaction-btn" onclick="editTransaction(${t.id})">✏️</button>
-                <button class="delete-transaction-btn" onclick="deleteTransaction(${t.id})">✖</button>
-            </div>
-        </div>`;
-    });
+    txs.forEach(t => { html += renderTransactionHistoryItem(t); });
     
     DOM.transactionHistory.innerHTML = html;
     
@@ -1569,21 +1527,11 @@ function updateCategoryBalanceDisplay(person) {
         } else {
             if(Math.abs(b) < 0.01) return;
         }
-        
-        const color = b > 0 ? '#ff1744' : (b < 0 ? '#81c784' : '#ffd54f');
-let status = b > 0 ? 'Borçlu' : (b < 0 ? 'Alacaklı' : '');
+        let status = b > 0 ? 'Borçlu' : (b < 0 ? 'Alacaklı' : '');
         if (c === 'Avans' && b < 0) {
             status = 'Avans';
         }
-        
-        const safeCat = c.replace(/'/g, "\\'");
-        
-        html += `
-        <div class="category-item ${b > 0 ? 'positive-balance' : 'negative-balance'}" onclick="showCategoryDetails('${safeCat}')">
-            <span class="category-name">${sanitizeHTML(c)}</span>
-            <span class="category-balance" style="color:${color}">${formatAmount(Math.abs(b))}</span>
-            <span>${status}</span>
-        </div>`;
+        html += renderCategoryItem(c, b, status);
     });
     grid.innerHTML = html || renderEmptyState('Kayıt yok');
 }
