@@ -1,5 +1,9 @@
 // Advanced Storage System: IndexedDB + localStorage fallback
 // Version: 1.0
+//
+// Sözleşme: getItem/setItem/removeItem/clear/getAllKeys her zaman aynı imzayı kullanır;
+// hata durumunda getItem/getAllKeys null/[] döner, yazma işlemleri sessizce başarısız olabilir.
+// syncQueue: arka plan senkronizasyonu için kullanılır; şema aşağıda belgelenmiştir.
 
 const DEBUG = false; // Set to false in production
 
@@ -42,7 +46,9 @@ class IndexedDBStorage {
                         db.createObjectStore(this.storeName);
                         logger.log('Object store created:', this.storeName);
                     }
-                    // Create syncQueue for background sync
+                    // syncQueue: kayıtlar service worker / app tarafından işlenir.
+                    // Önerilen item şeması: { id?, url, method, headers?, body?, timestamp, retryCount?, lastError? }
+                    // id: autoIncrement. retryCount: başarısız denemede artırılmalı; max retry ve eski kayıt temizliği tüketici (app/sw) tarafında yapılır.
                     if (!db.objectStoreNames.contains('syncQueue')) {
                         const syncStore = db.createObjectStore('syncQueue', { keyPath: 'id', autoIncrement: true });
                         syncStore.createIndex('timestamp', 'timestamp', { unique: false });
@@ -172,7 +178,8 @@ class IndexedDBStorage {
     }
 }
 
-// Hybrid Storage: IndexedDB with localStorage fallback
+// Hybrid Storage: IndexedDB with localStorage fallback.
+// localStorage fallback: değerler string olarak saklanır; app tarafı JSON.stringify/parse kullanır.
 class HybridStorage {
     constructor() {
         this.useIndexedDB = this.checkIndexedDBSupport();
