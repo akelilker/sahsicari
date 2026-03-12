@@ -2,6 +2,8 @@
 
 Kullanıcı veya veri katmanından gelen verinin DOM'a (innerHTML, insertAdjacentHTML, attribute) yazıldığı yerler. Faz 1'de işaretlenenler düzeltildi.
 
+**Yardımcılar (app.js):** `sanitizeHTML(str)` HTML için; `safeAttr(str)` attribute için; `setText(el, text)` sadece metin; `clearElement(el)` içeriği temizler.
+
 ## app.js
 
 | Satır (yaklaşık) | Konum | Veri | Durum |
