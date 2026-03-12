@@ -1,10 +1,4 @@
-function formatDateTR(dateObj) {
-    if (!dateObj) return '';
-    const d = String(dateObj.getDate()).padStart(2, '0');
-    const m = String(dateObj.getMonth() + 1).padStart(2, '0');
-    const y = dateObj.getFullYear();
-    return `${d}.${m}.${y}`;
-}
+/* formatDateTR → js/utils.js */
 const APP_VERSION = '78.34';
 
 function setVh() {
@@ -34,38 +28,9 @@ function setCurrentDate() {
     
 }
 
-function getLocalTimeISO() {
-    const now = new Date();
-    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 12, 0, 0);
-    return d.toISOString();
-}
+/* getLocalTimeISO, formatTitleCase, debounce → js/utils.js */
 
-/* XSS/render helpers: sanitizeHTML, safeAttr, setText, clearElement, renderEmptyState → js/utils.js */
-
-function formatTitleCase(str) {
-    if (!str) return "";
-    return str.toLocaleLowerCase('tr-TR').split(' ').map(word => 
-        word.charAt(0).toLocaleUpperCase('tr-TR') + word.slice(1)
-    ).join(' ');
-}
-
-function debounce(fn, delay = 180) {
-    let timeoutId = null;
-    return function(...args) {
-        const context = this;
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => fn.apply(context, args), delay);
-    };
-}
-
-function deformatCurrency(value) {
-    if (value === null || value === undefined) return 0;
-    const stringValue = String(value);
-    if (stringValue.trim() === '') return 0;
-    const cleanValue = stringValue.replace(/₺|\s|\./g, '').replace(',', '.');
-    const number = parseFloat(cleanValue);
-    return isNaN(number) ? 0 : number;
-}
+/* deformatCurrency, formatNumber, formatAmount → js/utils.js */
 
 function formatCurrency(input) {
     if (!input) return;
@@ -84,16 +49,6 @@ function formatCurrency(input) {
         newValue += ',';
     }
     input.value = newValue;
-}
-
-function formatNumber(num) {
-    const number = parseFloat(num);
-    if (isNaN(number)) return '0,00';
-    return number.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
-
-function formatAmount(amount) {
-    return '₺' + formatNumber(amount);
 }
 
 let allData = {};
