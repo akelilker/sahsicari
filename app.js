@@ -76,6 +76,11 @@ function clearElement(el) {
     while (el.firstChild) el.removeChild(el.firstChild);
 }
 
+/** Boş liste/alan için tek tip empty-state HTML (metin güvenli basılır). */
+function renderEmptyState(message) {
+    return '<div class="empty-state">' + sanitizeHTML(message) + '</div>';
+}
+
 function formatTitleCase(str) {
     if (!str) return "";
     return str.toLocaleLowerCase('tr-TR').split(' ').map(word => 
@@ -1586,7 +1591,7 @@ function updateTransactionHistory() {
     txs.sort((a,b) => new Date(b.date) - new Date(a.date));
     
     if(txs.length === 0) {
-         DOM.transactionHistory.innerHTML = '<div class="empty-state">Henüz işlem yok</div>';
+         DOM.transactionHistory.innerHTML = renderEmptyState('Henüz işlem yok');
          return;
     }
 
@@ -1664,7 +1669,7 @@ let status = b > 0 ? 'Borçlu' : (b < 0 ? 'Alacaklı' : '');
             <span>${status}</span>
         </div>`;
     });
-    grid.innerHTML = html || '<div class="empty-state">Kayıt yok</div>';
+    grid.innerHTML = html || renderEmptyState('Kayıt yok');
 }
 
 function showCategoryDetails(categoryName) {
@@ -1684,7 +1689,7 @@ function showCategoryDetails(categoryName) {
     currentCategoryTransactions = [...catTxs].reverse(); 
 
     if (catTxs.length === 0) {
-        contentEl.innerHTML = '<div class="empty-state">İşlem yok</div>';
+        contentEl.innerHTML = renderEmptyState('İşlem yok');
     } else {
         let runningBalance = 0;
         let rows = [];
@@ -2676,7 +2681,7 @@ function renderNotificationMenu() {
 
     content.innerHTML = '';
     if (notificationHistory.length === 0) {
-        content.innerHTML = '<div class="empty-state">Henüz bildirim yok.</div>';
+        content.innerHTML = renderEmptyState('Henüz bildirim yok.');
     } else {
         for (let i = notificationHistory.length - 1; i >= 0; i--) {
             const notif = notificationHistory[i];
@@ -2787,7 +2792,7 @@ function renderReportPreview() {
     `;
 
     if (totalCount === 0) {
-        listContainer.innerHTML = '<div class="empty-state">Kriterlere uygun kayıt yok.</div>';
+        listContainer.innerHTML = renderEmptyState('Kriterlere uygun kayıt yok.');
         return;
     }
 
@@ -3908,7 +3913,7 @@ function showGeneralStatusReport() {
             <span class="report-val val-red">${formatAmount(c.amount)}</span>
         </div>`;
     });
-    if(creditors.length === 0) html += '<div class="empty-state">Borç yok</div>';
+    if(creditors.length === 0) html += renderEmptyState('Borç yok');
     html += '</div>'; 
     html += '</div>'; 
 
@@ -3921,7 +3926,7 @@ function showGeneralStatusReport() {
             <span class="report-val val-green">${formatAmount(d.amount)}</span>
         </div>`;
     });
-    if(debtors.length === 0) html += '<div class="empty-state">Alacak yok</div>';
+    if(debtors.length === 0) html += renderEmptyState('Alacak yok');
     html += '</div>'; 
     html += '</div>'; 
     
