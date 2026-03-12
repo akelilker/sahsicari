@@ -1467,6 +1467,7 @@ overflow: hidden;
     padding-right: 32px !important;
     font-size: 16px !important;
     color: #00e676 !important;
+    -webkit-text-fill-color: #00e676 !important;
     background-color: transparent !important;
     border: 1.5px solid rgba(0, 230, 118, 0.45) !important;
     border-radius: 8px;
@@ -1495,16 +1496,9 @@ overflow: hidden;
     box-shadow: 0 0 0 2px rgba(0, 230, 118, 0.2);
 }
 
-#categoryManagementModal #categoryManagementPersonSelect:focus,
-#categoryManagementModal .category-mgmt-person-select:focus {
-    outline: none;
-    border-color: rgba(0, 230, 118, 0.7);
-    box-shadow: 0 0 0 2px rgba(0, 230, 118, 0.2);
-}
-
 #categoryManagementModal #categoryManagementPersonSelect option {
     text-align: center;
-    color: #00e676;
+    color: #ffffff;
     background: #1a2332;
 }
 
@@ -3306,6 +3300,7 @@ label[for="editDateInput"] {
 
     #categoryManagementModal #categoryManagementPersonSelect option {
         text-align: center;
+        color: #ffffff;
     }
 
 
