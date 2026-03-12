@@ -1,10 +1,17 @@
 <?php
+/**
+ * request_guard.php – Same-origin koruması (GET ve yazma istekleri).
+ * Tüm veri endpoint'leri (get_data, save, kd_load vb.) bu dosyayı require edip
+ * enforce_same_origin() çağırır. GET: Origin/Referer yoksa da (PWA, gizlilik) izin
+ * verilebilir. Yazma (POST/PUT): Origin veya Referer ile Host eşleşmeli; aksi 403.
+ */
 function deny_request(int $statusCode, string $message): void {
     http_response_code($statusCode);
     echo json_encode(["status" => "error", "message" => $message], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
+/** Host/Origin/Referer değerinden sadece host kısmını çıkarır (port, scheme temizlenir). */
 function normalize_host(?string $value): string {
     if (!is_string($value) || $value === '') return '';
     $trimmed = trim($value);
@@ -18,6 +25,7 @@ function normalize_host(?string $value): string {
     return strtolower(trim($trimmed, '[]'));
 }
 
+/** Yerel geliştirme: localhost / 127.0.0.1 / ::1 birbirine eşit kabul edilir. */
 function is_loopback_host(string $host): bool {
     return in_array($host, ['localhost', '127.0.0.1', '::1'], true);
 }
@@ -35,6 +43,14 @@ function hosts_match(string $left, string $right): bool {
     return is_loopback_host($left) && is_loopback_host($right);
 }
 
+/**
+ * Same-origin zorunlu kılar. Sıra:
+ * 1) Host zorunlu; yoksa 400.
+ * 2) Origin varsa: Origin host ile Request Host aynı olmalı; değilse 403.
+ * 3) Origin yoksa (PWA bazen null gönderir): Referer host ile Host eşleşmeli.
+ * 4) İkisi de yoksa: Sec-Fetch-Site same-origin/same-site/none olmalı; sadece GET
+ *    isteklerinde Origin/Referer yokluğu tolere edilir (PWA / gizlilik).
+ */
 function enforce_same_origin(): void {
     $hostHeader = $_SERVER['HTTP_HOST'] ?? '';
     $host = normalize_host($hostHeader);

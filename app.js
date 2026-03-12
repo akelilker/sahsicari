@@ -2840,9 +2840,6 @@ function createCategorySummaryData(person, allTransactions, periodTransactions, 
 }
 
 function exportToExcel() {
-    // #region agent log
-    fetch('http://127.0.0.1:7907/ingest/5d8741d3-3489-4f86-b195-36ed376ce6aa',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'1296d6'},body:JSON.stringify({sessionId:'1296d6',location:'app.js:exportToExcel',message:'exportToExcel called',data:{},hypothesisId:'H3',timestamp:Date.now()})}).catch(function(){});
-    // #endregion
     if (exportInProgress) return showNotification("⚠️ Rapor hazırlanıyor...", "warning");
     const person = currentPerson;
     if (!person) return showNotification('Önce kişi seçmelisiniz.', 'error');
