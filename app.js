@@ -748,7 +748,7 @@ function findBalanceSource(targetAmount) {
                 <strong>Bakiye kaynağı (${formatAmount(num)})</strong>
                 <button type="button" onclick="document.getElementById('balanceSourceModal').remove()" style="background:#37474f; color:#fff; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;">Kapat</button>
             </div>
-            <div id="balanceSourceModalBody" style="max-height:60vh; overflow:auto;">${msg.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
+            <div id="balanceSourceModalBody" style="max-height:60vh; overflow:auto;">${sanitizeHTML(msg)}</div>
         </div>
     `;
     document.body.appendChild(div);
@@ -3352,7 +3352,8 @@ async function exportStyledCategoryDetailToExcel(person, categoryName, transacti
 
 function showMemoryOverlay(title, message, icon) {
     document.getElementById('memAlertTitle').textContent = title;
-    document.getElementById('memAlertMessage').innerHTML = message; 
+    const safeMsg = String(message).split(/<br\s*\/?>/i).map(function (s) { return sanitizeHTML(s); }).join('<br>');
+    document.getElementById('memAlertMessage').innerHTML = safeMsg; 
     if(DOM.memAlertIcon) DOM.memAlertIcon.textContent = icon;
 
     const overlay = document.getElementById('customMemoryOverlay');

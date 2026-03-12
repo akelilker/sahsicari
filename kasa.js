@@ -42,6 +42,15 @@ return String(str)
 .replace(/'/g, '&#39;');
 }
 
+function safeAttr(str) {
+if (str === null || str === undefined) return '';
+return String(str)
+.replace(/&/g, '&amp;')
+.replace(/"/g, '&quot;')
+.replace(/'/g, '&#39;')
+.replace(/</g, '&lt;')
+.replace(/>/g, '&gt;');
+}
 
 // ==================== DATA ====================
 async function loadData() {
@@ -119,7 +128,7 @@ let html = `
 `;
 
 html += islemler.map(i => `
-    <div class="history-item" data-islem-id="${i.id}">
+    <div class="history-item" data-islem-id="${safeAttr(String(i.id))}">
         <div class="history-left">
             <div class="history-top-row">
                 <span class="history-type ${i.tip === 'giris' ? 'gelen' : 'giden'}">
@@ -182,7 +191,7 @@ grid.innerHTML = giderKat.map(k => {
     const safeK = sanitizeHTML(k);
     const shortK = safeK.length > 12 ? safeK.substring(0, 10) + '..' : safeK;
     return `
-    <div class="kategori-card" data-kategori="${safeK}">
+    <div class="kategori-card" data-kategori="${safeAttr(k)}">
         <div class="kat-icon">${katIkonlar[k] || '📁'}</div>
         <div class="kat-ad">${shortK}</div>
         <div class="kat-tutar">${formatMoney(toplamlar[k] || 0)}</div>
@@ -236,7 +245,7 @@ list.innerHTML = giderKat.map(k => {
     return `
     <div class="kategori-yonetim-item">
         <span>${katIkonlar[k] || '📁'} ${safeK}</span>
-        <button class="kategori-sil-btn" data-kategori="${safeK}">🗑️</button>
+        <button class="kategori-sil-btn" data-kategori="${safeAttr(k)}">🗑️</button>
     </div>
 `}).join('');
 
@@ -370,7 +379,7 @@ editModalContent.innerHTML = `
     </div>
     <div class="edit-form-group">
         <label>Tarih</label>
-        <input id="editTarih" class="edit-input" type="date" value="${i.tarih}">
+        <input id="editTarih" class="edit-input" type="date" value="${safeAttr(i.tarih || '')}">
     </div>
     <div class="edit-form-group">
         <label>Açıklama</label>

@@ -34,4 +34,6 @@ Kullanıcı veya veri katmanından gelen verinin DOM'a (innerHTML, insertAdjacen
 
 ---
 
-*Son güncelleme: Faz 1 + Faz 1 artıkları (reportSearchInput label, option sanitize, kasa.js XSS).*
+**Güvenlik düzeltmeleri (plan):** balanceSourceModal `msg` → sanitizeHTML(msg); showMemoryOverlay `message` → &lt;br&gt; korunarak sanitize; kasa.js attribute değerleri → safeAttr (data-islem-id, data-kategori, value tarih).
+
+*Son güncelleme: Faz 1 + güvenlik düzeltmeleri (balanceSourceModal, showMemoryOverlay, kasa safeAttr).*
