@@ -309,6 +309,28 @@ function bindPageEvents() {
     }
     const allocationOverlayCloseBtn = document.getElementById('allocationOverlayCloseBtn');
     if (allocationOverlayCloseBtn) allocationOverlayCloseBtn.addEventListener('click', closeAllocationOverlay);
+
+    const allocationOverlay = document.getElementById('allocationOverlay');
+    if (allocationOverlay) {
+        allocationOverlay.addEventListener('click', function(e) {
+            const btn = e.target.closest('.allocation-clear-btn');
+            if (btn) {
+                e.stopPropagation();
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                payCategoryInFull(btn);
+            }
+        }, true);
+        allocationOverlay.addEventListener('mousedown', function(e) {
+            if (e.target.closest('.allocation-clear-btn')) e.preventDefault();
+        }, true);
+        allocationOverlay.addEventListener('blur', function(e) {
+            const input = e.target;
+            if (input.classList && input.classList.contains('allocation-input')) {
+                persistAllocationInputValue(input);
+            }
+        }, true);
+    }
     const confirmAllocationBtn = document.getElementById('confirmAllocationBtn');
     if (confirmAllocationBtn) confirmAllocationBtn.addEventListener('click', confirmAllocation);
 }
@@ -1502,15 +1524,20 @@ function updateTransactionHistory() {
          return;
     }
 
-    let html = '<h4 style="color:#b0bec5; margin-bottom:5px; font-size:0.9em; font-weight:600; padding-left:2px;">Son İşlemler</h4>';
+    const MAX_HISTORY_ITEMS = 200;
+    const displayTxs = txs.length > MAX_HISTORY_ITEMS ? txs.slice(0, MAX_HISTORY_ITEMS) : txs;
     
-    txs.forEach(t => { html += renderTransactionHistoryItem(t); });
+    let html = '<h4 style="color:#b0bec5; margin-bottom:5px; font-size:0.9em; font-weight:600; padding-left:2px;">Son İşlemler</h4>';
+    displayTxs.forEach(t => { html += renderTransactionHistoryItem(t); });
+    if (txs.length > MAX_HISTORY_ITEMS) {
+        html += '<div style="text-align:center;color:#78909c;font-size:0.85em;padding:8px;border-top:1px solid rgba(255,255,255,0.05);">İlk ' + MAX_HISTORY_ITEMS + ' işlem gösteriliyor (toplam ' + txs.length + '). Tümünü görmek için Raporlar sekmesini kullanın.</div>';
+    }
     
     DOM.transactionHistory.innerHTML = html;
     
     const historyItems = DOM.transactionHistory.querySelectorAll('.history-item');
     historyItems.forEach(function(item, index) {
-        const transaction = txs[index];
+        const transaction = displayTxs[index];
         if (transaction) {
             attachThreeDotsMenu(item, transaction, currentPerson);
         }
@@ -1678,32 +1705,6 @@ function initiateAllocation() {
     itemsHtml += `<input type="hidden" id="totalAllocationSource" value="${amount}">`;
 
     content.innerHTML = headerHtml + itemsHtml;
-    
-    // Event Delegation - Sıfırla butonları için
-    content.addEventListener('click', function(e) {
-        const btn = e.target.closest('.allocation-clear-btn');
-        if (btn) {
-            e.stopPropagation();
-            e.preventDefault();
-            e.stopImmediatePropagation();
-            payCategoryInFull(btn);
-        }
-    }, true); // capture phase'de yakala
-    
-    // Input focus/blur sorununu çözmek için
-    content.addEventListener('mousedown', function(e) {
-        if (e.target.closest('.allocation-clear-btn')) {
-            e.preventDefault(); // Input'un blur olmasını engelle
-        }
-    }, true);
-
-    // Blur'da girilen tutarı koru; başka yere tıklanınca veya Tab ile silinmesin
-    content.addEventListener('blur', function(e) {
-        const input = e.target;
-        if (input.classList && input.classList.contains('allocation-input')) {
-            persistAllocationInputValue(input);
-        }
-    }, true);
     
     updateAllocationTotals();
 }
@@ -2671,9 +2672,11 @@ function renderReportPreview() {
     }
 
     const sortedTxs = [...periodTransactions].sort((a,b) => new Date(b.date) - new Date(a.date));
+    const MAX_REPORT_ITEMS = 300;
+    const displayTxs = sortedTxs.length > MAX_REPORT_ITEMS ? sortedTxs.slice(0, MAX_REPORT_ITEMS) : sortedTxs;
 
     let html = '';
-    sortedTxs.forEach(t => {
+    displayTxs.forEach(t => {
 const dateShort = formatDateTR(new Date(t.date));
 const amountClass = t.type === 'giden' ? 'text-expense' : 'text-income';
 const descHtml = t.description ? `<div style="font-size:0.75em; color:#90a4ae; margin-top:2px;">${sanitizeHTML(t.description)}</div>` : '';
@@ -2690,6 +2693,9 @@ const descHtml = t.description ? `<div style="font-size:0.75em; color:#90a4ae; m
             ${descHtml}
         </div>`;
     });
+    if (sortedTxs.length > MAX_REPORT_ITEMS) {
+        html += '<div style="text-align:center;color:#78909c;font-size:0.85em;padding:8px;border-top:1px solid rgba(255,255,255,0.05);">İlk ' + MAX_REPORT_ITEMS + ' işlem gösteriliyor (toplam ' + sortedTxs.length + '). Excel ile tümünü indirebilirsiniz.</div>';
+    }
 
     listContainer.innerHTML = html;
 }
