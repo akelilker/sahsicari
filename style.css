@@ -4138,9 +4138,9 @@ label[for="editDateInput"] {
     .header {
         background: rgba(12, 18, 32, 0.92);
     }
-    /* Ayarlar ve bildirim ikonları üst/alt boşluk 1er px azaltıldı */
+    /* Ayarlar ve bildirim ikonları üst/alt boşluk +4px (top/bottom) */
     .notification-icon-btn {
-        padding: 1px 0;
+        padding: 5px 0;
     }
     /* Ana başlık alanı iç dikey yükseklik +4px, yatay çizgi altına 3px boşluk */
     .header h1 {
@@ -4153,6 +4153,9 @@ label[for="editDateInput"] {
     .quick-access-section {
         background: transparent;
         margin-bottom: 3px; /* Favori kişiler ile Cari Kayıt arası 3px */
+    }
+    .quick-access-section h3 {
+        margin-top: 7px; /* Sık Kullanılanlar metni 5px aşağı */
     }
     /* Kasa geçiş butonu altına 2px boşluk */
     .quick-transaction-area {
