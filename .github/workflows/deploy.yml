@@ -36,7 +36,6 @@ jobs:
             backups/**
             kd_backups/**
             veriler.json
-            kd_veriler.json
             .DS_Store
             .cpanel.yml
             DEPLOY-*.md

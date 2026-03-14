@@ -2,4 +2,4 @@ backups/
 kd_backups/
 _archive/
 veriler.json
-kd_veriler.json
+# kd_veriler.json deploy'a dahil (sunucuya kopyalanır)
