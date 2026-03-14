@@ -32,6 +32,16 @@ function setCurrentDate() {
 
 /* deformatCurrency, formatNumber, formatAmount, formatCurrency → js/utils.js */
 
+/** fetch ile 45 sn timeout; ağ donmasında AbortError fırlatır. */
+function fetchWithTimeout(url, options, timeoutMs) {
+    timeoutMs = timeoutMs || 45000;
+    var controller = new AbortController();
+    var id = setTimeout(function () { controller.abort(); }, timeoutMs);
+    var opts = Object.assign({}, options || {});
+    opts.signal = controller.signal;
+    return fetch(url, opts).finally(function () { clearTimeout(id); });
+}
+
 let allData = {};
 let hasLoadedServerData = false;
 let notificationHistory = [];
@@ -440,7 +450,7 @@ function updateServerStatus(type, message) {
 async function testServerConnection() {
     updateServerStatus('', '🔄 Bağlantı test ediliyor...');
     try {
-        const response = await fetch('get_data.php?test=1&t=' + Date.now(), { 
+        const response = await fetchWithTimeout('get_data.php?test=1&t=' + Date.now(), { 
             method: 'GET', 
             headers: { 
                 'Accept': 'application/json'
@@ -458,7 +468,7 @@ async function testServerConnection() {
             updateServerStatus('error', `❌ HTTP Hatası: ${response.status}`);
         }
     } catch (error) {
-        updateServerStatus('error', '❌ Sunucuya Ulaşılamadı');
+        updateServerStatus('error', error && error.name === 'AbortError' ? '❌ Bağlantı zaman aşımı' : '❌ Sunucuya Ulaşılamadı');
     }
 }
 
@@ -471,7 +481,7 @@ function saveDataToServer(data, force = false) {
     const primaryUrl = force ? 'write_data.php?force=true' : 'write_data.php';
     const fallbackUrl = force ? 'save.php?force=true' : 'save.php';
 
-    const sendSave = (url) => fetch(url, {
+    const sendSave = (url) => fetchWithTimeout(url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -522,7 +532,7 @@ function saveDataToServer(data, force = false) {
         });
 }
 function loadDataFromServer() {
-    return fetch('get_data.php?t=' + Date.now(), { 
+    return fetchWithTimeout('get_data.php?t=' + Date.now(), { 
         method: 'GET', 
         headers: { 
             'Accept': 'application/json'
@@ -3615,11 +3625,11 @@ async function manualSync() {
 
             for (const item of syncQueue) {
                 try {
-                    const response = await fetch(item.url, {
+                    const response = await fetchWithTimeout(item.url, {
                         method: item.method,
                         headers: item.headers,
                         body: item.body
-                    });
+                    }, 45000);
 
                     if (response.ok) {
                         await removeSyncQueueItem(db, item.id);

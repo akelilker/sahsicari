@@ -174,13 +174,18 @@ async function syncPendingData() {
         DEBUG && console.log('[SW] Syncing', syncQueue.length, 'pending items');
 
         let syncedCount = 0;
+        const FETCH_TIMEOUT = 45000;
         for (const item of syncQueue) {
             try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
                 const response = await fetch(item.url, {
                     method: item.method,
                     headers: item.headers,
-                    body: item.body
+                    body: item.body,
+                    signal: controller.signal
                 });
+                clearTimeout(timeoutId);
 
                 if (response.ok) {
                     await removeFromSyncQueue(db, item.id);

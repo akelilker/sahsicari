@@ -5,6 +5,11 @@
  * enforce_same_origin() çağırır. GET: Origin/Referer yoksa da (PWA, gizlilik) izin
  * verilebilir. Yazma (POST/PUT): Origin veya Referer ile Host eşleşmeli; aksi 403.
  */
+if (!headers_sent()) {
+    header('X-Content-Type-Options: nosniff');
+    header('X-Frame-Options: SAMEORIGIN');
+}
+
 function deny_request(int $statusCode, string $message): void {
     http_response_code($statusCode);
     echo json_encode(["status" => "error", "message" => $message], JSON_UNESCAPED_UNICODE);

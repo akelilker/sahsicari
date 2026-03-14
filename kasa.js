@@ -52,28 +52,37 @@ return String(str)
 .replace(/>/g, '&gt;');
 }
 
+function fetchWithTimeout(url, options, timeoutMs) {
+timeoutMs = timeoutMs || 45000;
+var controller = new AbortController();
+var id = setTimeout(function () { controller.abort(); }, timeoutMs);
+var opts = Object.assign({}, options || {});
+opts.signal = controller.signal;
+return fetch(url, opts).finally(function () { clearTimeout(id); });
+}
+
 // ==================== DATA ====================
 async function loadData() {
 try {
-const res = await fetch(`kd_load.php?t=${Date.now()}`);
+const res = await fetchWithTimeout(`kd_load.php?t=${Date.now()}`);
 if (res.ok) {
 const data = await res.json();
 if (data && typeof data === 'object') kasaData = { ...kasaData, ...data };
 }
-} catch (_) { /* Varsayılan veri kullanılıyor */ }
+} catch (e) { if (e && e.name === 'AbortError') showNotification('Bağlantı zaman aşımı', 'error'); }
 updateAll();
 }
 
 async function saveData() {
 try {
-const res = await fetch('kd_save.php', {
+const res = await fetchWithTimeout('kd_save.php', {
 method: 'POST',
 headers: { 'Content-Type': 'application/json' },
 body: JSON.stringify(kasaData)
-});
+}, 45000);
 return res.ok;
 } catch (e) {
-showNotification('Kayıt hatası!', 'error');
+showNotification(e && e.name === 'AbortError' ? 'Kayıt zaman aşımı' : 'Kayıt hatası!', 'error');
 return false;
 }
 }
