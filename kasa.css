@@ -600,10 +600,21 @@ background: rgba(0, 230, 118, 0.2);
 color: #00e676;
 }
 
-/* Kasa içi modaller (kategori detay, işlem düzenle) kasa wrapper üstünde olmalı */
+/* Kasa içi modaller: ana modal ile aynı footer boşluğu, yatay/dikey ayarlar */
 #kasaCategoryDetailModal,
 #editModal {
     z-index: 4200 !important;
+    padding-top: calc(env(safe-area-inset-top) + 10px) !important;
+    padding-bottom: calc(41px + env(safe-area-inset-bottom)) !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+}
+#kasaCategoryDetailModal .modal-content,
+#editModal .modal-content {
+    width: 100% !important;
+    max-width: 450px !important;
+    margin: 0 auto !important;
+    max-height: calc(100dvh - env(safe-area-inset-top) - 51px) !important;
 }
 
 /* ==================== ✅ FOOTER VERSİYON BİLGİSİ FIX ==================== */
