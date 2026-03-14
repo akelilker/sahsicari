@@ -600,6 +600,12 @@ background: rgba(0, 230, 118, 0.2);
 color: #00e676;
 }
 
+/* Kasa içi modaller (kategori detay, işlem düzenle) kasa wrapper üstünde olmalı */
+#kasaCategoryDetailModal,
+#editModal {
+    z-index: 4200 !important;
+}
+
 /* ==================== ✅ FOOTER VERSİYON BİLGİSİ FIX ==================== */
 
 /* iOS PWA'da sola kaymayı önlemek: left 50% + translateX ile ortalama */
@@ -680,8 +686,11 @@ text-transform: none !important;
 letter-spacing: 0.3px !important;
 }
 
-/* Masaüstü: Footer çerçeve (üst kalın, yanlar ince) */
+/* Masaüstü: Footer sağ/soldan 1px daraltma + çerçeve */
 @media screen and (min-width: 769px) {
+    .global-status-bar {
+        max-width: calc(450px - 2px) !important;
+    }
     .global-status-bar::before {
         content: '';
         position: absolute;

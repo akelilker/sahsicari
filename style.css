@@ -4162,7 +4162,11 @@ label[for="editDateInput"] {
         margin-top: 4px;
         margin-bottom: 6px;
     }
-    /* Footer masaüstü çerçeve: üst kalın, yanlar ince (pseudo-element ile) */
+    /* Footer sağ/soldan 1px daraltma + çerçeve */
+    .global-status-bar {
+        left: 1px !important;
+        right: 1px !important;
+    }
     .global-status-bar::before {
         content: '';
         position: absolute;
