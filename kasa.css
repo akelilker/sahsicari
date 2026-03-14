@@ -39,16 +39,33 @@ position: relative;
 z-index: 4101;
 }
 
-/* Modal Body - Scroll alanı */
-.modal-body {
+/* Modal Body - Scroll alanı, kaydırma çubukları gizli */
+.kasa-modal-content .modal-body {
 flex: 1;
 overflow-y: auto;
 min-height: 0;
 -webkit-overflow-scrolling: touch;
 padding: 10px;
 padding-bottom: 20px;
-scrollbar-width: thin;
-scrollbar-color: rgba(255,255,255,0.1) transparent;
+scrollbar-width: none;
+-ms-overflow-style: none;
+}
+.kasa-modal-content .modal-body::-webkit-scrollbar {
+display: none;
+}
+.kasa-modal-content .category-balance-section,
+.kasa-modal-content #transactionHistory,
+.kasa-modal-content .history-container,
+.kasa-modal-content .kategori-yonetim-list {
+scrollbar-width: none;
+-ms-overflow-style: none;
+}
+.kasa-modal-content .modal-body::-webkit-scrollbar,
+.kasa-modal-content .category-balance-section::-webkit-scrollbar,
+.kasa-modal-content #transactionHistory::-webkit-scrollbar,
+.kasa-modal-content .history-container::-webkit-scrollbar,
+.kasa-modal-content .kategori-yonetim-list::-webkit-scrollbar {
+display: none;
 }
 
 /* Dönüş kapısı */
