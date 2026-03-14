@@ -15,7 +15,7 @@ display: flex;
 justify-content: center;
 align-items: flex-start;
 padding-top: calc(env(safe-area-inset-top) + 10px);
-padding-bottom: calc(45px + env(safe-area-inset-bottom));
+padding-bottom: calc(41px + env(safe-area-inset-bottom));
 z-index: 4100 !important;
 text-rendering: auto;
 -webkit-font-smoothing: antialiased;
