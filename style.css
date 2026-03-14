@@ -356,7 +356,7 @@ body.ios-pwa .debt-controls select {
 }
 
 .container::before { left: 2px; opacity: 0.95; }
-.container::after { right: 2px; opacity: 0; }
+.container::after { right: 2px; opacity: 0.95; }
 
 .content-scroll-wrapper {
     flex: 1;
