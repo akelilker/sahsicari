@@ -356,7 +356,7 @@ body.ios-pwa .debt-controls select {
 }
 
 .container::before { left: 2px; opacity: 0.95; }
-.container::after { right: 2px; }
+.container::after { right: 2px; opacity: 0.95; }
 
 .content-scroll-wrapper {
     flex: 1;
@@ -4134,6 +4134,7 @@ label[for="editDateInput"] {
     }
     .container {
         background: rgba(12, 18, 32, 0.97);
+        border-right: 1px solid rgba(200, 208, 216, 0.5);
     }
     .header {
         background: rgba(12, 18, 32, 0.92);
