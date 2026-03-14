@@ -679,3 +679,12 @@ font-weight: 600 !important;
 text-transform: none !important;
 letter-spacing: 0.3px !important;
 }
+
+/* Masaüstü: Footer çerçeve (üst kalın, yanlar ince) */
+@media screen and (min-width: 769px) {
+    .global-status-bar {
+        border-top: 2px solid rgba(0, 230, 118, 0.35) !important;
+        border-left: 1px solid rgba(0, 230, 118, 0.2) !important;
+        border-right: 1px solid rgba(0, 230, 118, 0.2) !important;
+    }
+}

@@ -4162,6 +4162,12 @@ label[for="editDateInput"] {
         margin-top: 4px;
         margin-bottom: 6px;
     }
+    /* Footer masaüstü çerçeve: üst kalın, yanlar ince */
+    .global-status-bar {
+        border-top: 2px solid rgba(0, 230, 118, 0.35);
+        border-left: 1px solid rgba(0, 230, 118, 0.2);
+        border-right: 1px solid rgba(0, 230, 118, 0.2);
+    }
     /* Kişi modalı masaüstü boşluk düzenlemeleri */
     #personModal .modal-header .header-top-row {
         margin-bottom: 0;
