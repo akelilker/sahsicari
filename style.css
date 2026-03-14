@@ -1352,6 +1352,25 @@ overflow: hidden;
     box-shadow: 0 0 30px rgba(0,0,0,0.8);
 }
 
+/* Kişi sayfasında kaydırma çubukları gizli */
+#personModal .modal-body,
+#personModal .history-container,
+#personModal .reports-dashboard,
+#personModal .category-balance-section,
+#personModal #reportPreviewList,
+#personModal [style*="overflow-y: auto"],
+#personModal [style*="overflow-y: auto !important"] {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+#personModal .modal-body::-webkit-scrollbar,
+#personModal .history-container::-webkit-scrollbar,
+#personModal .reports-dashboard::-webkit-scrollbar,
+#personModal .category-balance-section::-webkit-scrollbar,
+#personModal #reportPreviewList::-webkit-scrollbar {
+    display: none;
+}
+
 .modal-header {
     /* GÜNCELLEME: Kişi modalı netlik ayarı - Cam gibi görünüm için doygunluk artırıldı */
     background: linear-gradient(to bottom, rgba(46, 125, 50, 0.95) 0%, rgba(20, 24, 38, 0.86) 100%);
