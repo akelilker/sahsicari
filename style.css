@@ -4157,9 +4157,10 @@ label[for="editDateInput"] {
     .quick-access-section h3 {
         margin-top: 7px; /* Sık Kullanılanlar metni 5px aşağı */
     }
-    /* Kasa geçiş butonu altına 2px boşluk */
+    /* Hızlı İşlem + Kasa satırı üst/alt boşluk +4px */
     .quick-transaction-area {
-        margin-bottom: 2px;
+        margin-top: 4px;
+        margin-bottom: 6px;
     }
     /* Kişi modalı masaüstü boşluk düzenlemeleri */
     #personModal .modal-header .header-top-row {
