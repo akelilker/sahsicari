@@ -1405,6 +1405,11 @@ overflow: hidden;
     text-shadow: none;
 }
 
+#personModal .modal-header .text-expense {
+    color: #d40000;
+    text-shadow: none;
+}
+
 .modal-header h2 {
     flex-grow: 1;
     text-align: center;
