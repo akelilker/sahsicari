@@ -4242,40 +4242,6 @@ label[for="editDateInput"] {
     #personModal .modal-header .header-top-row {
         margin-bottom: 0;
     }
-    /* Kişi modali header: yeşil alanda metin ve rakamlar pırıl pırıl net */
-    #personModal .modal-header {
-        text-rendering: optimizeLegibility;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-    }
-    #personModal .modal-header h2,
-    #personModal .modal-header .info-label,
-    #personModal .modal-header .info-amount {
-        text-rendering: optimizeLegibility;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-    }
-    #personModal .modal-header h2 {
-        color: #ffffff;
-        font-weight: 800;
-        text-shadow: 0 1px 2px rgba(0,0,0,0.6);
-    }
-    #personModal .modal-header .info-label {
-        color: #e0e0e0;
-        font-weight: 700;
-    }
-    #personModal .modal-header .info-amount {
-        font-weight: 800;
-        text-shadow: none;
-    }
-    #personModal .modal-header .info-amount.text-income {
-        color: #00e676;
-        font-weight: 800;
-    }
-    #personModal .modal-header .info-amount.text-expense {
-        color: #ff5252;
-        font-weight: 800;
-    }
     #personModal .tab-buttons .tab-btn {
         padding: 12px 8px 3px 8px; /* Sekme başlıkları ile yatay çizgi arası toplam 3px */
     }
