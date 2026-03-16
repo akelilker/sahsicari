@@ -1372,8 +1372,8 @@ overflow: hidden;
 }
 
 .modal-header {
-    /* GÜNCELLEME: Kişi modalı netlik ayarı - Cam gibi görünüm için doygunluk artırıldı */
-    background: linear-gradient(to bottom, rgba(46, 125, 50, 0.95) 0%, rgba(20, 24, 38, 0.86) 100%);
+    /* Opak gradient: sis yok, arkadan blend yok */
+    background: linear-gradient(to bottom, #2e7d32 0%, #14182a 100%);
     padding: 6px 12px 0 12px;
     border-radius: 15px 15px 0 0;
     display: flex;
@@ -1394,6 +1394,10 @@ overflow: hidden;
     margin-bottom: 2px;
 }
 
+#personModal .modal-header .text-income {
+    text-shadow: none;
+}
+
 .modal-header h2 {
     flex-grow: 1;
     text-align: center;
@@ -1401,7 +1405,7 @@ overflow: hidden;
     font-size: 1.05em;
     font-weight: 700;
     color: #ffffff;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.8), 0 0 4px rgba(255,255,255,0.2);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.6);
     filter: none;
 }
 
@@ -1409,7 +1413,7 @@ overflow: hidden;
     background: transparent;
     border: none;
     color: #eceff1;
-    text-shadow: 0 0 5px rgba(255,255,255,0.3);
+    text-shadow: none;
     font-size: 1.5em;
     width: 30px;
     height: 30px;
@@ -3296,6 +3300,30 @@ select option {
 
 .summary-net-row .summary-val {
     font-size: 0.95em;
+}
+
+/* Mobil: Genel Durum – toplam borç/alacak etiket üstte, sayı alt satırda, yatayda orta */
+@media screen and (max-width: 768px) {
+    #generalStatusModal .summary-top-row {
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+    }
+    #generalStatusModal .summary-box-item {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 4px;
+        width: 100%;
+        max-width: 280px;
+    }
+    #generalStatusModal .summary-box-item .summary-label {
+        order: 1;
+    }
+    #generalStatusModal .summary-box-item .summary-val {
+        order: 2;
+        text-align: center;
+    }
 }
 
 /* === RAPORLAR DASHBOARD — FLAT GRID ===
