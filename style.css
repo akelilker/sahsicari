@@ -76,9 +76,17 @@
   --blue-40: rgba(66, 165, 245, 0.4);
   --blue-30: rgba(66, 165, 245, 0.3);
   --blue-20: rgba(66, 165, 245, 0.2);
-  --red-30: rgba(255, 23, 68, 0.3);
-  /* İşlem geçmişi ile aynı borç/expense kırmızısı (tek ton) */
-  --expense-red: #ff1744;
+  /* Tek kırmızı ton: Kasa logosu #d40000 (rgb 212,0,0) */
+  --expense-red: #d40000;
+  --red-80: rgba(212, 0, 0, 0.8);
+  --red-60: rgba(212, 0, 0, 0.6);
+  --red-50: rgba(212, 0, 0, 0.5);
+  --red-40: rgba(212, 0, 0, 0.4);
+  --red-30: rgba(212, 0, 0, 0.3);
+  --red-25: rgba(212, 0, 0, 0.25);
+  --red-20: rgba(212, 0, 0, 0.2);
+  --red-14: rgba(212, 0, 0, 0.14);
+  --red-10: rgba(212, 0, 0, 0.1);
   --green-30: rgba(0, 230, 118, 0.3);
   --tab-purple: rgba(98, 0, 234, 0.6);
   --dark-bg: rgba(20, 30, 60, 0.95);
@@ -322,7 +330,7 @@ body.ios-pwa .debt-controls select {
 .container.theme-blue-glow { --light-color: #42A5F5; --light-shadow: rgba(66, 165, 245, 0.6); }
 .container.theme-lila-glow { --light-color: #9575CD; --light-shadow: rgba(149, 117, 205, 0.6); }
 .container.theme-green-glow { --light-color: #00E676; --light-shadow: rgba(0, 230, 118, 0.6); }
-.container.theme-red-glow { --light-color: #ff1744; --light-shadow: rgba(255, 23, 68, 0.6); }
+.container.theme-red-glow { --light-color: var(--expense-red); --light-shadow: var(--red-60); }
 .container.theme-gold-glow { --light-color: #FFD700; --light-shadow: rgba(255, 215, 0, 0.6); }
 .container.theme-cyan-glow { --light-color: #00E5FF; --light-shadow: rgba(0, 229, 255, 0.5); }
 .container.theme-none-glow { --light-color: transparent; --light-shadow: transparent; }
@@ -623,7 +631,7 @@ body.ios-pwa .debt-controls select {
 }
 
 .delete-notif-btn {
-    color: #ff1744;
+    color: var(--expense-red);
     cursor: pointer;
     font-weight: 900;
     font-size: 1.1em;
@@ -695,7 +703,7 @@ body.ios-pwa .debt-controls select {
 }
 
 .summary-card.debt h3 {
-    color: #d40000;
+    color: var(--expense-red);
     text-shadow: none;
 }
 .summary-card:nth-child(3) h3 { color: #b0bec5; }
@@ -990,7 +998,7 @@ body.ios-pwa .debt-controls select {
 }
 .btn-danger {
     color: var(--expense-red);
-    border-color: rgba(255, 23, 68, 0.25);
+    border-color: var(--red-25);
     text-shadow: none;
 }
 
@@ -1004,7 +1012,7 @@ body.ios-pwa .debt-controls select {
 .dropdown-menu .btn-memory-clear,
 .dropdown-menu .btn.btn-memory-clear {
     color: var(--expense-red);
-    border: 1px solid rgba(255, 23, 68, 0.5);
+    border: 1px solid var(--red-50);
     text-shadow: none;
 }
 
@@ -1113,7 +1121,7 @@ body.ios-pwa .debt-controls select {
 }
 
 .q-icon.alacakli { color: #00e676 !important; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.7)); }
-.q-icon.borclu { color: #ff1744 !important; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.7)); }
+.q-icon.borclu { color: var(--expense-red) !important; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.7)); }
 
 .q-name {
     font-size: 0.82em;
@@ -1286,7 +1294,7 @@ body.modal-open-ios .global-status-bar {
 }
 
 #serverStatusText.text-offline {
-    color: #ff1744;
+    color: var(--expense-red);
     animation: statusDim 4s forwards;
     opacity: 1;
 }
@@ -1406,7 +1414,7 @@ overflow: hidden;
 }
 
 #personModal .modal-header .text-expense {
-    color: #d40000;
+    color: var(--expense-red);
     text-shadow: none;
 }
 
@@ -1570,7 +1578,7 @@ overflow: hidden;
 .btn-cancel-person {
     flex: 1;
     background: transparent;
-    border: 1px solid rgba(255, 23, 68, 0.5);
+    border: 1px solid var(--red-50);
     color: var(--expense-red);
     text-shadow: none;
     font-size: 11px;
@@ -1583,7 +1591,7 @@ overflow: hidden;
 .btn-cancel-person:hover,
 .btn-cancel-person:focus,
 .btn-cancel-person:active {
-    background: rgba(255, 23, 68, 0.14);
+    background: var(--red-14);
 }
 
 #addPersonModal .modal-body .form-group label {
@@ -1884,8 +1892,8 @@ select option {
 }
 
 .type-btn.active.giden {
-    background: rgba(255, 23, 68, 0.25);
-    border: 1px solid rgba(255, 23, 68, 0.8);
+    background: var(--red-25);
+    border: 1px solid var(--red-80);
     text-shadow: none;
 }
 .type-btn.active.gelen {
@@ -2167,7 +2175,7 @@ select option {
 
 .category-item .category-name::before {
     content: '• ';
-    color: #ff1744;
+    color: var(--expense-red);
     margin-right: 2px;
     font-size: 1.2em;
     vertical-align: middle;
@@ -2176,7 +2184,7 @@ select option {
 .category-item .category-balance {
     font-size: 0.8em;
     font-weight: 800;
-    color: #ff1744;
+    color: var(--expense-red);
     line-height: 1.1;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
     white-space: nowrap;
@@ -2987,10 +2995,10 @@ select option {
 }
 
 #quickOverlayContainer .close-overlay-btn {
-    background: rgba(255, 82, 82, 0.25);
-    color: #ff5252;
-    border: 2px solid rgba(255, 82, 82, 0.7);
-    box-shadow: 0 0 8px rgba(255, 82, 82, 0.35);
+    background: var(--red-25);
+    color: var(--expense-red);
+    border: 2px solid var(--red-50);
+    box-shadow: 0 0 8px var(--red-30);
 }
 
 .quick-search-wrapper {
@@ -3184,8 +3192,7 @@ select option {
 
 .report-col.left-col .report-header {
     background: transparent;
-    /* FIX: Sol rapor başlığı kırmızısı net */
-    color: #ff1744;
+    color: var(--expense-red);
     border: none;
 }
 
@@ -3897,8 +3904,8 @@ label[for="editDateInput"] {
     .dropdown-menu .btn-danger,
     .quick-panel-content .btn-danger {
         background: rgba(14, 21, 37, 0.95);
-        border-color: rgba(255, 82, 82, 0.25);
-        color: #ff1744;
+        border-color: var(--red-25);
+        color: var(--expense-red);
     }
 
     .dropdown-menu .btn-success,
@@ -4496,9 +4503,9 @@ label[for="editDateInput"] {
 }
 
 #filterBtn-giden.active {
-    background: rgba(255, 23, 68, 0.2);
+    background: var(--red-20);
     color: var(--expense-red);
-    box-shadow: 0 0 10px rgba(255, 23, 68, 0.2);
+    box-shadow: 0 0 10px var(--red-20);
     font-weight: 700;
     text-shadow: none;
 }
@@ -4669,7 +4676,7 @@ label[for="editDateInput"] {
 }
 
 .custom-alert-overlay.error-state .alert-content {
-    border: 2px solid #ff1744;
+    border: 2px solid var(--expense-red);
     box-shadow: 0 0 20px var(--red-30);
 }
 
@@ -4680,7 +4687,7 @@ label[for="editDateInput"] {
 }
 
 .custom-alert-overlay.error-state .alert-icon {
-    color: #ff1744;
+    color: var(--expense-red);
     animation: shake 0.5s ease-in-out;
 }
 
@@ -4694,7 +4701,7 @@ label[for="editDateInput"] {
 }
 
 .custom-alert-overlay.error-state .alert-title {
-    color: #ff1744;
+    color: var(--expense-red);
 }
 
 .alert-message {
@@ -4725,17 +4732,17 @@ label[for="editDateInput"] {
 .alert-btn:active { transform: scale(0.95); }
 
 .btn-yes {
-    background: rgba(255, 23, 68, 0.2);
+    background: var(--red-20);
     color: var(--expense-red);
-    border: 1px solid rgba(255, 23, 68, 0.5);
-    box-shadow: 0 0 15px rgba(255, 23, 68, 0.1);
+    border: 1px solid var(--red-50);
+    box-shadow: 0 0 15px var(--red-10);
     text-shadow: none;
 }
 
 .custom-alert-overlay.error-state .btn-yes {
-    background: #d50000;
+    background: var(--expense-red);
     color: white;
-    border-color: #ff1744;
+    border-color: var(--expense-red);
 }
 
 .btn-no {

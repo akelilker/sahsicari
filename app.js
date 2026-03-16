@@ -1770,7 +1770,7 @@ function updateAllocationTotals() {
         displayEl.textContent = formatAmount(remainingAmount);
         if(remainingAmount === 0) displayEl.style.color = '#66bb6a';
         else if (remainingAmount > 0) displayEl.style.color = '#ffd54f';
-        else displayEl.style.color = '#ef5350';
+        else displayEl.style.color = '#d40000';
     }
 }
 
@@ -2573,7 +2573,7 @@ function renderNotificationMenu() {
         for (let i = notificationHistory.length - 1; i >= 0; i--) {
             const notif = notificationHistory[i];
             const item = document.createElement('div');
-            const color = notif.type === 'success' ? '#81c784' : '#ef5350';
+            const color = notif.type === 'success' ? '#81c784' : '#d40000';
             
             item.style.color = color;
             item.style.fontSize = '0.85em';
@@ -2671,7 +2671,7 @@ function renderReportPreview() {
 
     const formattedTotal = formatAmount(Math.abs(totalAmount));
     const direction = totalAmount > 0 ? '(Alacak)' : (totalAmount < 0 ? '(Borç)' : '');
-    const color = totalAmount > 0 ? '#00e676' : (totalAmount < 0 ? '#ff1744' : '#b0bec5');
+    const color = totalAmount > 0 ? '#00e676' : (totalAmount < 0 ? '#d40000' : '#b0bec5');
 
     summaryContainer.innerHTML = `
         <span style="color:#e0e0e0;">${totalCount} İşlem</span> | 
@@ -4283,7 +4283,7 @@ function injectThreeDotMenuStyles() {
     
     const style = document.createElement('style');
     style.id = 'three-dot-menu-styles';
-    style.textContent = '.three-dot-menu {background: rgba(14, 21, 37, 0.98);border: 1px solid rgba(255, 255, 255, 0.4);border-radius: 12px;padding: 8px;min-width: 150px;box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);opacity: 0;transform: translateX(20px);transition: all 0.2s ease;}.three-dot-menu.show {opacity: 1;transform: translateX(0);}.three-dot-menu .menu-item {padding: 8px 15px;color: #e0e0e0;font-weight: 600;cursor: pointer;border-radius: 8px;display: flex;align-items: center;gap: 10px;transition: all 0.2s ease;}.three-dot-menu .menu-item:hover {transform: scale(1.05);}.three-dot-menu .menu-item[data-action="delete"]:hover {color: #ff1744;}.three-dot-menu .menu-item span {font-size: 18px;}';
+    style.textContent = '.three-dot-menu {background: rgba(14, 21, 37, 0.98);border: 1px solid rgba(255, 255, 255, 0.4);border-radius: 12px;padding: 8px;min-width: 150px;box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);opacity: 0;transform: translateX(20px);transition: all 0.2s ease;}.three-dot-menu.show {opacity: 1;transform: translateX(0);}.three-dot-menu .menu-item {padding: 8px 15px;color: #e0e0e0;font-weight: 600;cursor: pointer;border-radius: 8px;display: flex;align-items: center;gap: 10px;transition: all 0.2s ease;}.three-dot-menu .menu-item:hover {transform: scale(1.05);}.three-dot-menu .menu-item[data-action="delete"]:hover {color: #d40000;}.three-dot-menu .menu-item span {font-size: 18px;}';
     
     document.head.appendChild(style);
 }
@@ -4707,7 +4707,7 @@ function showSiriConfirmModal(person, amount, type, desc) {
                     <div style="background:rgba(255,255,255,0.05); border-radius:12px; padding:15px; margin-bottom:15px;">
                         <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
                             <span style="color:#78909c;">Kişi:</span>
-                            <span style="color:#e0e0e0; font-weight:600;" id="siriPersonDisplay">${matchedPerson || '<span style="color:#ff1744;">Bulunamadı</span>'}</span>
+                            <span style="color:#e0e0e0; font-weight:600;" id="siriPersonDisplay">${matchedPerson || '<span style="color:#d40000;">Bulunamadı</span>'}</span>
                         </div>
                         <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
                             <span style="color:#78909c;">Tutar:</span>
@@ -4727,7 +4727,7 @@ function showSiriConfirmModal(person, amount, type, desc) {
                     
                     ${!matchedPerson ? `
                     <div style="background:rgba(255,23,68,0.1); border:1px solid rgba(255,23,68,0.3); border-radius:8px; padding:10px; margin-bottom:15px;">
-                        <span style="color:#ff1744; font-size:0.9em;">⚠️ "${sanitizeHTML(person)}" kişisi bulunamadı. Lütfen kişi seçin:</span>
+                        <span style="color:#d40000; font-size:0.9em;">⚠️ "${sanitizeHTML(person)}" kişisi bulunamadı. Lütfen kişi seçin:</span>
                         <select id="siriPersonSelect" style="width:100%; margin-top:8px; padding:10px; border-radius:8px; background:#1a2332; color:#e0e0e0; border:1px solid rgba(255,255,255,0.2);">
                             <option value="">Kişi Seçin...</option>
                         </select>

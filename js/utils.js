@@ -117,7 +117,7 @@
      */
     function renderCategoryItem(categoryName, balance, status) {
         var b = Number(balance) || 0;
-        var color = b > 0 ? '#ff1744' : (b < 0 ? '#81c784' : '#ffd54f');
+        var color = b > 0 ? '#d40000' : (b < 0 ? '#81c784' : '#ffd54f');
         var balanceClass = b > 0 ? 'positive-balance' : 'negative-balance';
         var safeForOnclick = String(categoryName).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
         return '<div class="category-item ' + balanceClass + '" onclick="showCategoryDetails(\'' + safeForOnclick + '\')">' +

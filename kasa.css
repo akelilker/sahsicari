@@ -256,8 +256,8 @@ opacity: 1;
 background: rgba(180, 40, 40, 0.75) !important;
 border: 1px solid rgba(180, 40, 40, 0.9) !important;
 color: #ffffff;
-box-shadow: 0 0 8px rgba(255, 23, 68, 0.3);
-text-shadow: 0 0 8px rgba(255, 23, 68, 0.4);
+box-shadow: 0 0 8px var(--red-30);
+text-shadow: 0 0 8px var(--red-40);
 }
 
 #addTransactionBtn {
@@ -305,7 +305,7 @@ text-overflow: ellipsis;
 .kategori-card .kat-tutar {
 font-size: 0.8em;
 font-weight: 600;
-color: #ff1744;
+color: var(--expense-red);
 }
 
 /* Kategori Yönetim Listesi */
@@ -331,7 +331,7 @@ color: #e0e0e0;
 .kategori-yonetim-item button {
 background: transparent;
 border: none;
-color: #ff1744;
+color: var(--expense-red);
 cursor: pointer;
 padding: 2px 6px;
 font-size: 0.9em;
@@ -393,8 +393,8 @@ filter: none !important;
 }
 
 .history-type.giden {
-color: #e53935 !important;
-text-shadow: 0 0 8px rgba(255, 23, 68, 0.4) !important;
+color: var(--expense-red) !important;
+text-shadow: 0 0 8px var(--red-40) !important;
 }
 
 .history-type.gelen {
@@ -694,8 +694,8 @@ box-shadow: 0 0 6px rgba(0, 230, 118, 0.6) !important;
 }
 
 .status-dot.offline {
-background: #ff6b6b !important;
-box-shadow: 0 0 6px rgba(255, 107, 107, 0.6) !important;
+background: var(--expense-red) !important;
+box-shadow: 0 0 6px var(--red-60) !important;
 }
 
 .text-online {
@@ -707,7 +707,7 @@ letter-spacing: 0.3px !important;
 }
 
 .text-offline {
-color: #ff6b6b !important;
+color: var(--expense-red) !important;
 font-size: 0.75rem !important;
 font-weight: 600 !important;
 text-transform: none !important;

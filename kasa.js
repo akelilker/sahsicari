@@ -291,8 +291,8 @@ const bakiye = kasaData.baslangicBakiye + giris - cikis;
 ozet.innerHTML = `
     <p><strong>Başlangıç:</strong> ${formatMoney(kasaData.baslangicBakiye)}</p>
     <p><strong>Toplam Giriş:</strong> <span style="color:#00e676">${formatMoney(giris)}</span></p>
-    <p><strong>Toplam Çıkış:</strong> <span style="color:#ff1744">${formatMoney(cikis)}</span></p>
-    <p><strong>Anlık Bakiye:</strong> <span style="color:${bakiye >= 0 ? '#00e676' : '#ff1744'}">${formatMoney(bakiye)}</span></p>
+    <p><strong>Toplam Çıkış:</strong> <span style="color:#d40000">${formatMoney(cikis)}</span></p>
+    <p><strong>Anlık Bakiye:</strong> <span style="color:${bakiye >= 0 ? '#00e676' : '#d40000'}">${formatMoney(bakiye)}</span></p>
     <p><strong>İşlem Sayısı:</strong> ${kasaData.islemler.length}</p>
 `;
 
@@ -397,7 +397,7 @@ editModalContent.innerHTML = `
     
     <div style="display:flex; gap:10px; margin-top:15px;">
         <button class="btn btn-success edit-update-btn" style="flex:1;">💾 Güncelle</button>
-        <button class="btn edit-delete-btn" style="flex:1; border-color:#ff1744; color:#ff1744;">🗑️ Sil</button>
+        <button class="btn edit-delete-btn" style="flex:1; border-color:#d40000; color:#d40000;">🗑️ Sil</button>
     </div>
     <div style="margin-top:10px;">
          <button class="btn edit-cancel-btn" style="width:100%;">İptal</button>
@@ -547,7 +547,7 @@ if (islemListesi.length === 0) {
     islemListesi.forEach(t => {
         totalTutar += t.tutar;
         const dateStr = new Date(t.tarih).toLocaleDateString('tr-TR');
-        const colorClass = t.tip === 'giris' ? '#00e676' : '#ff1744'; 
+        const colorClass = t.tip === 'giris' ? '#00e676' : '#d40000'; 
         
         html += `
             <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
