@@ -949,6 +949,13 @@ body.ios-pwa .debt-controls select {
     border: 1px solid rgba(255, 255, 255, 0.38);
     background: rgba(14, 21, 37, 0.95);
 }
+/* Veriler: Genel Durum, Yedek Al, Yedekten Geri Yükle — metin büyüklüğü aynı */
+.control-panel .general-status-btn,
+.control-panel .control-panel-grid .btn,
+.control-panel .file-upload-btn {
+    font-size: 11px;
+    font-weight: 700;
+}
 
 .btn {
     background: rgba(14, 21, 37, 0.6);
@@ -2987,10 +2994,10 @@ select option {
 }
 
 #quickOverlayContainer .close-overlay-btn {
-    background: rgba(255, 255, 255, 0.4);
-    color: #ffffff;
-    border: 2px solid rgba(255, 255, 255, 0.6);
-    box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+    background: rgba(255, 82, 82, 0.25);
+    color: #ff5252;
+    border: 2px solid rgba(255, 82, 82, 0.7);
+    box-shadow: 0 0 8px rgba(255, 82, 82, 0.35);
 }
 
 .quick-search-wrapper {
