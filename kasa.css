@@ -399,7 +399,7 @@ text-shadow: 0 0 8px var(--red-40) !important;
 
 .history-type.gelen {
 color: #00e676 !important;
-text-shadow: 0 0 8px rgba(0, 230, 118, 0.4) !important;
+text-shadow: none !important;
 }
 
 .history-date {
