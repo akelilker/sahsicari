@@ -695,7 +695,7 @@ body.ios-pwa .debt-controls select {
 }
 
 .summary-card.debt h3 {
-    color: #d50000;
+    color: #d40000;
     text-shadow: none;
 }
 .summary-card:nth-child(3) h3 { color: #b0bec5; }
