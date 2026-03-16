@@ -1418,6 +1418,17 @@ overflow: hidden;
     text-shadow: none;
 }
 
+/* Header etiketlerinde beyazı minimal açık (sadece person modal) */
+#personModal .modal-header .info-label {
+    color: #e8ecf0;
+}
+#personModal .modal-header h2 {
+    color: #f8fafb;
+}
+#personModal .modal-header .close-modal-btn {
+    color: #f5f6f8;
+}
+
 .modal-header h2 {
     flex-grow: 1;
     text-align: center;
