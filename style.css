@@ -2642,7 +2642,7 @@ select option {
     }
 }
 
-/* iPhone yan (landscape): Kişi modali kategori detayı – sütun aralığı dar, Açıklama geniş */
+/* iPhone yan (landscape): Kişi modali kategori detayı – sütun aralığı dar, Açıklama geniş ve alt satıra geçsin */
 @media screen and (orientation: landscape) and (max-width: 932px) {
     #categoryDetailContent .detail-table {
         table-layout: fixed;
@@ -2677,13 +2677,29 @@ select option {
         padding-left: 4px;
     }
     #categoryDetailContent .detail-table tbody td:last-child {
-        display: block;
-        -webkit-line-clamp: unset;
-        line-clamp: unset;
-        -webkit-box-orient: unset;
-        overflow: visible;
-        text-overflow: clip;
-        white-space: normal;
+        display: table-cell !important;
+        -webkit-line-clamp: unset !important;
+        line-clamp: unset !important;
+        -webkit-box-orient: unset !important;
+        overflow: visible !important;
+        text-overflow: clip !important;
+        white-space: normal !important;
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+    }
+}
+
+/* iOS PWA landscape: Açıklama kesilmesin, mutlaka alt satıra geçsin */
+@media screen and (orientation: landscape) {
+    body.ios-pwa #categoryDetailContent .detail-table tbody td:last-child {
+        -webkit-line-clamp: unset !important;
+        line-clamp: unset !important;
+        display: table-cell !important;
+        overflow: visible !important;
+        white-space: normal !important;
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+        text-overflow: clip !important;
     }
 }
 
@@ -4225,6 +4241,39 @@ label[for="editDateInput"] {
     /* Kişi modalı masaüstü boşluk düzenlemeleri */
     #personModal .modal-header .header-top-row {
         margin-bottom: 0;
+    }
+    /* Kişi modali header: yeşil alanda metin ve rakamlar pırıl pırıl net */
+    #personModal .modal-header {
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    #personModal .modal-header h2,
+    #personModal .modal-header .info-label,
+    #personModal .modal-header .info-amount {
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    #personModal .modal-header h2 {
+        color: #ffffff;
+        text-shadow: 0 1px 1px rgba(0,0,0,0.5);
+    }
+    #personModal .modal-header .info-label {
+        color: #ffffff;
+        font-weight: 600;
+    }
+    #personModal .modal-header .info-amount {
+        font-weight: 700;
+        text-shadow: none;
+    }
+    #personModal .modal-header .info-amount.text-income {
+        color: #b9f6ca;
+        text-shadow: 0 0 1px rgba(255,255,255,0.3);
+    }
+    #personModal .modal-header .info-amount.text-expense {
+        color: #ffcdd2;
+        text-shadow: 0 0 1px rgba(255,255,255,0.2);
     }
     #personModal .tab-buttons .tab-btn {
         padding: 12px 8px 3px 8px; /* Sekme başlıkları ile yatay çizgi arası toplam 3px */
