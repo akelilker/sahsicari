@@ -2146,10 +2146,10 @@ select option {
     justify-content: center;
     min-height: 28px;
     padding: 2px 12px;
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: none;
+    border-radius: 0;
+    background: transparent;
     color: #cfd8dc;
-    background: rgba(14, 21, 37, 0.55);
     text-shadow: none;
     font-weight: 600;
     font-size: 12px;
