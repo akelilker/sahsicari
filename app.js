@@ -359,12 +359,14 @@ function bindModalEvents() {
     if (dateInputEl) dateInputEl.addEventListener('change', handleDateChange);
     const addTransactionBtn = document.getElementById('addTransactionBtn');
     if (addTransactionBtn) addTransactionBtn.addEventListener('click', processSingleTransaction);
-    const categoryAddNewBtn = document.getElementById('categoryAddNewBtn');
-    if (categoryAddNewBtn) {
-        categoryAddNewBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            const tabBtn = document.querySelector('#personModal .tab-btn[data-tab="kategoriDurumu"]');
-            if (tabBtn) openTab(null, 'kategoriDurumu', tabBtn);
+    const categorySelect = document.getElementById('category');
+    if (categorySelect) {
+        categorySelect.addEventListener('change', function() {
+            if (this.value === '__add_new_category__') {
+                this.value = '';
+                const tabBtn = document.querySelector('#personModal .tab-btn[data-tab="kategoriDurumu"]');
+                if (tabBtn) openTab(null, 'kategoriDurumu', tabBtn);
+            }
         });
     }
     const showZeroBalanceToggle = document.getElementById('showZeroBalanceToggle');
@@ -1089,7 +1091,9 @@ function populateCategorySelect(selectElement, person) {
         const safeCVal = String(c).replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&/g, '&amp;');
         html += `<option value="${safeCVal}">${sanitizeHTML(c)}${statusText}</option>`;
     });
-    
+    if (selectElement.id === 'category') {
+        html += '<option value="__add_new_category__">+ Kategori yönetimi</option>';
+    }
     selectElement.innerHTML = html;
 }
 
