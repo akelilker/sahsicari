@@ -1314,7 +1314,7 @@ body.modal-open-ios .global-status-bar {
 .modal {
     display: none;
     position: fixed;
-    z-index: 3000;
+    z-index: 4100;
     left: 0;
     top: 0;
     width: 100%;
