@@ -361,10 +361,13 @@ body.ios-pwa .debt-controls select {
         rgba(255, 255, 255, 0) 96%
     );
     filter: drop-shadow(0 0 3px var(--light-shadow)) drop-shadow(0 0 5px var(--light-shadow));
+    opacity: 0.95;
+    transform: translateZ(0);
+    isolation: isolate;
 }
 
-.container::before { left: 2px; opacity: 0.95; }
-.container::after { right: 2px; opacity: 0.95; }
+.container::before { left: 2px; }
+.container::after { right: 2px; }
 
 .content-scroll-wrapper {
     flex: 1;
@@ -1204,7 +1207,7 @@ body.ios-pwa .debt-controls select {
     color: #eceff1;
     font-size: 0.75em;
     font-weight: 600;
-    z-index: 4000;
+    z-index: 4200;
     box-shadow: 0 -2px 4px rgba(0,0,0,0.2), 0 -12px 18px -6px var(--light-shadow);
     padding: 5px 12px;
     padding-bottom: env(safe-area-inset-bottom);
@@ -1217,6 +1220,11 @@ body.modal-open-ios .global-status-bar {
     z-index: 9999;
     position: absolute !important;
     pointer-events: auto !important;
+}
+
+/* Modal açıkken footer hep görünsün; ışık modala/çerçeveye yansımasın */
+body:has(.modal.show) .global-status-bar {
+    box-shadow: 0 -2px 4px rgba(0,0,0,0.2);
 }
 
 .status-bar-inner {
