@@ -359,6 +359,14 @@ function bindModalEvents() {
     if (dateInputEl) dateInputEl.addEventListener('change', handleDateChange);
     const addTransactionBtn = document.getElementById('addTransactionBtn');
     if (addTransactionBtn) addTransactionBtn.addEventListener('click', processSingleTransaction);
+    const categoryAddNewBtn = document.getElementById('categoryAddNewBtn');
+    if (categoryAddNewBtn) {
+        categoryAddNewBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const tabBtn = document.querySelector('#personModal .tab-btn[data-tab="kategoriDurumu"]');
+            if (tabBtn) openTab(null, 'kategoriDurumu', tabBtn);
+        });
+    }
     const showZeroBalanceToggle = document.getElementById('showZeroBalanceToggle');
     if (showZeroBalanceToggle) showZeroBalanceToggle.addEventListener('change', function() { updateCategoryBalanceDisplay(currentPerson); });
     const toggleShareOptionsBtn = document.getElementById('toggleShareOptionsBtn');
@@ -1074,9 +1082,9 @@ function populateCategorySelect(selectElement, person) {
         const bal = balances[c] || 0;
         let statusText = '';
         if (bal < -0.01) {
-            statusText = ` (-${formatAmount(Math.abs(bal))})`;
+            statusText = `\u200B (-${formatAmount(Math.abs(bal))})`;
         } else if (bal > 0.01) {
-            statusText = ` (+${formatAmount(bal)})`;
+            statusText = `\u200B (+${formatAmount(bal)})`;
         }
         const safeCVal = String(c).replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&/g, '&amp;');
         html += `<option value="${safeCVal}">${sanitizeHTML(c)}${statusText}</option>`;

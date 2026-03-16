@@ -1739,6 +1739,18 @@ height: 100%;
     text-shadow: 0 1px 1px rgba(0,0,0,0.55);
 }
 
+.category-add-new-link {
+    display: inline-block;
+    margin-top: 6px;
+    font-size: 0.85em;
+    color: #81c784;
+    text-decoration: none;
+}
+.category-add-new-link:hover {
+    text-decoration: underline;
+    color: #a5d6a7;
+}
+
 #yeniIslem .form-group:nth-last-child(2) {
     margin-bottom: 1.5px;
 }
@@ -3323,6 +3335,10 @@ select option {
     #generalStatusModal .summary-box-item .summary-val {
         order: 2;
         text-align: center;
+    }
+    /* Kategori seçimi: yatayda taşmayı azalt (liste metni zero-width space ile satır kırılınca "(" tutarla kalır) */
+    #yeniIslem #category {
+        min-width: 0;
     }
 }
 
