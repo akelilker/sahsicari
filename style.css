@@ -1233,6 +1233,13 @@ body:has(.modal.show) .global-status-bar::before {
     border-right: none;
 }
 
+/* Modal açıkken sadece sağ-sol lazer çizgilerini gizle */
+body:has(.modal.show) .container::before,
+body:has(.modal.show) .container::after {
+    display: none !important;
+    opacity: 0 !important;
+}
+
 .status-bar-inner {
     width: 100%;
     display: flex;
