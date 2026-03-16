@@ -4257,23 +4257,24 @@ label[for="editDateInput"] {
     }
     #personModal .modal-header h2 {
         color: #ffffff;
-        text-shadow: 0 1px 1px rgba(0,0,0,0.5);
+        font-weight: 800;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.6);
     }
     #personModal .modal-header .info-label {
-        color: #ffffff;
-        font-weight: 600;
+        color: #e0e0e0;
+        font-weight: 700;
     }
     #personModal .modal-header .info-amount {
-        font-weight: 700;
+        font-weight: 800;
         text-shadow: none;
     }
     #personModal .modal-header .info-amount.text-income {
-        color: #b9f6ca;
-        text-shadow: 0 0 1px rgba(255,255,255,0.3);
+        color: #00e676;
+        font-weight: 800;
     }
     #personModal .modal-header .info-amount.text-expense {
-        color: #ffcdd2;
-        text-shadow: 0 0 1px rgba(255,255,255,0.2);
+        color: #ff5252;
+        font-weight: 800;
     }
     #personModal .tab-buttons .tab-btn {
         padding: 12px 8px 3px 8px; /* Sekme başlıkları ile yatay çizgi arası toplam 3px */
