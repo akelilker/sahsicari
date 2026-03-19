@@ -349,7 +349,7 @@ body.ios-pwa .debt-controls select {
     content: '';
     position: absolute;
     top: 48px;
-    bottom: 37px;
+    bottom: calc(var(--footer-h) + env(safe-area-inset-bottom));
     width: 1.6px;
     z-index: 2002;
     pointer-events: none;
@@ -1224,20 +1224,20 @@ body.modal-open-ios .global-status-bar {
 
 /* Modal açıkken footer hep görünsün; tema ışığı korunsun, taşma azaltılsın */
 body:has(.modal.show) .global-status-bar {
-    box-shadow: 0 -2px 4px rgba(0,0,0,0.2), 0 -8px 12px -8px var(--light-shadow);
+    box-shadow: 0 -2px 4px rgba(0,0,0,0.2), 0 -12px 18px -6px var(--light-shadow);
 }
 
 body:has(.modal.show) .global-status-bar::before {
-    border-top: 1px solid var(--light-shadow);
-    border-left: none;
-    border-right: none;
+    border-top: 2px solid var(--light-shadow);
+    border-left: 1px solid var(--light-shadow);
+    border-right: 1px solid var(--light-shadow);
 }
 
 /* Modal açıkken sadece sağ-sol lazer çizgilerini gizle */
 body:has(.modal.show) .container::before,
 body:has(.modal.show) .container::after {
-    display: none !important;
-    opacity: 0 !important;
+    display: block !important;
+    opacity: 0.95 !important;
 }
 
 .status-bar-inner {
@@ -4421,8 +4421,8 @@ label[for="editDateInput"] {
     }
     /* Footer sağ/soldan 1px daraltma + çerçeve */
     .global-status-bar {
-        left: 1px !important;
-        right: 1px !important;
+        left: 0 !important;
+        right: 0 !important;
     }
     .global-status-bar::before {
         content: '';
