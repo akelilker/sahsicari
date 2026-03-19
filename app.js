@@ -48,6 +48,13 @@ let notificationHistory = [];
 let transactionDateHolder = null;
 let currentPerson = null;
 let currentCategoryTransactions = [];
+let currentCategoryDetailState = {
+    person: null,
+    category: null,
+    allTransactions: [],
+    filteredTransactions: [],
+    openingBalance: 0
+};
 let exportInProgress = false;
 let editingTransactionId = null; 
 let isProcessing = false; 
@@ -94,7 +101,10 @@ const DOM = {
     reportPreviewSummary: null,
     startDate: null,
     endDate: null,
-    reportSearchInput: null
+    reportSearchInput: null,
+    categoryDetailStartDate: null,
+    categoryDetailEndDate: null,
+    categoryDetailExcelBtn: null
 };
 
 function initDOMCache() {
@@ -131,6 +141,9 @@ function initDOMCache() {
     DOM.startDate = document.getElementById('startDate');
     DOM.endDate = document.getElementById('endDate');
     DOM.reportSearchInput = document.getElementById('reportSearchInput');
+    DOM.categoryDetailStartDate = document.getElementById('categoryDetailStartDate');
+    DOM.categoryDetailEndDate = document.getElementById('categoryDetailEndDate');
+    DOM.categoryDetailExcelBtn = document.getElementById('categoryDetailExcelBtn');
 
     if (DOM.amount) {
         DOM.amount.addEventListener('input', function() {
@@ -410,6 +423,21 @@ function bindModalEvents() {
     if (saveEditedTransactionBtn) saveEditedTransactionBtn.addEventListener('click', saveEditedTransaction);
     const memoryOverlayNoBtn = document.getElementById('memoryOverlayNoBtn');
     if (memoryOverlayNoBtn) memoryOverlayNoBtn.addEventListener('click', closeMemoryOverlay);
+    if (DOM.categoryDetailStartDate) {
+        DOM.categoryDetailStartDate.addEventListener('change', function() {
+            syncCategoryDetailDateRange('start');
+            renderCategoryDetailContent();
+        });
+    }
+    if (DOM.categoryDetailEndDate) {
+        DOM.categoryDetailEndDate.addEventListener('change', function() {
+            syncCategoryDetailDateRange('end');
+            renderCategoryDetailContent();
+        });
+    }
+    if (DOM.categoryDetailExcelBtn) {
+        DOM.categoryDetailExcelBtn.addEventListener('click', exportCurrentCategoryDetailToExcel);
+    }
 
     const colorSelectionMenu = document.getElementById('colorSelectionMenu');
     if (colorSelectionMenu) {
@@ -1591,7 +1619,6 @@ function showCategoryDetails(categoryName) {
 
     const modal = DOM.categoryDetailModal;
     const titleEl = document.getElementById('categoryDetailTitle');
-    const contentEl = document.getElementById('categoryDetailContent');
     
     titleEl.textContent = `${person.toUpperCase()} - ${categoryName} Detayı`;
     
@@ -1599,7 +1626,36 @@ function showCategoryDetails(categoryName) {
     const catTxs = txs.filter(t => t.category === categoryName)
                       .sort((a, b) => new Date(a.date) - new Date(b.date));
 
-    currentCategoryTransactions = [...catTxs].reverse(); 
+    currentCategoryDetailState.person = person;
+    currentCategoryDetailState.category = categoryName;
+    currentCategoryDetailState.allTransactions = catTxs;
+    currentCategoryDetailState.filteredTransactions = [...catTxs];
+    currentCategoryDetailState.openingBalance = 0;
+
+    if (DOM.categoryDetailStartDate) {
+        DOM.categoryDetailStartDate.value = catTxs.length ? formatDateForInput(catTxs[0].date) : '';
+        DOM.categoryDetailStartDate.disabled = catTxs.length === 0;
+    }
+    if (DOM.categoryDetailEndDate) {
+        DOM.categoryDetailEndDate.value = catTxs.length ? formatDateForInput(catTxs[catTxs.length - 1].date) : '';
+        DOM.categoryDetailEndDate.disabled = catTxs.length === 0;
+    }
+
+    renderCategoryDetailContent();
+    
+    modal.dataset.category = categoryName;
+    modal.style.display = 'block';
+    
+    DOM.mainAppContainer?.classList.add('disable-events');
+    document.body.classList.add("disable-events"); 
+    return;
+    /*
+
+    currentCategoryDetailState.person = person;
+    currentCategoryDetailState.category = categoryName;
+    currentCategoryDetailState.allTransactions = catTxs;
+    currentCategoryDetailState.filteredTransactions = [...catTxs];
+    currentCategoryDetailState.openingBalance = 0;
 
     if (catTxs.length === 0) {
         contentEl.innerHTML = renderEmptyState('İşlem yok');
@@ -1647,6 +1703,125 @@ function showCategoryDetails(categoryName) {
             }, 100);
         };
     }
+    */
+}
+
+function formatDateForInput(dateValue) {
+    const date = new Date(dateValue);
+    return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
+}
+
+function syncCategoryDetailDateRange(changedField) {
+    const startValue = DOM.categoryDetailStartDate ? DOM.categoryDetailStartDate.value : '';
+    const endValue = DOM.categoryDetailEndDate ? DOM.categoryDetailEndDate.value : '';
+
+    if (!startValue || !endValue || startValue <= endValue) return;
+
+    if (changedField === 'start' && DOM.categoryDetailEndDate) {
+        DOM.categoryDetailEndDate.value = startValue;
+    } else if (changedField === 'end' && DOM.categoryDetailStartDate) {
+        DOM.categoryDetailStartDate.value = endValue;
+    }
+}
+
+function getFilteredCategoryDetailTransactions() {
+    const allTransactions = currentCategoryDetailState.allTransactions || [];
+    const startValue = DOM.categoryDetailStartDate ? DOM.categoryDetailStartDate.value : '';
+    const endValue = DOM.categoryDetailEndDate ? DOM.categoryDetailEndDate.value : '';
+
+    let filteredTransactions = allTransactions;
+    let openingBalance = 0;
+
+    if (startValue) {
+        const startDate = new Date(startValue + 'T00:00:00');
+        openingBalance = allTransactions.reduce((total, transaction) => {
+            const transactionDate = new Date(transaction.date);
+            if (transactionDate < startDate) {
+                return total + (transaction.type === 'giden' ? transaction.amount : -transaction.amount);
+            }
+            return total;
+        }, 0);
+        filteredTransactions = filteredTransactions.filter(transaction => new Date(transaction.date) >= startDate);
+    }
+
+    if (endValue) {
+        const endDate = new Date(endValue + 'T23:59:59.999');
+        filteredTransactions = filteredTransactions.filter(transaction => new Date(transaction.date) <= endDate);
+    }
+
+    return { filteredTransactions, openingBalance };
+}
+
+function updateCategoryDetailExcelButtonState() {
+    if (!DOM.categoryDetailExcelBtn) return;
+    DOM.categoryDetailExcelBtn.disabled = currentCategoryDetailState.filteredTransactions.length === 0;
+}
+
+function renderCategoryDetailContent() {
+    const contentEl = document.getElementById('categoryDetailContent');
+    if (!contentEl) return;
+
+    const allTransactions = currentCategoryDetailState.allTransactions || [];
+    if (allTransactions.length === 0) {
+        currentCategoryTransactions = [];
+        currentCategoryDetailState.filteredTransactions = [];
+        currentCategoryDetailState.openingBalance = 0;
+        updateCategoryDetailExcelButtonState();
+        contentEl.innerHTML = renderEmptyState('İşlem yok');
+        return;
+    }
+
+    const { filteredTransactions, openingBalance } = getFilteredCategoryDetailTransactions();
+    currentCategoryDetailState.filteredTransactions = filteredTransactions;
+    currentCategoryDetailState.openingBalance = openingBalance;
+    currentCategoryTransactions = [...filteredTransactions].reverse();
+    updateCategoryDetailExcelButtonState();
+
+    if (filteredTransactions.length === 0) {
+        contentEl.innerHTML = renderEmptyState('Bu tarih aralığında işlem yok');
+        return;
+    }
+
+    let runningBalance = openingBalance;
+    let rows = [];
+
+    filteredTransactions.forEach(transaction => {
+        runningBalance += transaction.type === 'giden' ? transaction.amount : -transaction.amount;
+        rows.push(`
+            <tr>
+                <td>${formatDateTR(new Date(transaction.date))}</td>
+                <td class="val-gelen">${transaction.type === 'gelen' ? formatNumber(transaction.amount) : ''}</td>
+                <td class="val-giden">${transaction.type === 'giden' ? formatNumber(transaction.amount) : ''}</td>
+                <td class="val-bakiye">${formatNumber(runningBalance)}</td>
+                <td>${sanitizeHTML(transaction.description || '')}</td>
+            </tr>
+        `);
+    });
+
+    contentEl.innerHTML = `
+        <table class="detail-table">
+            <thead>
+                <tr><th>Tarih</th><th>Gelen</th><th>Giden</th><th>Bakiye</th><th>Açıklama</th></tr>
+            </thead>
+            <tbody>${rows.reverse().join('')}</tbody>
+        </table>
+    `;
+}
+
+function exportCurrentCategoryDetailToExcel() {
+    const person = currentCategoryDetailState.person;
+    const categoryName = currentCategoryDetailState.category;
+    const transactions = currentCategoryDetailState.filteredTransactions || [];
+
+    if (!person || !categoryName || transactions.length === 0) {
+        showNotification('⚠️ Excel için işlem bulunamadı', 'warning');
+        return;
+    }
+
+    showNotification('⚠️ Rapor hazırlanıyor...', 'warning');
+    setTimeout(() => {
+        exportStyledCategoryDetailToExcel(person, categoryName, transactions, currentCategoryDetailState.openingBalance);
+    }, 100);
 }
 
 function initiateAllocation() {
@@ -3212,10 +3387,11 @@ async function exportMonthlySummary() {
     }
 }
 
-async function exportStyledCategoryDetailToExcel(person, categoryName, transactions) {
+async function exportStyledCategoryDetailToExcel(person, categoryName, transactions, openingBalance) {
     if (!transactions || transactions.length === 0) return showNotification('⚠️ Veri yok', 'warning');
 
     const sortedTxs = [...transactions].sort((a, b) => new Date(a.date) - new Date(b.date));
+    const initialBalance = Number(openingBalance) || 0;
     
     const startDate = formatDateTR(new Date(sortedTxs[0].date));
     const endDate = formatDateTR(new Date(sortedTxs[sortedTxs.length - 1].date));
@@ -3283,7 +3459,7 @@ async function exportStyledCategoryDetailToExcel(person, categoryName, transacti
         50 
     ];
 
-    let runningBalance = 0;
+    let runningBalance = initialBalance;
     
     sortedTxs.forEach(tx => {
         let amountNum = Number(tx.amount);
