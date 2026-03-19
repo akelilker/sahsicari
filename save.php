@@ -19,11 +19,32 @@ require_once __DIR__ . '/request_guard.php';
 enforce_same_origin();
 
 /** Toplam işlem sayısını hesaplar (kişi başına transactions dizisi). */
+function countPersistedPeople(array $data): int {
+    $n = 0;
+    foreach ($data as $key => $person) {
+        if ($key === 'metadata' || !is_array($person)) {
+            continue;
+        }
+        $n++;
+    }
+    return $n;
+}
+
 function countTotalTransactions(array $data): int {
     $n = 0;
-    foreach ($data as $person) {
-        if (is_array($person) && isset($person['transactions']) && is_array($person['transactions'])) {
-            $n += count($person['transactions']);
+    foreach ($data as $key => $person) {
+        if ($key === 'metadata' || !is_array($person)) {
+            continue;
+        }
+        foreach ($person as $yearKey => $yearData) {
+            if (!ctype_digit((string) $yearKey) || !is_array($yearData)) {
+                continue;
+            }
+            foreach ($yearData as $monthData) {
+                if (is_array($monthData) && isset($monthData['transactions']) && is_array($monthData['transactions'])) {
+                    $n += count($monthData['transactions']);
+                }
+            }
         }
     }
     return $n;
@@ -49,8 +70,8 @@ if (!$force && file_exists($mainFile)) {
     $oldData = json_decode($oldDataContent, true);
 
     if (is_array($oldData) && count($oldData) > 0) {
-        $oldPeopleCount = count($oldData);
-        $newPeopleCount = count($newData);
+        $oldPeopleCount = countPersistedPeople($oldData);
+        $newPeopleCount = countPersistedPeople($newData);
         $oldTxCount = countTotalTransactions($oldData);
         $newTxCount = countTotalTransactions($newData);
 
@@ -85,7 +106,15 @@ if (!is_dir($backupDir) && !mkdir($backupDir, 0755, true)) {
     exit;
 }
 if (file_exists($mainFile)) {
-    $backupFile = $backupDir . '/veriler_' . date('Y-m-d_H-i-s') . '.json';
+    $microNow = microtime(true);
+    $timestamp = date('Y-m-d_H-i-s', (int) $microNow);
+    $microPart = sprintf('%06d', (int) (($microNow - floor($microNow)) * 1000000));
+    try {
+        $randomPart = bin2hex(random_bytes(2));
+    } catch (Throwable $e) {
+        $randomPart = str_pad((string) mt_rand(0, 65535), 4, '0', STR_PAD_LEFT);
+    }
+    $backupFile = $backupDir . '/veriler_' . $timestamp . '_' . $microPart . '_' . $randomPart . '.json';
     if (!copy($mainFile, $backupFile)) {
         error_log('save.php backup copy failed: ' . $backupFile);
         http_response_code(500);
