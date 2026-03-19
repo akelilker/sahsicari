@@ -2259,9 +2259,9 @@ select option {
 }
 
 .category-item {
-    background: rgba(60, 55, 75, 0.16);
-    border: 0.7px solid var(--tab-purple);
-    box-shadow: none;
+    background: rgba(60, 55, 75, 0.18);
+    border: 1px solid rgba(149, 117, 205, 0.72);
+    box-shadow: inset 0 0 0 1px rgba(149, 117, 205, 0.12), 0 0 10px rgba(149, 117, 205, 0.14);
     padding: 6px 4px;
     border-radius: 12px;
     display: flex;
@@ -3527,6 +3527,61 @@ select option {
     margin-top: 8px;
     padding: 4px 0;
     font-size: 14px;
+}
+
+.report-preview-item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) max-content;
+    align-items: start;
+    gap: 10px;
+    padding: 6px 4px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.report-preview-main {
+    min-width: 0;
+}
+
+.report-preview-topline {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.report-preview-date {
+    flex: 0 0 70px;
+    min-width: 70px;
+    font-size: 0.8em;
+    color: #90a4ae;
+}
+
+.report-preview-category {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: 0.85em;
+    color: #e0e0e0;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.report-preview-desc {
+    margin-top: 2px;
+    font-size: 0.75em;
+    color: #90a4ae;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+
+.report-preview-amount {
+    min-width: max-content;
+    font-size: 0.9em;
+    font-weight: 700;
+    text-align: right;
+    justify-self: end;
+    white-space: nowrap;
 }
 
 /* İşlem Düzenle - Tarih Label Gizle (Her yerde) */

@@ -2864,20 +2864,22 @@ function renderReportPreview() {
 
     let html = '';
     displayTxs.forEach(t => {
-const dateShort = formatDateTR(new Date(t.date));
-const amountClass = t.type === 'giden' ? 'text-expense' : 'text-income';
-const descHtml = t.description ? `<div style="font-size:0.75em; color:#90a4ae; margin-top:2px;">${sanitizeHTML(t.description)}</div>` : '';
+        const dateShort = formatDateTR(new Date(t.date));
+        const amountClass = t.type === 'giden' ? 'text-expense' : 'text-income';
+        const descHtml = t.description
+            ? `<div class="report-preview-desc">${sanitizeHTML(t.description)}</div>`
+            : '';
 
         html += `
-        <div style="border-bottom:1px solid rgba(255,255,255,0.05); padding:6px 4px;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <span style="font-size:0.8em; color:#90a4ae; min-width:70px;">${dateShort}</span>
-                    <span style="font-size:0.85em; color:#e0e0e0; font-weight:600;">${sanitizeHTML(t.category)}</span>
+        <div class="report-preview-item">
+            <div class="report-preview-main">
+                <div class="report-preview-topline">
+                    <span class="report-preview-date">${dateShort}</span>
+                    <span class="report-preview-category">${sanitizeHTML(t.category)}</span>
                 </div>
-                <span class="${amountClass}" style="font-size:0.9em; font-weight:700;">${formatAmount(t.amount)}</span>
+                ${descHtml}
             </div>
-            ${descHtml}
+            <span class="report-preview-amount ${amountClass}">${formatAmount(t.amount)}</span>
         </div>`;
     });
     if (sortedTxs.length > MAX_REPORT_ITEMS) {
