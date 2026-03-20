@@ -1504,6 +1504,7 @@ overflow: hidden;
 
 .category-detail-date-group {
     min-width: 0;
+    text-align: center;
 }
 
 .category-detail-date-group label {
@@ -1513,25 +1514,41 @@ overflow: hidden;
     font-size: 0.72em;
     font-weight: 600;
     text-shadow: none;
+    text-align: center;
 }
 
 .category-detail-date-input {
     width: 100%;
     min-width: 0;
     height: 30px;
-    padding: 4px 24px 4px 0;
-    border: none;
-    border-radius: 0;
-    background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2342A5F5'%3E%3Cpath d='M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z'/%3E%3C/svg%3E") no-repeat right 4px center / 14px 14px;
+    padding: 4px 28px;
+    border: 1px solid rgba(149, 117, 205, 0.72);
+    border-radius: 10px;
+    background: rgba(60, 55, 75, 0.18) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2342A5F5'%3E%3Cpath d='M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z'/%3E%3C/svg%3E") no-repeat right 8px center / 14px 14px;
     color: #cfd8dc;
     font-family: 'Segoe UI', sans-serif;
     font-size: 12px;
     font-weight: 620;
     outline: none;
-    text-align: left;
+    text-align: center;
+    text-align-last: center;
     text-shadow: 0 1px 1px rgba(0,0,0,0.55);
+    box-shadow: inset 0 0 0 1px rgba(149, 117, 205, 0.12);
     -webkit-appearance: none;
     appearance: none;
+}
+
+.category-detail-date-input::-webkit-date-and-time-value {
+    text-align: center;
+}
+
+.category-detail-date-input::-webkit-datetime-edit {
+    padding: 0;
+}
+
+.category-detail-date-input::-webkit-datetime-edit-fields-wrapper {
+    display: flex;
+    justify-content: center;
 }
 
 .category-detail-date-input::-webkit-calendar-picker-indicator {
@@ -1555,10 +1572,11 @@ overflow: hidden;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid rgba(0, 230, 118, 0.25);
-    border-radius: 8px;
-    background: rgba(14, 21, 37, 0.6);
-    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
@@ -1570,8 +1588,8 @@ overflow: hidden;
 }
 
 .excel-mini-icon {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     display: block;
     background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%2300e676' d='M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z'/%3E%3Cpath fill='%2300c853' d='M14 2v5h5z'/%3E%3Cpath fill='%230b1a2d' d='M9.8 9.2h1.7l1 1.9 1-1.9h1.7l-1.7 2.9 1.8 3H13l-1.1-2-1.1 2H9l1.8-3z'/%3E%3C/svg%3E") no-repeat center / contain;
 }
@@ -4020,10 +4038,10 @@ label[for="editDateInput"] {
 
     .category-detail-date-input {
         height: 28px;
-        padding-right: 20px;
+        padding: 4px 24px;
         font-size: 11px;
         background-size: 12px 12px;
-        background-position: right 3px center;
+        background-position: right 6px center;
     }
 
     .category-detail-excel-btn {
@@ -4032,8 +4050,8 @@ label[for="editDateInput"] {
     }
 
     .excel-mini-icon {
-        width: 16px;
-        height: 16px;
+        width: 18px;
+        height: 18px;
     }
 
     .quick-panel-content {
