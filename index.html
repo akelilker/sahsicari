@@ -516,15 +516,20 @@
             <div class="category-detail-toolbar">
                 <div class="category-detail-date-group">
                     <label for="categoryDetailStartDate">Başlangıç</label>
-                    <input id="categoryDetailStartDate" class="category-detail-date-input" type="date">
+                    <div class="category-detail-date-field">
+                        <span id="categoryDetailStartDisplay" class="category-detail-date-display" aria-hidden="true"></span>
+                        <input id="categoryDetailStartDate" class="category-detail-date-input" type="date">
+                    </div>
                 </div>
                 <div class="category-detail-date-group">
                     <label for="categoryDetailEndDate">Bitiş</label>
-                    <input id="categoryDetailEndDate" class="category-detail-date-input" type="date">
+                    <div class="category-detail-date-field">
+                        <span id="categoryDetailEndDisplay" class="category-detail-date-display" aria-hidden="true"></span>
+                        <input id="categoryDetailEndDate" class="category-detail-date-input" type="date">
+                    </div>
                 </div>
                 <button id="categoryDetailExcelBtn" class="category-detail-excel-btn" title="Excel Raporu Al" type="button" aria-label="Excel Raporu Al">
                     <span class="excel-mini-icon" aria-hidden="true"></span>
-                    <span class="excel-mini-text">Excel</span>
                 </button>
             </div>
             <div id="categoryDetailContent"></div>

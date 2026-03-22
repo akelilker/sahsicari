@@ -1491,7 +1491,7 @@ overflow: hidden;
 }
 
 #categoryDetailModal {
-    padding-bottom: calc(40px + env(safe-area-inset-bottom) + 10px);
+    padding-bottom: calc(var(--footer-h) + env(safe-area-inset-bottom) + 22px);
 }
 
 .category-detail-toolbar {
@@ -1511,6 +1511,26 @@ overflow: hidden;
     text-align: left;
 }
 
+.category-detail-date-field {
+    position: relative;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.category-detail-date-display {
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #cfd8dc;
+    font-size: 12px;
+    font-weight: 620;
+    pointer-events: none;
+    user-select: none;
+    z-index: 2;
+    white-space: nowrap;
+}
+
 .category-detail-date-group label {
     margin-bottom: 0;
     color: #78909c;
@@ -1526,34 +1546,49 @@ overflow: hidden;
     flex: 1 1 auto;
     min-width: 0;
     height: 30px;
-    padding: 4px 28px;
+    padding: 4px 28px 4px 8px;
     border: 1px solid rgba(149, 117, 205, 0.72);
     border-radius: 10px;
     background: rgba(60, 55, 75, 0.18) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2342A5F5'%3E%3Cpath d='M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z'/%3E%3C/svg%3E") no-repeat right 8px center / 14px 14px;
-    color: #cfd8dc;
+    color: transparent;
+    caret-color: transparent;
+    -webkit-text-fill-color: transparent;
     font-family: 'Segoe UI', sans-serif;
     font-size: 12px;
     font-weight: 620;
     outline: none;
-    text-align: center;
-    text-align-last: center;
+    text-align: left;
+    text-align-last: left;
     text-shadow: 0 1px 1px rgba(0,0,0,0.55);
     box-shadow: inset 0 0 0 1px rgba(149, 117, 205, 0.12);
     -webkit-appearance: none;
     appearance: none;
+    position: relative;
 }
 
 .category-detail-date-input::-webkit-date-and-time-value {
-    text-align: center;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    text-align: left;
 }
 
 .category-detail-date-input::-webkit-datetime-edit {
     padding: 0;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
 }
 
 .category-detail-date-input::-webkit-datetime-edit-fields-wrapper {
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
+}
+
+.category-detail-date-input::-webkit-datetime-edit-text,
+.category-detail-date-input::-webkit-datetime-edit-month-field,
+.category-detail-date-input::-webkit-datetime-edit-day-field,
+.category-detail-date-input::-webkit-datetime-edit-year-field {
+    color: transparent;
+    -webkit-text-fill-color: transparent;
 }
 
 .category-detail-date-input::-webkit-calendar-picker-indicator {
@@ -1571,18 +1606,19 @@ overflow: hidden;
 }
 
 .category-detail-excel-btn {
-    min-width: 74px;
+    width: 28px;
+    min-width: 28px;
     height: 30px;
     align-self: center;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    border: 1px solid rgba(0, 230, 118, 0.7);
-    border-radius: 10px;
-    background: rgba(0, 230, 118, 0.12);
-    box-shadow: inset 0 0 0 1px rgba(0, 230, 118, 0.1);
-    padding: 0 10px;
+    gap: 0;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
@@ -1594,17 +1630,10 @@ overflow: hidden;
 }
 
 .excel-mini-icon {
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
     display: block;
     background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%2300e676' d='M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z'/%3E%3Cpath fill='%2300c853' d='M14 2v5h5z'/%3E%3Cpath fill='%230b1a2d' d='M9.8 9.2h1.7l1 1.9 1-1.9h1.7l-1.7 2.9 1.8 3H13l-1.1-2-1.1 2H9l1.8-3z'/%3E%3C/svg%3E") no-repeat center / contain;
-}
-
-.excel-mini-text {
-    color: #00e676;
-    font-size: 0.78em;
-    font-weight: 700;
-    letter-spacing: 0.02em;
 }
 
 .category-detail-footer {
@@ -4017,9 +4046,19 @@ label[for="editDateInput"] {
         -webkit-overflow-scrolling: touch;
     }
 
+    #categoryDetailModal {
+        padding-bottom: calc(var(--footer-h) + env(safe-area-inset-bottom) + 24px);
+    }
+
+    #categoryDetailModal .modal-content {
+        margin-bottom: 10px;
+        max-height: calc(100dvh - var(--sa-top) - var(--footer-h) - env(safe-area-inset-bottom) - 24px);
+    }
+
     #categoryDetailModal .modal-body {
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
+        padding-bottom: calc(var(--footer-h) + env(safe-area-inset-bottom) + 24px);
     }
 
     .detail-table tbody td:last-child {
@@ -4063,19 +4102,20 @@ label[for="editDateInput"] {
         background-position: right 6px center;
     }
 
+    .category-detail-date-display {
+        left: 8px;
+        font-size: 11px;
+    }
+
     .category-detail-excel-btn {
-        min-width: 68px;
+        width: 26px;
+        min-width: 26px;
         height: 28px;
-        gap: 6px;
     }
 
     .excel-mini-icon {
-        width: 14px;
-        height: 14px;
-    }
-
-    .excel-mini-text {
-        font-size: 0.72em;
+        width: 16px;
+        height: 16px;
     }
 
     .quick-panel-content {

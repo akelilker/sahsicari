@@ -104,6 +104,8 @@ const DOM = {
     reportSearchInput: null,
     categoryDetailStartDate: null,
     categoryDetailEndDate: null,
+    categoryDetailStartDisplay: null,
+    categoryDetailEndDisplay: null,
     categoryDetailExcelBtn: null
 };
 
@@ -143,6 +145,8 @@ function initDOMCache() {
     DOM.reportSearchInput = document.getElementById('reportSearchInput');
     DOM.categoryDetailStartDate = document.getElementById('categoryDetailStartDate');
     DOM.categoryDetailEndDate = document.getElementById('categoryDetailEndDate');
+    DOM.categoryDetailStartDisplay = document.getElementById('categoryDetailStartDisplay');
+    DOM.categoryDetailEndDisplay = document.getElementById('categoryDetailEndDisplay');
     DOM.categoryDetailExcelBtn = document.getElementById('categoryDetailExcelBtn');
 
     if (DOM.amount) {
@@ -426,12 +430,14 @@ function bindModalEvents() {
     if (DOM.categoryDetailStartDate) {
         DOM.categoryDetailStartDate.addEventListener('change', function() {
             syncCategoryDetailDateRange('start');
+            syncCategoryDetailDateDisplays();
             renderCategoryDetailContent();
         });
     }
     if (DOM.categoryDetailEndDate) {
         DOM.categoryDetailEndDate.addEventListener('change', function() {
             syncCategoryDetailDateRange('end');
+            syncCategoryDetailDateDisplays();
             renderCategoryDetailContent();
         });
     }
@@ -1640,6 +1646,7 @@ function showCategoryDetails(categoryName) {
         DOM.categoryDetailEndDate.value = catTxs.length ? formatDateForInput(catTxs[catTxs.length - 1].date) : '';
         DOM.categoryDetailEndDate.disabled = catTxs.length === 0;
     }
+    syncCategoryDetailDateDisplays();
 
     renderCategoryDetailContent();
     
@@ -1709,6 +1716,24 @@ function showCategoryDetails(categoryName) {
 function formatDateForInput(dateValue) {
     const date = new Date(dateValue);
     return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
+}
+
+function formatDateDDMMYYYY(dateValue) {
+    if (!dateValue) return '';
+    const date = new Date(dateValue);
+    if (isNaN(date.getTime())) return '';
+    return String(date.getDate()).padStart(2, '0') + '.' + String(date.getMonth() + 1).padStart(2, '0') + '.' + date.getFullYear();
+}
+
+function syncCategoryDetailDateDisplays() {
+    if (DOM.categoryDetailStartDisplay) {
+        const startValue = DOM.categoryDetailStartDate ? DOM.categoryDetailStartDate.value : '';
+        DOM.categoryDetailStartDisplay.textContent = startValue ? formatDateDDMMYYYY(startValue) : '__.__.____';
+    }
+    if (DOM.categoryDetailEndDisplay) {
+        const endValue = DOM.categoryDetailEndDate ? DOM.categoryDetailEndDate.value : '';
+        DOM.categoryDetailEndDisplay.textContent = endValue ? formatDateDDMMYYYY(endValue) : '__.__.____';
+    }
 }
 
 function syncCategoryDetailDateRange(changedField) {
