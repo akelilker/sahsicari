@@ -5073,8 +5073,13 @@ label[for="editDateInput"] {
     /* Mobil menü boyutları */
     #settingsMenu {
         z-index: 2010;
-        width: 50%;
+    }
+
+    /* iOS PWA: ayarlar açılır menüsü ekran genişliğinin %50’si */
+    body.ios-pwa #settingsMenu {
+        width: 50vw;
         max-width: 50vw;
+        box-sizing: border-box;
     }
 
     #notificationMenu {
