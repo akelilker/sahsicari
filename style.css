@@ -229,7 +229,13 @@ body.ios-pwa .history-item .description {
 
 /* iOS PWA UI ayarları (plan 1–5, 7–8) */
 body.ios-pwa .header h1 {
-    padding: 4px 2px 15px 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 6px 4px;
+    overflow: visible;
+    box-sizing: border-box;
 }
 body.ios-pwa .header h1 .title-text {
     font-size: calc(0.8em + 0.7pt);
@@ -3697,6 +3703,20 @@ label[for="editDateInput"] {
         margin-right: auto;
         padding-left: 0;
         padding-right: 0;
+    }
+
+    /* iOS PWA: başlık metni çerçevede yatay/dikey ortalı; alt çizgi (absolute) merkezi etkilemez */
+    body.ios-pwa .header h1 {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 0 8px;
+        min-height: 75px;
+        margin-top: 8px;
+        margin-bottom: 0;
+        overflow: visible;
+        box-sizing: border-box;
     }
 
     .container::before,
