@@ -1548,7 +1548,7 @@ overflow: hidden;
 }
 
 .category-detail-date-input {
-    width: auto;
+    width: 100%;
     flex: 1 1 auto;
     min-width: 0;
     height: 30px;
@@ -4115,6 +4115,8 @@ label[for="editDateInput"] {
     }
 
     .category-detail-date-input {
+        width: 100%;
+        min-width: 0;
         height: 28px;
         padding: 4px 22px 4px 8px;
         font-size: 11px;
