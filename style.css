@@ -2764,14 +2764,14 @@ select option {
     }
     #categoryDetailContent .detail-table thead th,
     #categoryDetailContent .detail-table tbody td {
-        padding-left: 3px;
-        padding-right: 3px;
+        padding-left: 2px;
+        padding-right: 2px;
     }
     #categoryDetailContent .detail-table th:nth-child(1),
     #categoryDetailContent .detail-table td:nth-child(1) {
-        width: 72px;
-        min-width: 72px;
-        padding-right: 4px;
+        width: 68px;
+        min-width: 68px;
+        padding-right: 3px;
     }
     #categoryDetailContent .detail-table th:nth-child(2),
     #categoryDetailContent .detail-table td:nth-child(2),
@@ -2779,8 +2779,9 @@ select option {
     #categoryDetailContent .detail-table td:nth-child(3),
     #categoryDetailContent .detail-table th:nth-child(4),
     #categoryDetailContent .detail-table td:nth-child(4) {
-        width: 82px;
-        min-width: 82px;
+        width: 80px;
+        min-width: 80px;
+        font-size: 10.5px;
         font-variant-numeric: tabular-nums;
     }
     #categoryDetailContent .detail-table th:nth-child(5),
@@ -2788,17 +2789,19 @@ select option {
         width: auto;
         min-width: 188px;
         max-width: none;
-        padding-left: 8px;
+        padding-left: 6px;
     }
     #categoryDetailContent .detail-table tbody td:last-child {
-        display: block;
+        display: table-cell;
         -webkit-line-clamp: unset;
         line-clamp: unset;
         -webkit-box-orient: unset;
-        overflow: visible;
+        overflow: hidden;
         text-overflow: clip;
         white-space: normal;
-        padding-left: 8px;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+        padding-left: 6px;
     }
 }
 
@@ -4644,11 +4647,11 @@ label[for="editDateInput"] {
     }
     #categoryDetailContent .detail-table th:nth-child(1),
     #categoryDetailContent .detail-table td:nth-child(1) {
-        padding-right: 4px;
+        padding-right: 3px;
     }
     #categoryDetailContent .detail-table th:nth-child(2),
     #categoryDetailContent .detail-table td:nth-child(2) {
-        padding-left: 3px;
+        padding-left: 2px;
     }
     /* Veriler kutusu: aynı yeşil ton, sadece parlak */
     .control-panel {
