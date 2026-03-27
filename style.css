@@ -1500,11 +1500,34 @@ overflow: hidden;
     padding-bottom: calc(var(--footer-h) + env(safe-area-inset-bottom) + 22px);
 }
 
-.category-detail-toolbar {
+#categoryDetailModal .modal-header .header-top-row {
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr) 30px;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 0;
+}
+
+#categoryDetailModal .modal-header h2 {
+    margin: 0;
+    text-align: center;
+}
+
+#categoryDetailModal .modal-header .back-modal-btn {
+    justify-self: start;
+    font-size: 1.3em;
+}
+
+#categoryDetailModal .modal-header .close-modal-btn {
+    justify-self: end;
+}
+
+#categoryDetailModal .category-detail-toolbar {
     display: flex;
     flex-wrap: nowrap;
     gap: 8px;
     align-items: center;
+    margin-top: 24px;
     margin-bottom: 10px;
 }
 
@@ -4103,7 +4126,7 @@ label[for="editDateInput"] {
         font-size: 10px;
     }
 
-    .category-detail-toolbar {
+    #categoryDetailModal .category-detail-toolbar {
         gap: 5px;
     }
 
