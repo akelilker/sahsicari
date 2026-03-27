@@ -3061,6 +3061,10 @@ select option {
     backdrop-filter: none;
 }
 
+#allocationOverlay {
+    z-index: 4300;
+}
+
 .quick-overlay-backdrop {
     position: absolute;
     top: 0;
