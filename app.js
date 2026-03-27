@@ -1885,8 +1885,14 @@ function initiateAllocation() {
 
     let itemsHtml = '<div class="allocation-items-container">';
 
-    debts.forEach(cat => {
+    debts.forEach((cat, index) => {
         const debtAmount = allData[person].categoryBalances[cat];
+        const safeCategoryAttr = String(cat)
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+        const allocationInputId = `allocation-input-${index}`;
         let pay = 0;
         if(remainingMoney > 0) {
             pay = Math.min(remainingMoney, debtAmount);
@@ -1901,7 +1907,8 @@ function initiateAllocation() {
             </div>
             
             <div class="allocation-item-controls">
-                <input type="text" class="allocation-input" value="" 
+                <input type="text" id="${allocationInputId}" name="allocationAmount-${index}" class="allocation-input" value="" 
+                       aria-label="${safeCategoryAttr} dağıtım tutarı"
                        oninput="formatCurrency(this); updateAllocationTotals();" 
                        placeholder="0,00">
                 
