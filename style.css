@@ -4150,28 +4150,28 @@ label[for="editDateInput"] {
     }
 
     #categoryDetailModal .category-detail-toolbar {
-        gap: 5px;
+        gap: 3px;
     }
 
     .category-detail-date-group {
-        gap: 4px;
+        gap: 2px;
     }
 
     .category-detail-date-group label {
         white-space: nowrap;
         margin-bottom: 0;
         text-align: left;
-        font-size: 0.66em;
+        font-size: 0.64em;
     }
 
     .category-detail-date-input {
         width: 100%;
         min-width: 0;
         height: 28px;
-        padding: 4px 22px 4px 8px;
+        padding: 4px 24px 4px 8px;
         font-size: 11px;
-        background-size: 12px 12px;
-        background-position: right 6px center;
+        background-size: 13px 13px;
+        background-position: right 7px center;
     }
 
     .category-detail-date-display {
@@ -4180,14 +4180,14 @@ label[for="editDateInput"] {
     }
 
     .category-detail-excel-btn {
-        width: 26px;
-        min-width: 26px;
+        width: 27px;
+        min-width: 27px;
         height: 28px;
     }
 
     .excel-mini-icon {
-        width: 16px;
-        height: 16px;
+        width: 19px;
+        height: 19px;
     }
 
     .quick-panel-content {
