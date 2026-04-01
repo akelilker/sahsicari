@@ -1186,14 +1186,10 @@ function maybeTriggerMainAutoAllocation() {
     if (!person || type !== 'gelen' || amount <= 0.01) return;
 
     const debts = getDebtorCategoriesForPerson(person);
-    if (debts.length === 1) {
-        applySingleDebtDefaultCategory(DOM.category, person);
-        return;
-    }
+    if (debts.length === 0) return;
 
-    if (debts.length > 1) {
-        initiateAllocation();
-    }
+    applySingleDebtDefaultCategory(DOM.category, person);
+    initiateAllocation();
 }
 
 function populatePersonSelect(selectElement, sortedPeople = null) {
@@ -1863,7 +1859,8 @@ function initiateAllocation() {
     DOM.mainAppContainer?.classList.add('disable-events');
     document.body.classList.add("disable-events");
 
-    let remainingMoney = amount;
+    const isSingleDebtFlow = debts.length === 1;
+    const singleDebtCategory = isSingleDebtFlow ? debts[0] : '';
     
     let headerHtml = `
         <div class="allocation-header">
@@ -1893,11 +1890,12 @@ function initiateAllocation() {
             .replace(/</g, '&lt;')
             .replace(/>/g, '&gt;');
         const allocationInputId = `allocation-input-${index}`;
-        let pay = 0;
-        if(remainingMoney > 0) {
-            pay = Math.min(remainingMoney, debtAmount);
-            remainingMoney -= pay;
-        }
+        const defaultAllocationAmount = (isSingleDebtFlow && cat === singleDebtCategory)
+            ? Math.min(amount, debtAmount)
+            : 0;
+        const defaultAllocationValue = defaultAllocationAmount > 0.01
+            ? formatNumber(defaultAllocationAmount)
+            : '';
         
         itemsHtml += `
         <div class="allocation-item" data-category="${cat}" data-max-debt="${debtAmount}">
@@ -1907,7 +1905,7 @@ function initiateAllocation() {
             </div>
             
             <div class="allocation-item-controls">
-                <input type="text" id="${allocationInputId}" name="allocationAmount-${index}" class="allocation-input" value="" 
+                <input type="text" id="${allocationInputId}" name="allocationAmount-${index}" class="allocation-input" value="${defaultAllocationValue}" 
                        aria-label="${safeCategoryAttr} dağıtım tutarı"
                        oninput="formatCurrency(this); updateAllocationTotals();" 
                        placeholder="0,00">
@@ -2139,10 +2137,8 @@ async function processSingleTransaction() {
 
     if (transType === 'gelen') {
         const debts = getDebtorCategoriesForPerson(currentPerson);
-        if (debts.length === 1) {
+        if (debts.length > 0) {
             applySingleDebtDefaultCategory(DOM.category, currentPerson);
-            category = DOM.category?.value || category;
-        } else if (debts.length > 1) {
             initiateAllocation();
             return;
         }
@@ -4251,13 +4247,11 @@ function checkQuickAllocation() {
     if (!allData[person]) return;
 
     const debts = getDebtorCategoriesForPerson(person);
-    if (debts.length === 1) {
-        applySingleDebtDefaultCategory(document.getElementById('quickCategory'), person);
-        return;
-    }
-
-    if (debts.length > 1) {
+    if (debts.length > 0) {
+        const quickCategorySelect = document.getElementById('quickCategory');
+        applySingleDebtDefaultCategory(quickCategorySelect, person);
         const desc = document.getElementById('quickDescription')?.value?.trim() || '';
+        quickAllocationCategory = quickCategorySelect?.value || '';
 
         closeQuickTransactionOverlay();
 
@@ -4336,13 +4330,10 @@ async function processQuickTransaction() {
 
     if (type === 'gelen' && allData[person]) {
         const debts = getDebtorCategoriesForPerson(person);
-
-        if (debts.length === 1) {
-            applySingleDebtDefaultCategory(document.getElementById('quickCategory'), person);
-            category = document.getElementById('quickCategory').value || category;
-        }
-
-        if (debts.length > 1) {
+        if (debts.length > 0) {
+            const quickCategorySelect = document.getElementById('quickCategory');
+            applySingleDebtDefaultCategory(quickCategorySelect, person);
+            category = quickCategorySelect?.value || category;
             closeQuickTransactionOverlay();
             
             currentPerson = person;
