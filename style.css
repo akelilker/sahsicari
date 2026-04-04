@@ -2368,6 +2368,26 @@ select option {
     outline: none;
 }
 
+/* Kırmızı nokta akışta değil: isim kutunun tam genişliğine göre ortalanır */
+.category-item-name-row {
+    position: relative;
+    width: 100%;
+    min-width: 0;
+}
+
+.category-item-name-row::before {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--expense-red);
+    pointer-events: none;
+}
+
 .category-item .category-name {
     font-size: 0.75rem;
     font-weight: 700;
@@ -2380,14 +2400,6 @@ select option {
     text-overflow: ellipsis;
     padding: 0 2px;
     text-shadow: 0 1px 1px rgba(0,0,0,0.55);
-}
-
-.category-item .category-name::before {
-    content: '• ';
-    color: var(--expense-red);
-    margin-right: 2px;
-    font-size: 1.2em;
-    vertical-align: middle;
 }
 
 .category-item .category-balance {

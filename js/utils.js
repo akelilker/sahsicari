@@ -121,7 +121,7 @@
         var balanceClass = b > 0 ? 'positive-balance' : 'negative-balance';
         var safeForOnclick = String(categoryName).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
         return '<div class="category-item ' + balanceClass + '" onclick="showCategoryDetails(\'' + safeForOnclick + '\')">' +
-            '<span class="category-name">' + sanitizeHTML(categoryName) + '</span>' +
+            '<div class="category-item-name-row"><span class="category-name">' + sanitizeHTML(categoryName) + '</span></div>' +
             '<span class="category-balance" style="color:' + color + '">' + formatAmount(Math.abs(b)) + '</span>' +
             '<span>' + sanitizeHTML(status) + '</span></div>';
     }
