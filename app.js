@@ -381,8 +381,9 @@ function bindModalEvents() {
         categorySelect.addEventListener('change', function() {
             if (this.value === '__add_new_category__') {
                 this.value = '';
-                const tabBtn = document.querySelector('#personModal .tab-btn[data-tab="kategoriDurumu"]');
-                if (tabBtn) openTab(null, 'kategoriDurumu', tabBtn);
+                showCategoryManagementModal(
+                    currentPerson && allData[currentPerson] ? { person: currentPerson } : undefined
+                );
             }
         });
     }
@@ -1501,7 +1502,18 @@ function closeCurrentModal(el) {
             }
             return;
         }
-        
+        if (modalId === 'categoryManagementModal' && currentPerson) {
+            const personModal = document.getElementById('personModal');
+            if (personModal) {
+                personModal.style.display = 'block';
+                personModal.classList.add('show');
+                DOM.mainAppContainer?.classList.add('disable-events');
+                document.body.classList.add("disable-events");
+            }
+            if (DOM.category) populateCategorySelect(DOM.category, currentPerson);
+            return;
+        }
+
         if (!checkAnyMenuOpen()) {
             DOM.mainAppContainer?.classList.remove('disable-events');
             document.body.classList.remove("disable-events"); 
@@ -2653,11 +2665,17 @@ function deletePersonByName(personName) {
     }
 } 
 
-function showCategoryManagementModal() {
-    document.getElementById('settingsMenu').style.display = 'none'; 
+function showCategoryManagementModal(opts) {
+    const settingsMenu = document.getElementById('settingsMenu');
+    if (settingsMenu) settingsMenu.style.display = 'none';
     openModal('categoryManagementModal');
     const sel = document.getElementById('categoryManagementPersonSelect');
     populatePersonSelect(sel);
+    const prefer = opts && opts.person;
+    if (prefer && allData[prefer] && sel) {
+        sel.value = prefer;
+        populateCategoryEditor(prefer);
+    }
 }
 
 function populateCategoryEditor(person) {
