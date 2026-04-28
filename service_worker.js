@@ -1,6 +1,6 @@
-// Service Worker with Smart Caching - v78.35
+// Service Worker with Smart Caching - v78.36
 const DEBUG = false; // Set to true for development
-const SW_VERSION = '78.35';
+const SW_VERSION = '78.36';
 const CACHE_NAME = `sahsi-hesap-v${SW_VERSION}`;
 const API_BYPASS_PATHS = new Set(['/load.php', '/get_data.php', '/save.php', '/write_data.php', '/api_save.php', '/kd_load.php', '/kd_save.php']);
 const urlsToCache = [
@@ -9,9 +9,9 @@ const urlsToCache = [
     '/kasa.html',
     '/offline.html',
     '/storage.js?v=1.0',
-    '/js/utils.js?v=78.35',
-    '/style.css?v=78.35',
-    '/app.js?v=78.35',
+    '/js/utils.js?v=78.36',
+    '/style.css?v=78.36',
+    '/app.js?v=78.36',
     '/kasa.css?v=1.11',
     '/kasa.js?v=1.11',
     '/manifest.json',

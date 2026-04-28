@@ -2831,7 +2831,8 @@ select option {
 @media screen and (max-width: 480px) and (orientation: portrait) {
     #categoryDetailContent .detail-table {
         font-size: 10px;
-        width: 100%;
+        width: max-content;
+        min-width: 440px;
         table-layout: fixed;
     }
 
@@ -2851,36 +2852,37 @@ select option {
 
     #categoryDetailContent .detail-table th:nth-child(1),
     #categoryDetailContent .detail-table td:nth-child(1) {
-        width: 50px;
+        width: 74px;
+        min-width: 74px;
         font-size: 9px;
     }
 
     #categoryDetailContent .detail-table th:nth-child(2),
     #categoryDetailContent .detail-table td:nth-child(2) {
-        width: 70px;
-        min-width: 70px;
+        width: 86px;
+        min-width: 86px;
         font-size: 10px;
     }
 
     #categoryDetailContent .detail-table th:nth-child(3),
     #categoryDetailContent .detail-table td:nth-child(3) {
-        width: 70px;
-        min-width: 70px;
+        width: 86px;
+        min-width: 86px;
         font-size: 10px;
     }
 
     #categoryDetailContent .detail-table th:nth-child(4),
     #categoryDetailContent .detail-table td:nth-child(4) {
-        width: 70px;
-        min-width: 70px;
+        width: 86px;
+        min-width: 86px;
         font-size: 10px;
     }
 
     #categoryDetailContent .detail-table th:nth-child(5),
     #categoryDetailContent .detail-table td:nth-child(5) {
-        width: auto;
-        min-width: 0;
-        max-width: none;
+        width: 108px;
+        min-width: 108px;
+        max-width: 108px;
         font-size: 10px;
     }
 
