@@ -2840,7 +2840,23 @@ select option {
         overflow-x: hidden !important;
     }
 
+    #categoryDetailModal .modal-content {
+        width: calc(100vw - 6px);
+        max-width: calc(100vw - 6px);
+        margin: 0 auto;
+    }
+
+    #categoryDetailModal .modal-body {
+        padding-left: 6px;
+        padding-right: 6px;
+    }
+
     #categoryDetailContent {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        padding-left: 0;
+        padding-right: 0;
         overflow-x: hidden;
     }
 
@@ -2874,14 +2890,14 @@ select option {
 
     #categoryDetailContent .detail-table th:nth-child(1),
     #categoryDetailContent .detail-table td:nth-child(1) {
-        width: 14%;
+        width: 12%;
         min-width: 0;
         font-size: 8.8px;
     }
 
     #categoryDetailContent .detail-table th:nth-child(2),
     #categoryDetailContent .detail-table td:nth-child(2) {
-        width: 15%;
+        width: 14%;
         min-width: 0;
         font-size: 9.2px;
         font-variant-numeric: tabular-nums;
@@ -2889,7 +2905,7 @@ select option {
 
     #categoryDetailContent .detail-table th:nth-child(3),
     #categoryDetailContent .detail-table td:nth-child(3) {
-        width: 15%;
+        width: 14%;
         min-width: 0;
         font-size: 9.2px;
         font-variant-numeric: tabular-nums;
@@ -2897,7 +2913,7 @@ select option {
 
     #categoryDetailContent .detail-table th:nth-child(4),
     #categoryDetailContent .detail-table td:nth-child(4) {
-        width: 16%;
+        width: 14%;
         min-width: 0;
         font-size: 9.2px;
         font-variant-numeric: tabular-nums;
@@ -2905,10 +2921,11 @@ select option {
 
     #categoryDetailContent .detail-table th:nth-child(5),
     #categoryDetailContent .detail-table td:nth-child(5) {
-        width: 40%;
+        width: 46%;
         min-width: 0;
         max-width: none;
         font-size: 9.7px;
+        padding-right: 0;
         overflow-wrap: break-word;
         word-break: normal;
     }
