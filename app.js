@@ -1657,6 +1657,8 @@ function showCategoryDetails(categoryName) {
     syncCategoryDetailDateDisplays();
 
     renderCategoryDetailContent();
+    const categoryDetailContent = document.getElementById('categoryDetailContent');
+    if (categoryDetailContent) categoryDetailContent.scrollLeft = 0;
     
     modal.dataset.category = categoryName;
     modal.style.display = 'block';

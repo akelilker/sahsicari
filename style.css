@@ -2696,8 +2696,8 @@ select option {
 
 .detail-table tbody td:not(:last-child) {
     white-space: nowrap;
-    overflow: visible;
-    text-overflow: clip;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .detail-table tbody td:last-child {
@@ -2759,8 +2759,11 @@ select option {
 
 .mobile-hint { display: none !important; }
 
-/* Detay tablosu / kategori özeti: binlik sonrası sayılar görünsün, gerekirse yatay kaydırma */
-#categoryDetailContent,
+/* Detay tablosu: kategori detayda yatay kayma yok, rapor listesinde gerektiğinde kaydırma olabilir */
+#categoryDetailContent {
+    overflow-x: hidden;
+    max-width: 100%;
+}
 .report-preview-list {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -2828,7 +2831,15 @@ select option {
     }
 }
 
-@media screen and (max-width: 480px) and (orientation: portrait) {
+@media screen and (max-width: 768px) and (orientation: portrait) {
+    #categoryDetailModal,
+    #categoryDetailModal .modal-content,
+    #categoryDetailModal .modal-body,
+    #categoryDetailContent {
+        max-width: 100%;
+        overflow-x: hidden !important;
+    }
+
     #categoryDetailContent {
         overflow-x: hidden;
     }
@@ -2836,6 +2847,7 @@ select option {
     #categoryDetailContent .detail-table {
         font-size: 9.5px;
         width: 100%;
+        max-width: 100%;
         min-width: 0;
         table-layout: fixed;
     }
@@ -2856,7 +2868,8 @@ select option {
 
     #categoryDetailContent .detail-table tbody td:not(:last-child) {
         overflow: hidden;
-        text-overflow: clip;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     #categoryDetailContent .detail-table th:nth-child(1),
@@ -2871,6 +2884,7 @@ select option {
         width: 17.5%;
         min-width: 0;
         font-size: 9.5px;
+        font-variant-numeric: tabular-nums;
     }
 
     #categoryDetailContent .detail-table th:nth-child(3),
@@ -2878,6 +2892,7 @@ select option {
         width: 18%;
         min-width: 0;
         font-size: 9.5px;
+        font-variant-numeric: tabular-nums;
     }
 
     #categoryDetailContent .detail-table th:nth-child(4),
@@ -2885,6 +2900,7 @@ select option {
         width: 20.5%;
         min-width: 0;
         font-size: 9.5px;
+        font-variant-numeric: tabular-nums;
     }
 
     #categoryDetailContent .detail-table th:nth-child(5),
@@ -2893,6 +2909,8 @@ select option {
         min-width: 0;
         max-width: none;
         font-size: 10.5px;
+        overflow-wrap: break-word;
+        word-break: normal;
     }
 
     #categoryDetailContent .detail-table tbody td:last-child {
