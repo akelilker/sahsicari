@@ -2829,8 +2829,12 @@ select option {
 }
 
 @media screen and (max-width: 480px) and (orientation: portrait) {
+    #categoryDetailContent {
+        overflow-x: hidden;
+    }
+
     #categoryDetailContent .detail-table {
-        font-size: 10px;
+        font-size: 9.5px;
         width: 100%;
         min-width: 0;
         table-layout: fixed;
@@ -2841,13 +2845,13 @@ select option {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        padding: 5px 1px;
-        font-size: 9px;
+        padding: 5px 2px;
+        font-size: 9.5px;
     }
 
     #categoryDetailContent .detail-table tbody td {
-        padding: 4px 1px;
-        font-size: 10px;
+        padding: 4px 2px;
+        font-size: 9.5px;
     }
 
     #categoryDetailContent .detail-table tbody td:not(:last-child) {
@@ -2857,38 +2861,38 @@ select option {
 
     #categoryDetailContent .detail-table th:nth-child(1),
     #categoryDetailContent .detail-table td:nth-child(1) {
-        width: 14%;
+        width: 15.5%;
         min-width: 0;
-        font-size: 8px;
+        font-size: 8.5px;
     }
 
     #categoryDetailContent .detail-table th:nth-child(2),
     #categoryDetailContent .detail-table td:nth-child(2) {
-        width: 18%;
+        width: 17.5%;
         min-width: 0;
-        font-size: 9px;
+        font-size: 9.5px;
     }
 
     #categoryDetailContent .detail-table th:nth-child(3),
     #categoryDetailContent .detail-table td:nth-child(3) {
         width: 18%;
         min-width: 0;
-        font-size: 9px;
+        font-size: 9.5px;
     }
 
     #categoryDetailContent .detail-table th:nth-child(4),
     #categoryDetailContent .detail-table td:nth-child(4) {
-        width: 20%;
+        width: 20.5%;
         min-width: 0;
-        font-size: 9px;
+        font-size: 9.5px;
     }
 
     #categoryDetailContent .detail-table th:nth-child(5),
     #categoryDetailContent .detail-table td:nth-child(5) {
-        width: 30%;
+        width: 28.5%;
         min-width: 0;
         max-width: none;
-        font-size: 10px;
+        font-size: 10.5px;
     }
 
     #categoryDetailContent .detail-table tbody td:last-child {
@@ -2899,7 +2903,7 @@ select option {
         overflow: hidden !important;
         text-overflow: ellipsis !important;
         white-space: normal;
-        line-height: 1.32;
+        line-height: 1.28;
     }
 
     .mobile-hint {
