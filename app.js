@@ -1,5 +1,5 @@
 /* formatDateTR → js/utils.js */
-const APP_VERSION = '78.34';
+const APP_VERSION = '78.35';
 
 function setVh() {
     const vh = window.innerHeight * 0.01;
