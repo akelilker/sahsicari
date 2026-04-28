@@ -2831,8 +2831,8 @@ select option {
 @media screen and (max-width: 480px) and (orientation: portrait) {
     #categoryDetailContent .detail-table {
         font-size: 10px;
-        width: max-content;
-        min-width: 440px;
+        width: 100%;
+        min-width: 0;
         table-layout: fixed;
     }
 
@@ -2850,39 +2850,44 @@ select option {
         font-size: 10px;
     }
 
+    #categoryDetailContent .detail-table tbody td:not(:last-child) {
+        overflow: hidden;
+        text-overflow: clip;
+    }
+
     #categoryDetailContent .detail-table th:nth-child(1),
     #categoryDetailContent .detail-table td:nth-child(1) {
-        width: 74px;
-        min-width: 74px;
-        font-size: 9px;
+        width: 14%;
+        min-width: 0;
+        font-size: 8px;
     }
 
     #categoryDetailContent .detail-table th:nth-child(2),
     #categoryDetailContent .detail-table td:nth-child(2) {
-        width: 86px;
-        min-width: 86px;
-        font-size: 10px;
+        width: 18%;
+        min-width: 0;
+        font-size: 9px;
     }
 
     #categoryDetailContent .detail-table th:nth-child(3),
     #categoryDetailContent .detail-table td:nth-child(3) {
-        width: 86px;
-        min-width: 86px;
-        font-size: 10px;
+        width: 18%;
+        min-width: 0;
+        font-size: 9px;
     }
 
     #categoryDetailContent .detail-table th:nth-child(4),
     #categoryDetailContent .detail-table td:nth-child(4) {
-        width: 86px;
-        min-width: 86px;
-        font-size: 10px;
+        width: 20%;
+        min-width: 0;
+        font-size: 9px;
     }
 
     #categoryDetailContent .detail-table th:nth-child(5),
     #categoryDetailContent .detail-table td:nth-child(5) {
-        width: 108px;
-        min-width: 108px;
-        max-width: 108px;
+        width: 30%;
+        min-width: 0;
+        max-width: none;
         font-size: 10px;
     }
 
