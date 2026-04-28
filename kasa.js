@@ -377,21 +377,21 @@ const katOptions = kasaData.kategoriler
 const editModalContent = document.getElementById('editModalContent');
 editModalContent.innerHTML = `
     <div class="edit-form-group">
-        <label>Tutar (₺)</label>
+        <label for="editTutar">Tutar (₺)</label>
         <input id="editTutar" class="edit-input" type="text" value="${formatNum(i.tutar)}" oninput="formatCurrency(this)">
     </div>
     <div class="edit-form-group">
-        <label>Kategori</label>
+        <label for="editKategori">Kategori</label>
         <select id="editKategori" class="edit-input" ${i.tip === 'giris' ? 'disabled' : ''}>
             ${katOptions}
         </select>
     </div>
     <div class="edit-form-group">
-        <label>Tarih</label>
+        <label for="editTarih">Tarih</label>
         <input id="editTarih" class="edit-input" type="date" value="${safeAttr(i.tarih || '')}">
     </div>
     <div class="edit-form-group">
-        <label>Açıklama</label>
+        <label for="editAciklama">Açıklama</label>
         <input id="editAciklama" class="edit-input" type="text" value="${sanitizeHTML(i.aciklama || '')}">
     </div>
     
