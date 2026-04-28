@@ -2829,99 +2829,63 @@ select option {
 }
 
 @media screen and (max-width: 480px) and (orientation: portrait) {
-    #categoryDetailContent {
-        overflow-x: hidden;
-    }
-
     #categoryDetailContent .detail-table {
-        display: block;
+        font-size: 10px;
         width: 100%;
         min-width: 0;
-        table-layout: auto;
-        font-size: 10px;
-    }
-
-    #categoryDetailContent .detail-table thead,
-    #categoryDetailContent .detail-table tbody {
-        display: block;
-        width: 100%;
-    }
-
-    #categoryDetailContent .detail-table thead tr,
-    #categoryDetailContent .detail-table tbody tr {
-        display: grid;
-        grid-template-columns: 62px minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.12fr);
-        column-gap: 4px;
-        width: 100%;
+        table-layout: fixed;
     }
 
     #categoryDetailContent .detail-table thead th {
-        display: block;
         min-width: 0;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        padding: 5px 0;
+        padding: 5px 1px;
         font-size: 9px;
-    }
-
-    #categoryDetailContent .detail-table thead th:nth-child(5) {
-        display: none;
-    }
-
-    #categoryDetailContent .detail-table tbody tr {
-        padding: 4px 0;
-        border-bottom: 1px solid var(--white-05);
     }
 
     #categoryDetailContent .detail-table tbody td {
-        width: auto;
-        min-width: 0;
-        max-width: none;
-        padding: 1px 0;
-        border-bottom: 0;
-        font-size: 9px;
-        line-height: 1.25;
+        padding: 4px 1px;
+        font-size: 10px;
     }
 
     #categoryDetailContent .detail-table tbody td:not(:last-child) {
         overflow: hidden;
         text-overflow: clip;
-        white-space: nowrap;
     }
 
     #categoryDetailContent .detail-table th:nth-child(1),
     #categoryDetailContent .detail-table td:nth-child(1) {
-        width: auto;
+        width: 14%;
         min-width: 0;
         font-size: 8px;
     }
 
     #categoryDetailContent .detail-table th:nth-child(2),
     #categoryDetailContent .detail-table td:nth-child(2) {
-        width: auto;
+        width: 18%;
         min-width: 0;
         font-size: 9px;
     }
 
     #categoryDetailContent .detail-table th:nth-child(3),
     #categoryDetailContent .detail-table td:nth-child(3) {
-        width: auto;
+        width: 18%;
         min-width: 0;
         font-size: 9px;
     }
 
     #categoryDetailContent .detail-table th:nth-child(4),
     #categoryDetailContent .detail-table td:nth-child(4) {
-        width: auto;
+        width: 20%;
         min-width: 0;
         font-size: 9px;
     }
 
     #categoryDetailContent .detail-table th:nth-child(5),
     #categoryDetailContent .detail-table td:nth-child(5) {
-        grid-column: 1 / -1;
-        width: auto;
+        width: 30%;
         min-width: 0;
         max-width: none;
         font-size: 10px;
@@ -2929,22 +2893,13 @@ select option {
 
     #categoryDetailContent .detail-table tbody td:last-child {
         display: -webkit-box !important;
-        -webkit-line-clamp: 2;
-        line-clamp: 2;
+        -webkit-line-clamp: 3;
+        line-clamp: 3;
         -webkit-box-orient: vertical;
         overflow: hidden !important;
         text-overflow: ellipsis !important;
         white-space: normal;
-        overflow-wrap: break-word;
-        word-break: normal;
-        line-height: 1.28;
-        padding: 2px 0 0 66px;
-        color: #cfd8dc;
-    }
-
-    #categoryDetailContent .detail-table tbody td:last-child:empty {
-        display: none !important;
-        padding: 0;
+        line-height: 1.32;
     }
 
     .mobile-hint {
