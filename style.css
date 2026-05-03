@@ -2657,9 +2657,6 @@ select option {
     text-shadow: none;
 }
 
-/* Kategori detay / rapor detay tablosu
-   Kök sahiplik: tablo kolonları CSS tarafından yönetilir. Mobil kategori detayda kolonlar sıkıştırılmaz;
-   içerik doğal minimum genişlikte kalır ve #categoryDetailContent yatay kaydırma alanı olur. */
 .detail-table {
     width: 100%;
     border-collapse: collapse;
@@ -2762,20 +2759,21 @@ select option {
 
 .mobile-hint { display: none !important; }
 
-#categoryDetailContent,
-.report-preview-list {
+/* Detay tablosu: kategori detayda yatay kayma yok, rapor listesinde gerektiğinde kaydırma olabilir */
+#categoryDetailContent {
+    overflow-x: hidden;
     max-width: 100%;
+}
+.report-preview-list {
     overflow-x: auto;
-    overflow-y: visible;
     -webkit-overflow-scrolling: touch;
 }
-
 #categoryDetailContent .detail-table,
 .report-preview-list .detail-table {
     min-width: 1px;
 }
 
-/* Masaüstü: kategori detay hesap hareketleri ekrana oturur, açıklama dengeli genişler. */
+/* Masaüstü: Kategori detay hesap hareketleri – rakam sütunları taşmasın, açıklama dengeli daralsın */
 @media screen and (min-width: 769px) {
     #categoryDetailContent .detail-table {
         table-layout: fixed;
@@ -2833,24 +2831,24 @@ select option {
     }
 }
 
-/* Mobil dikey: tablo sıkıştırılmaz; yatay kaydırılır. Açıklama sağ alanını kendi kolonunda kullanır. */
 @media screen and (max-width: 768px) and (orientation: portrait) {
     #categoryDetailModal,
     #categoryDetailModal .modal-content,
-    #categoryDetailModal .modal-body {
+    #categoryDetailModal .modal-body,
+    #categoryDetailContent {
         max-width: 100%;
         overflow-x: hidden;
     }
 
     #categoryDetailModal .modal-content {
-        width: calc(100vw - 6px);
-        max-width: calc(100vw - 6px);
+        width: calc(100vw - 2px);
+        max-width: calc(100vw - 2px);
         margin: 0 auto;
     }
 
     #categoryDetailModal .modal-body {
-        padding-left: 6px;
-        padding-right: 6px;
+        padding-left: 1px;
+        padding-right: 1px;
     }
 
     #categoryDetailContent {
@@ -2859,64 +2857,83 @@ select option {
         box-sizing: border-box;
         padding-left: 0;
         padding-right: 0;
-        overflow-x: auto;
-        overflow-y: visible;
-        -webkit-overflow-scrolling: touch;
+        overflow-x: hidden;
     }
 
     #categoryDetailContent .detail-table {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
         table-layout: fixed;
-        width: max-content;
-        min-width: 620px;
-        max-width: none;
-        font-size: 11.5px;
+        border-collapse: collapse;
+        font-size: 10.4px;
+    }
+
+    #categoryDetailContent .detail-table thead th,
+    #categoryDetailContent .detail-table tbody td {
+        min-width: 0;
+        padding-left: 1px;
+        padding-right: 1px;
+        box-sizing: border-box;
+        overflow: hidden;
+        text-overflow: clip;
+        font-variant-numeric: tabular-nums;
     }
 
     #categoryDetailContent .detail-table thead th {
-        padding: 6px 6px;
-        font-size: 11px;
+        padding-top: 6px;
+        padding-bottom: 6px;
+        font-size: 10.3px;
+        white-space: nowrap;
     }
 
     #categoryDetailContent .detail-table tbody td {
-        padding: 6px 6px;
-        font-size: 11.5px;
-    }
-
-    #categoryDetailContent .detail-table tbody td:not(:last-child) {
-        overflow: hidden;
-        text-overflow: ellipsis;
+        padding-top: 6px;
+        padding-bottom: 6px;
+        font-size: 10.4px;
         white-space: nowrap;
+        line-height: 1.2;
     }
 
     #categoryDetailContent .detail-table th:nth-child(1),
     #categoryDetailContent .detail-table td:nth-child(1) {
-        width: 76px;
-        min-width: 76px;
-        font-size: 10.5px;
+        width: 15%;
+        font-size: 10.2px;
+        text-align: left;
     }
 
     #categoryDetailContent .detail-table th:nth-child(2),
-    #categoryDetailContent .detail-table td:nth-child(2),
+    #categoryDetailContent .detail-table td:nth-child(2) {
+        width: 21%;
+        font-size: 10.6px;
+        text-align: right;
+    }
+
     #categoryDetailContent .detail-table th:nth-child(3),
-    #categoryDetailContent .detail-table td:nth-child(3),
+    #categoryDetailContent .detail-table td:nth-child(3) {
+        width: 21%;
+        font-size: 10.6px;
+        text-align: right;
+    }
+
     #categoryDetailContent .detail-table th:nth-child(4),
     #categoryDetailContent .detail-table td:nth-child(4) {
-        width: 104px;
-        min-width: 104px;
-        font-size: 11.5px;
-        font-variant-numeric: tabular-nums;
+        width: 21%;
+        font-size: 10.6px;
+        text-align: right;
+        padding-right: 1px;
     }
 
     #categoryDetailContent .detail-table th:nth-child(5),
     #categoryDetailContent .detail-table td:nth-child(5) {
-        width: 232px;
-        min-width: 232px;
-        max-width: 232px;
-        font-size: 11.5px;
-        padding-left: 8px;
-        padding-right: 6px;
+        width: 22%;
+        font-size: 10.2px;
+        text-align: left;
+        padding-left: 1px;
+        padding-right: 1px;
+        white-space: normal;
         overflow-wrap: anywhere;
-        word-break: normal;
+        word-break: break-word;
     }
 
     #categoryDetailContent .detail-table tbody td:last-child {
@@ -2924,10 +2941,9 @@ select option {
         -webkit-line-clamp: unset;
         line-clamp: unset;
         -webkit-box-orient: unset;
-        overflow: visible;
+        overflow: hidden;
         text-overflow: clip;
-        white-space: normal;
-        line-height: 1.3;
+        line-height: 1.18;
     }
 
     .mobile-hint {
@@ -2943,7 +2959,7 @@ select option {
     }
 }
 
-/* iPhone yan (landscape): Kişi modali kategori detayı – sütunlar doğal genişlikte, açıklama okunur. */
+/* iPhone yan (landscape): Kişi modali kategori detayı – sütun aralığı dar, Açıklama geniş ve alt satıra geçsin */
 @media screen and (orientation: landscape) and (max-width: 932px) {
     #categoryDetailModal {
         padding-top: calc(var(--sa-top) + 4px);
@@ -2974,17 +2990,9 @@ select option {
         flex: 0 1 260px;
     }
 
-    #categoryDetailContent {
-        overflow-x: auto;
-        overflow-y: visible;
-        -webkit-overflow-scrolling: touch;
-    }
-
     #categoryDetailContent .detail-table {
         table-layout: fixed;
-        width: max-content;
-        min-width: 690px;
-        max-width: none;
+        width: 100%;
         font-size: 11px;
     }
     #categoryDetailContent .detail-table thead th {
@@ -3006,41 +3014,40 @@ select option {
     #categoryDetailContent .detail-table td:nth-child(3),
     #categoryDetailContent .detail-table th:nth-child(4),
     #categoryDetailContent .detail-table td:nth-child(4) {
-        width: 96px;
-        min-width: 96px;
-        font-variant-numeric: tabular-nums;
+        width: 90px;
+        min-width: 90px;
     }
     #categoryDetailContent .detail-table th:nth-child(5),
     #categoryDetailContent .detail-table td:nth-child(5) {
-        width: 324px;
-        min-width: 324px;
-        max-width: 324px;
+        width: auto;
+        min-width: 190px;
+        max-width: none;
         padding-left: 8px;
     }
     #categoryDetailContent .detail-table tbody td:last-child {
-        display: table-cell;
-        -webkit-line-clamp: unset;
-        line-clamp: unset;
-        -webkit-box-orient: unset;
-        overflow: visible;
-        text-overflow: clip;
-        white-space: normal;
-        word-wrap: break-word;
-        overflow-wrap: anywhere;
+        display: table-cell !important;
+        -webkit-line-clamp: unset !important;
+        line-clamp: unset !important;
+        -webkit-box-orient: unset !important;
+        overflow: visible !important;
+        text-overflow: clip !important;
+        white-space: normal !important;
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
     }
 }
 
 /* iOS PWA landscape: Açıklama kesilmesin, mutlaka alt satıra geçsin */
 @media screen and (orientation: landscape) {
     body.ios-pwa #categoryDetailContent .detail-table tbody td:last-child {
-        -webkit-line-clamp: unset;
-        line-clamp: unset;
-        display: table-cell;
-        overflow: visible;
-        white-space: normal;
-        word-wrap: break-word;
-        overflow-wrap: anywhere;
-        text-overflow: clip;
+        -webkit-line-clamp: unset !important;
+        line-clamp: unset !important;
+        display: table-cell !important;
+        overflow: visible !important;
+        white-space: normal !important;
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+        text-overflow: clip !important;
     }
 }
 
