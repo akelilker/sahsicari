@@ -2897,28 +2897,28 @@ select option {
 
     #categoryDetailContent .detail-table th:nth-child(1),
     #categoryDetailContent .detail-table td:nth-child(1) {
-        width: 15%;
+        width: 18%;
         font-size: 10.2px;
         text-align: left;
     }
 
     #categoryDetailContent .detail-table th:nth-child(2),
     #categoryDetailContent .detail-table td:nth-child(2) {
-        width: 21%;
+        width: 18%;
         font-size: 10.6px;
         text-align: right;
     }
 
     #categoryDetailContent .detail-table th:nth-child(3),
     #categoryDetailContent .detail-table td:nth-child(3) {
-        width: 21%;
+        width: 18%;
         font-size: 10.6px;
         text-align: right;
     }
 
     #categoryDetailContent .detail-table th:nth-child(4),
     #categoryDetailContent .detail-table td:nth-child(4) {
-        width: 21%;
+        width: 18%;
         font-size: 10.6px;
         text-align: right;
         padding-right: 1px;
@@ -2926,14 +2926,14 @@ select option {
 
     #categoryDetailContent .detail-table th:nth-child(5),
     #categoryDetailContent .detail-table td:nth-child(5) {
-        width: 22%;
+        width: 28%;
         font-size: 10.2px;
         text-align: left;
         padding-left: 1px;
         padding-right: 1px;
         white-space: normal;
-        overflow-wrap: anywhere;
-        word-break: break-word;
+        overflow-wrap: break-word;
+        word-break: normal;
     }
 
     #categoryDetailContent .detail-table tbody td:last-child {
