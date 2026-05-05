@@ -1,5 +1,5 @@
 /* formatDateTR → js/utils.js */
-const APP_VERSION = '78.40';
+const APP_VERSION = '78.34';
 
 function setVh() {
     const vh = window.innerHeight * 0.01;
@@ -1657,8 +1657,6 @@ function showCategoryDetails(categoryName) {
     syncCategoryDetailDateDisplays();
 
     renderCategoryDetailContent();
-    const categoryDetailContent = document.getElementById('categoryDetailContent');
-    if (categoryDetailContent) categoryDetailContent.scrollLeft = 0;
     
     modal.dataset.category = categoryName;
     modal.style.display = 'block';
