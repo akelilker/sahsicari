@@ -4573,12 +4573,18 @@ label[for="editDateInput"] {
     }
 
     .header,
+    .quick-transaction-area {
+        box-shadow: none;
+    }
+
     .summary-card,
     .quick-access-section,
-    .quick-transaction-area,
     .debt-status-section,
     .control-panel {
-        box-shadow: none;
+        border-color: rgba(214, 224, 232, 0.74);
+        box-shadow:
+            0 0 0 1px rgba(255, 255, 255, 0.08),
+            0 8px 18px rgba(0, 0, 0, 0.28);
     }
 
     .quick-item {
@@ -5298,7 +5304,8 @@ label[for="editDateInput"] {
         margin-top: 5px;
     }
     .quick-access-section {
-        background: transparent;
+        background: rgba(10, 16, 30, 0.85);
+        border: 1px solid rgba(214, 224, 232, 0.72);
         margin-bottom: 3px; /* Favori kişiler ile Cari Kayıt arası 3px */
     }
     .quick-access-section h3 {
