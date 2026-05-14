@@ -32,7 +32,7 @@
         <div id="menuBackdrop" class="menu-backdrop-overlay" role="button" tabindex="0" aria-label="Menüyü kapat"></div>
         
         <div class="top-controls">
-            <div id="pwaInstallBanner" class="pwa-install-banner" style="display: none;">
+            <div id="pwaInstallBanner" class="pwa-install-banner u-hidden">
                 <div class="pwa-install-content">
                     <span class="pwa-install-text">Uygulamayı İndirmek İçin Tıklayın</span>
                     <button id="pwaInstallBtn" class="pwa-install-btn">Yükle</button>
@@ -52,7 +52,7 @@
 
             <div class="pos-rel"><button id="notificationIcon" class="notification-icon-btn" title="Bildirimler"> 🔔 </button>
                 <div class="dropdown-menu notification-menu" id="notificationMenu">
-                    <div style="padding:10px; text-align:center; color:#78909c;">Yükleniyor...</div>
+                    <div class="notification-menu-loading">Yükleniyor...</div>
                 </div>
             </div>
         </div>
@@ -76,7 +76,7 @@
         </div>
 
         <div class="quick-access-section">
-            <h3 style="opacity: 0.6; font-size: 0.8em; margin-bottom: 5px;">SIK KULLANILANLAR</h3>
+            <h3 class="quick-access-section-heading">SIK KULLANILANLAR</h3>
             <div id="quickAccessGrid" class="quick-grid"></div>
         </div>
 
@@ -141,7 +141,7 @@
 
 </div> 
 
-<div id="quickOverlayContainer" class="quick-overlay" style="display:none;">
+<div id="quickOverlayContainer" class="quick-overlay u-hidden">
     <div class="quick-overlay-backdrop" id="quickOverlayBackdrop" role="button" tabindex="0" aria-label="Hızlı işlem panelini kapat"></div>
     
     <div class="quick-panel-content">
@@ -160,8 +160,8 @@
 
         <div id="quickPersonList" class="quick-person-list"></div>
 
-        <div id="quickTransactionForm" style="display:none;">
-            <div class="form-group" style="text-align:center; margin-bottom:15px !important;">
+        <div id="quickTransactionForm" class="u-hidden">
+            <div class="form-group quick-form-person-row">
                 <div id="selectedPersonNameDisplay" class="selected-person-badge"></div>
             </div>
 
@@ -199,18 +199,18 @@
     </div>
 </div>
 
-<div id="allocationOverlay" class="quick-overlay" style="display:none;">
+<div id="allocationOverlay" class="quick-overlay u-hidden">
     <div class="quick-overlay-backdrop" id="allocationOverlayBackdrop" role="button" tabindex="0" aria-label="Dağıtım panelini kapat"></div>
     <div class="quick-panel-content allocation-panel">
-        <div class="quick-panel-header" style="justify-content: center; position: relative; margin-bottom: 20px;">
-            <h3 style="margin:0 auto; font-size: 1.1em; color: #e0e0e0;">Gelen Para Dağıtımı</h3>
-            <button type="button" class="close-overlay-btn" id="allocationOverlayCloseBtn" style="position:absolute; right:0; top: -5px;">✕</button>
+        <div class="quick-panel-header allocation-panel-header-row">
+            <h3 class="allocation-panel-title">Gelen Para Dağıtımı</h3>
+            <button type="button" class="close-overlay-btn allocation-panel-close" id="allocationOverlayCloseBtn">✕</button>
         </div>
         
         <div id="allocationDynamicContent">
             </div>
 
-        <button type="button" class="btn btn-success" id="confirmAllocationBtn" style="width:100%; margin-top:20px; padding: 12px 6px; font-weight:700; font-size: 0.9em;">DAĞITIMI ONAYLA</button>
+        <button type="button" class="btn btn-success allocation-confirm-full" id="confirmAllocationBtn">DAĞITIMI ONAYLA</button>
     </div>
 </div>
 
@@ -254,7 +254,7 @@
                 
                 <div class="form-group">
                     <label for="category">Kategori</label>
-                    <select id="category" style="width: 100%;"><option value="">Seçin</option></select>
+                    <select id="category" class="form-select-full-width"><option value="">Seçin</option></select>
                 </div>
                 <div class="form-group">
                     <label for="description">Açıklama</label>
@@ -262,36 +262,36 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="dateInput" style="color:#aaa; font-size:0.8em; margin-bottom:0;">Tarih</label>
+                    <label for="dateInput" class="form-label-date-muted">Tarih</label>
                     <div class="date-row-transparent">
                         <span class="current-date-display mobile-date-display" aria-hidden="true"></span>
                         <input id="dateInput" class="transparent-date-input" type="date"/>
                     </div>
                 </div>
                 
-                <div class="form-group" style="display:flex; gap:8px; flex-wrap:wrap;">
+                <div class="form-group form-actions-inline">
                     <button type="button" class="btn btn-success" id="addTransactionBtn">Kaydet</button>
                 </div>
             </div>
             <div class="tab-content" id="islemGecmisi">
                 <div class="history-container">
                     <div id="transactionHistory">
-                        <div style="text-align:center;color:#78909c;padding:8px;">Henüz İşlem Yok</div>
+                        <div class="empty-state-muted">Henüz İşlem Yok</div>
                     </div>
                 </div>
             </div>
             <div class="tab-content" id="kategoriDurumu">
                 <div class="category-balance-section" id="categoryBalanceSection">
-                    <div style="display: flex; align-items: center; justify-content: flex-end; margin-bottom: 10px; font-size: 0.8em;">
-                        <label id="showZeroBalanceToggleBtn" for="showZeroBalanceToggle" style="margin-right: 0; cursor: pointer;">Sıfır Bakiyeleri Göster</label>
+                    <div class="zero-balance-toggle-row">
+                        <label id="showZeroBalanceToggleBtn" for="showZeroBalanceToggle">Sıfır Bakiyeleri Göster</label>
                         <input type="checkbox" id="showZeroBalanceToggle">
                     </div>
                     <div class="category-balance-grid" id="categoryBalanceGrid"></div>
                     
-                    <button type="button" class="btn share-btn" id="toggleShareOptionsBtn" style="width:100%; margin-top: 12px;">📋 Özeti Paylaş</button>
-                    <div id="shareOptions" style="display: none; justify-content: center; gap: 30px; margin-top: 15px;">
-                        <span role="button" tabindex="0" id="exportSummaryExcelBtn" style="cursor: pointer; color: #66bb6a; font-weight: 700; font-size: 0.95em;">Excel</span>
-                        <span role="button" tabindex="0" id="copySummaryTextBtn" style="cursor: pointer; color: #cfd8dc; font-weight: 700; font-size: 0.95em;">Kopyala</span>
+                    <button type="button" class="btn share-btn share-btn-full" id="toggleShareOptionsBtn">📋 Özeti Paylaş</button>
+                    <div id="shareOptions">
+                        <span role="button" tabindex="0" id="exportSummaryExcelBtn" class="share-link-excel">Excel</span>
+                        <span role="button" tabindex="0" id="copySummaryTextBtn" class="share-link-copy">Kopyala</span>
                     </div>
 
                 </div>
@@ -389,7 +389,7 @@
             </div>
         </div>
         <div class="modal-body">
-            <button type="button" class="btn btn-success" id="personMgmtAddPersonBtn" style="width:100%; margin-bottom: 12px;">+ Yeni Kişi Ekle</button>
+            <button type="button" class="btn btn-success btn-block-mb" id="personMgmtAddPersonBtn">+ Yeni Kişi Ekle</button>
             <div id="personManagementList"></div>
         </div>
     </div>
@@ -410,12 +410,12 @@
                     <option value="">Kişi Seçin...</option>
                 </select>
             </div>
-            <div id="categoryEditor" style="display:none; margin-top: 15px;">
-                <h4 style="color: #ff9800; text-align: center; margin-bottom: 8px;">Mevcut Kategoriler</h4>
-                <div id="categoryManagementList" style="max-height: 40dvh; overflow-y: auto; margin-bottom: 12px;"></div>
-                <div style="display: flex; gap: 8px;">
+            <div id="categoryEditor" class="category-editor-hidden">
+                <h4 class="category-mgmt-heading">Mevcut Kategoriler</h4>
+                <div id="categoryManagementList" class="category-mgmt-list-scroll"></div>
+                <div class="category-mgmt-input-row">
                     <label for="newManagedCategoryInput" class="sr-only">Yeni kategori adı</label>
-                    <input id="newManagedCategoryInput" placeholder="Yeni kategori adı..." style="flex: 1; padding: 8px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #e0e0e0; font-size: 13px;" type="text"/>
+                    <input id="newManagedCategoryInput" placeholder="Yeni kategori adı..." class="category-mgmt-new-input" type="text"/>
                     <button type="button" class="btn btn-success" id="addCategoryFromManagerBtn">Ekle</button>
                 </div>
             </div>
@@ -432,8 +432,8 @@
             </div>
         </div>
         <div class="modal-body">
-            <p style="text-align:center; margin-bottom:12px;">Lütfen Rapor Oluşturmak İçin Yıl ve Ay Seçin:</p>
-            <div class="form-group" style="margin-bottom:20px;">
+            <p class="monthly-report-lead">Lütfen Rapor Oluşturmak İçin Yıl ve Ay Seçin:</p>
+            <div class="form-group monthly-report-form-spaced">
                 <label for="summaryYearSelect">Yıl</label>
                 <select id="summaryYearSelect"></select>
             </div>
@@ -441,7 +441,7 @@
                 <label for="summaryMonthSelect">Ay</label>
                 <select id="summaryMonthSelect"></select>
             </div>
-            <button type="button" class="btn btn-success" id="generateReportBtn" style="margin-top:20px;">Rapor Oluştur</button>
+            <button type="button" class="btn btn-success btn-mt-20" id="generateReportBtn">Rapor Oluştur</button>
         </div>
     </div>
 </div>
@@ -455,20 +455,20 @@
             </div>
         </div>
         <div class="modal-body">
-            <h4 style="color:#42a5f5;margin-bottom:12px;"> 📱 Online Kullanım:</h4>
-            <ol style="margin-bottom:18px;line-height:1.5;">
+            <h4 class="sync-help-heading"> 📱 Online Kullanım:</h4>
+            <ol class="sync-help-list">
                 <li>Bu Sayfayı iPhone'da <strong>Safari</strong>'de açın.</li>
                 <li><strong>Paylaş</strong> butonu ➡️  <strong>"Ana Ekrana Ekle"</strong> seçeneğini kullanın.</li>
                 <li>Artık Uygulama Gibi Tam Ekran Kullanabilirsiniz! 🎉</li>
             </ol>
-            <h4 style="color:#42a5f5;margin-bottom:12px;"> ⚙️ Veri Yönetimi:</h4>
-            <ol style="margin-bottom:18px;line-height:1.5;">
+            <h4 class="sync-help-heading"> ⚙️ Veri Yönetimi:</h4>
+            <ol class="sync-help-list">
                 <li>Tüm verileriniz anında sunucuya kaydedilir.</li>
                 <li><strong>"Genel Durum"</strong> ile özet bilgilerinizi görüntüleyebilirsiniz.</li>
                 <li><strong>"Yedek Al"</strong> ile verilerinizin bir kopyasını indirebilirsiniz.</li>
                 <li><strong>"Yedekten Geri Yükle"</strong> ile indirdiğiniz yedeği sunucuya geri yükleyebilirsiniz.</li>
             </ol>
-            <div style="text-align:center;margin-top:18px;">
+            <div class="sync-help-footer">
                 <button type="button" class="btn btn-cloud" id="syncHelpCloseBtn">Anladım ✅ </button>
             </div>
         </div>
@@ -498,7 +498,7 @@
             </div>
             <div class="form-group">
                 <label for="editCategory">Kategori</label>
-                <select id="editCategory" style="width: 100%;"><option value="">Seçin</option></select>
+                <select id="editCategory" class="form-select-full-width"><option value="">Seçin</option></select>
             </div>
             <div class="form-group">
                 <label for="editDescription">Açıklama</label>
@@ -566,24 +566,8 @@
     </div>
 </div>
   
-<div id="colorSelectionMenu" style="
-    display: none; 
-    position: fixed;
-    top: 0;
-    left: 0; 
-    right: 0;
-    bottom: 0;
-    background: transparent;
-    z-index: 999999;
-    justify-content: center;
-    align-items: center;
-">
-    <div id="colorBubbles" style="
-        display: flex; 
-        flex-direction: column;
-        align-items: center;
-        gap: 15px;
-    ">
+<div id="colorSelectionMenu" class="color-selection-menu">
+    <div id="colorBubbles" class="color-selection-menu__bubbles">
         <button type="button" class="neon-btn neon-btn-white" data-glow="white"></button>
         <button type="button" class="neon-btn neon-btn-blue" data-glow="blue"></button>
         <button type="button" class="neon-btn neon-btn-lila" data-glow="lila"></button>

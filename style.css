@@ -13,6 +13,358 @@
     border: 0;
 }
 
+/* Görünürlük: önceden style.display ile yapılan aç/kapa (JS classList ile) */
+.u-hidden {
+    display: none !important;
+}
+
+/* Özet paylaşım satırı — toggleShareOptions ile class üzerinden */
+#shareOptions {
+    display: none;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 15px;
+}
+#shareOptions.share-options--visible {
+    display: flex;
+}
+
+/* Renk menüsü: index’teki sabit çerçeve (açılışta JS hâlâ cssText ile mobil/desktop ayırır) */
+#colorSelectionMenu {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: transparent;
+    z-index: 999999;
+    justify-content: center;
+    align-items: center;
+}
+#colorBubbles {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+/* İşlem geçmişi üç nokta menüsü (önceden injectThreeDotMenuStyles ile ekleniyordu) */
+.three-dot-menu {
+    background: rgba(14, 21, 37, 0.98);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 12px;
+    padding: 8px;
+    min-width: 150px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+    opacity: 0;
+    transform: translateX(20px);
+    transition: all 0.2s ease;
+}
+.three-dot-menu.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+.three-dot-menu .menu-item {
+    padding: 8px 15px;
+    color: #e0e0e0;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.2s ease;
+}
+.three-dot-menu .menu-item:hover {
+    transform: scale(1.05);
+}
+.three-dot-menu .menu-item[data-action="delete"]:hover {
+    color: #d40000;
+}
+.three-dot-menu .menu-item span {
+    font-size: 18px;
+}
+
+/* findBalanceSource() dinamik modal */
+.balance-source-modal-shell {
+    max-width: 90%;
+    margin: 20px auto;
+    background: #1e2a38;
+    padding: 20px;
+    border-radius: 12px;
+    white-space: pre-wrap;
+    font-family: monospace;
+    font-size: 12px;
+}
+.balance-source-modal-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+.balance-source-modal-body {
+    max-height: 60vh;
+    overflow: auto;
+}
+.btn.balance-source-modal-close {
+    background: #37474f;
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* findBalanceSource: taşıyıcı (js’te cssText yok) */
+.balance-source-modal-host {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 9999;
+    overflow: auto;
+}
+
+/* Tam ad / q-name genişliği (initDisplayNamesAndObserver — inline style yok) */
+.display-name-el {
+    white-space: nowrap;
+    overflow: visible;
+    text-overflow: clip;
+    min-width: 86px;
+    max-width: 240px;
+    display: inline-block;
+    padding: 0 6px;
+}
+
+/* Dağıtım açıklama popup başlığı */
+.allocation-popup-title--tight {
+    margin-bottom: 15px;
+    font-size: 1em;
+}
+
+/* Siri onay modalı (dinamik HTML) */
+.siri-confirm-modal.modal {
+    display: flex;
+    z-index: 9999;
+}
+.siri-confirm-modal .modal-content {
+    max-width: 350px;
+    padding: 20px;
+}
+.siri-confirm-modal .modal-header {
+    border-bottom: none;
+    padding-bottom: 10px;
+}
+.siri-confirm-modal .modal-header h2 {
+    margin: 0;
+    font-size: 1.2em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.siri-confirm-modal .modal-body {
+    padding: 15px 0;
+}
+.siri-confirm-summary {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+.siri-confirm-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+.siri-confirm-row:last-child {
+    margin-bottom: 0;
+}
+.siri-confirm-label {
+    color: #78909c;
+}
+.siri-confirm-value {
+    color: #e0e0e0;
+    font-weight: 600;
+}
+.siri-confirm-value--missing {
+    color: #d40000;
+}
+.siri-confirm-value--ok {
+    color: #00e676;
+}
+.siri-confirm-warn {
+    background: rgba(255, 23, 68, 0.1);
+    border: 1px solid rgba(255, 23, 68, 0.3);
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 15px;
+}
+.siri-confirm-warn-text {
+    color: #d40000;
+    font-size: 0.9em;
+}
+.siri-person-select {
+    width: 100%;
+    margin-top: 8px;
+    padding: 10px;
+    border-radius: 8px;
+    background: #1a2332;
+    color: #e0e0e0;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.siri-confirm-actions {
+    display: flex;
+    gap: 10px;
+}
+.siri-confirm-actions .btn {
+    flex: 1;
+}
+.siri-confirm-btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* index.html yardımcıları */
+.notification-menu-loading {
+    padding: 10px;
+    text-align: center;
+    color: #78909c;
+}
+.quick-access-section-heading {
+    opacity: 0.6;
+    font-size: 0.8em;
+    margin-bottom: 5px;
+}
+.allocation-panel-header-row {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    margin-bottom: 20px;
+}
+.allocation-panel-title {
+    margin: 0 auto;
+    font-size: 1.1em;
+    color: #e0e0e0;
+}
+.allocation-panel-close {
+    position: absolute;
+    right: 0;
+    top: -5px;
+}
+.allocation-confirm-full {
+    width: 100%;
+    margin-top: 20px;
+    padding: 12px 6px;
+    font-weight: 700;
+    font-size: 0.9em;
+}
+.form-select-full-width {
+    width: 100%;
+}
+.form-label-date-muted {
+    color: #aaa;
+    font-size: 0.8em;
+    margin-bottom: 0;
+}
+.form-actions-inline {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.empty-state-muted {
+    text-align: center;
+    color: #78909c;
+    padding: 8px;
+}
+.zero-balance-toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+    font-size: 0.8em;
+}
+.zero-balance-toggle-row label {
+    margin-right: 0;
+    cursor: pointer;
+}
+.share-btn-full {
+    width: 100%;
+    margin-top: 12px;
+}
+.share-link-excel {
+    cursor: pointer;
+    color: #66bb6a;
+    font-weight: 700;
+    font-size: 0.95em;
+}
+.share-link-copy {
+    cursor: pointer;
+    color: #cfd8dc;
+    font-weight: 700;
+    font-size: 0.95em;
+}
+.btn-block-mb {
+    width: 100%;
+    margin-bottom: 12px;
+}
+.category-editor-hidden {
+    display: none;
+    margin-top: 15px;
+}
+.category-editor-visible {
+    display: block;
+    margin-top: 15px;
+}
+.category-mgmt-heading {
+    color: #ff9800;
+    text-align: center;
+    margin-bottom: 8px;
+}
+.category-mgmt-list-scroll {
+    max-height: 40dvh;
+    overflow-y: auto;
+    margin-bottom: 12px;
+}
+.category-mgmt-input-row {
+    display: flex;
+    gap: 8px;
+}
+.category-mgmt-new-input {
+    flex: 1;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: #e0e0e0;
+    font-size: 13px;
+}
+.monthly-report-lead {
+    text-align: center;
+    margin-bottom: 12px;
+}
+.monthly-report-form-spaced {
+    margin-bottom: 20px;
+}
+.btn-mt-20 {
+    margin-top: 20px;
+}
+.sync-help-heading {
+    color: #42a5f5;
+    margin-bottom: 12px;
+}
+.sync-help-list {
+    margin-bottom: 18px;
+    line-height: 1.5;
+}
+.sync-help-footer {
+    text-align: center;
+    margin-top: 18px;
+}
+.quick-form-person-row {
+    text-align: center;
+    margin-bottom: 15px !important;
+}
+
 /* 1. TEMEL AYARLAR VE RESET */
 * {
     margin: 0;
@@ -655,6 +1007,12 @@ body.ios-pwa .debt-controls select {
     align-items: center;
     justify-content: center;
 }
+button.delete-notif-btn {
+    background: transparent;
+    border: none;
+    font: inherit;
+    line-height: 1;
+}
 
 .total-summary {
     display: flex;
@@ -986,6 +1344,7 @@ body.ios-pwa .debt-controls select {
     background: rgba(255, 255, 255, 0.03);
 }
 
+/* Native <select> katmanları: üst toolbar (.debt-controls) | genel modal form (.form-group) | kategori yönetimi (#categoryManagementModal) | kişi modalı yeni işlem (#yeniIslem yükseklik) */
 .debt-controls select {
     flex: 1;
     min-width: 0;
@@ -2180,16 +2539,16 @@ height: 100%;
     text-shadow: 0 1px 1px rgba(0,0,0,0.55);
 }
 
-.form-group input:not(.date-picker-simple):not(.transparent-date-input):focus,
-.form-group select:focus {
-    outline: none;
-    border-color: #42a5f5;
-}
-
 .form-group select {
     color: #e0e0e0;
     -webkit-text-fill-color: #e0e0e0;
     font-weight: 500;
+}
+
+.form-group input:not(.date-picker-simple):not(.transparent-date-input):focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #42a5f5;
 }
 .form-group select option {
     color: #e0e0e0;
@@ -2203,7 +2562,7 @@ height: 100%;
     font-weight: 600;
 }
 
-/* Tüm select dropdown'lar için */
+/* Dinamik eklenen select’ler için zemin (siri vb.); form / toolbar daha spesifik kurallarla üstüne yazar */
 select {
     background-color: #0e1525;
 }

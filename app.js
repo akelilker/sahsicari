@@ -1,6 +1,12 @@
 /* formatDateTR → js/utils.js */
 const APP_VERSION = '78.34';
 
+/* -----------------------------------------------------------------------------
+   Dosya düzeni: yardımcılar & DOM önbelleği → olay bağlama → veri/sunucu
+   → ana özet & kişi modalı → işlemler/Excel → hızlı işlem & dağıtım
+   → kategori/raporlar → menüler & bildirim → PWA/depolama → bootstrap
+   ----------------------------------------------------------------------------- */
+
 function setVh() {
     const vh = window.innerHeight * 0.01;
     document.documentElement.style.setProperty('--vh', `${vh}px`);
@@ -61,6 +67,7 @@ let isProcessing = false;
 let quickPersonSelectedValue = null; 
 let quickAllocationDesc = '';
 let quickAllocationCategory = ''; 
+let quickOverlayAmountListenersRegistered = false;
 let currentReportFilterType = 'all';
 let renderReportPreviewDebounced = null;
 
@@ -300,6 +307,16 @@ function bindMenuEvents() {
             else if (action === 'memory-clear') initiateMemoryClear();
         });
     }
+    const notificationMenu = document.getElementById('notificationMenu');
+    if (notificationMenu) {
+        notificationMenu.addEventListener('click', function(e) {
+            const del = e.target.closest('.delete-notif-btn[data-notification-index]');
+            if (!del) return;
+            e.preventDefault();
+            const idx = parseInt(del.getAttribute('data-notification-index'), 10);
+            if (!Number.isNaN(idx)) deleteNotification(idx);
+        });
+    }
 }
 
 function bindPageEvents() {
@@ -354,6 +371,23 @@ function bindPageEvents() {
     if (quickOverlayCloseBtn) quickOverlayCloseBtn.addEventListener('click', closeQuickTransactionOverlay);
     const quickSearchInput = document.getElementById('quickSearchInput');
     if (quickSearchInput) quickSearchInput.addEventListener('input', filterQuickPersonList);
+    const quickPersonList = document.getElementById('quickPersonList');
+    if (quickPersonList && !quickPersonList.dataset.personPickDelegate) {
+        quickPersonList.dataset.personPickDelegate = '1';
+        quickPersonList.addEventListener('click', function(e) {
+            const addBtn = e.target.closest('.quick-add-person-btn');
+            if (addBtn) {
+                closeQuickTransactionOverlay();
+                showPersonManagementModal();
+                return;
+            }
+            const row = e.target.closest('.quick-person-item:not(.quick-add-person-btn)');
+            if (!row || !quickPersonList.contains(row)) return;
+            const enc = row.getAttribute('data-quick-person');
+            const person = enc ? decodeURIComponent(enc) : (row.textContent || '').trim();
+            if (person) selectQuickPersonFromOverlay(person);
+        });
+    }
     const quickGidenBtn = document.getElementById('quickGidenBtn');
     if (quickGidenBtn) quickGidenBtn.addEventListener('click', function() { setQuickTransactionType('giden'); });
     const quickGelenBtn = document.getElementById('quickGelenBtn');
@@ -402,6 +436,27 @@ function bindPageEvents() {
 
 function bindModalEvents() {
     document.addEventListener('click', function(e) {
+        const allocBtn = e.target.closest('[data-allocation-action]');
+        if (allocBtn && allocBtn.closest('#allocationDescPopup')) {
+            const action = allocBtn.getAttribute('data-allocation-action');
+            if (action === 'finalize-null') {
+                finalizeAllocation(null);
+                return;
+            }
+            if (action === 'show-desc-input') {
+                showDescriptionInput();
+                return;
+            }
+            if (action === 'close-desc-popup') {
+                closeAllocationDescPopup();
+                return;
+            }
+            if (action === 'finalize-with-desc') {
+                const input = document.getElementById('allocationDescInput');
+                finalizeAllocation(input ? input.value : '');
+                return;
+            }
+        }
         const closeBtn = e.target.closest('.close-modal-btn');
         if (closeBtn) { closeCurrentModal(closeBtn); return; }
         const tabBtn = e.target.closest('.tab-btn[data-tab]');
@@ -526,6 +581,9 @@ window.addEventListener('load', async function() {
         migrateOldDataSafely();
         updateMainDisplay();
         setCurrentDate();
+
+        registerQuickOverlayDeferredListeners();
+        checkSiriParams();
     });
 });
 
@@ -878,25 +936,32 @@ function findBalanceSource(targetAmount) {
     if (modal) {
         const body = document.getElementById('balanceSourceModalBody');
         if (body) body.textContent = msg;
-        modal.style.display = 'block';
         if (typeof closeAllMenus === 'function') closeAllMenus();
         return;
     }
     const div = document.createElement('div');
     div.id = 'balanceSourceModal';
-    div.className = 'modal';
-    div.style.cssText = 'display:block; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; overflow:auto;';
+    div.className = 'balance-source-modal-host';
     div.innerHTML = `
-        <div style="max-width:90%; margin:20px auto; background:#1e2a38; padding:20px; border-radius:12px; white-space:pre-wrap; font-family:monospace; font-size:12px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <div class="balance-source-modal-shell">
+            <div class="balance-source-modal-toolbar">
                 <strong>Bakiye kaynağı (${formatAmount(num)})</strong>
-                <button type="button" onclick="document.getElementById('balanceSourceModal').remove()" style="background:#37474f; color:#fff; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;">Kapat</button>
+                <button type="button" class="btn balance-source-modal-close" id="balanceSourceModalCloseBtn">Kapat</button>
             </div>
-            <div id="balanceSourceModalBody" style="max-height:60vh; overflow:auto;">${sanitizeHTML(msg)}</div>
+            <div id="balanceSourceModalBody" class="balance-source-modal-body">${sanitizeHTML(msg)}</div>
         </div>
     `;
     document.body.appendChild(div);
-    div.onclick = function(e) { if (e.target === div) div.remove(); };
+    function removeBalanceSourceModal() {
+        div.removeEventListener('click', onBalanceSourceBackdropClick);
+        div.remove();
+    }
+    function onBalanceSourceBackdropClick(e) {
+        if (e.target === div) removeBalanceSourceModal();
+    }
+    div.addEventListener('click', onBalanceSourceBackdropClick);
+    const closeBtn = div.querySelector('#balanceSourceModalCloseBtn');
+    if (closeBtn) closeBtn.addEventListener('click', removeBalanceSourceModal);
 }
 window.findBalanceSource = findBalanceSource;
 
@@ -926,6 +991,31 @@ function safeDisplayName(name) {
     return (name.length > 15) ? name.substring(0, 15) + '…' : name;
 }
 
+function escapeHtmlAttr(s) {
+    return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/</g, '&lt;');
+}
+
+function wireQuickAccessGridItems() {
+    const grid = DOM.quickAccessGrid;
+    if (!grid) return;
+    grid.querySelectorAll('.quick-item').forEach(function(item) {
+        const person = item.getAttribute('data-person');
+        const index = parseInt(item.getAttribute('data-index'), 10);
+        if (person == null || person === '' || Number.isNaN(index)) return;
+        item.addEventListener('click', function(e) { handleQuickItemClick(e, person); });
+        item.addEventListener('dragstart', function(e) { handleDragStart(e, index); });
+        item.addEventListener('dragover', handleDragOver);
+        item.addEventListener('drop', function(e) { handleDrop(e, index); });
+        item.addEventListener('dragend', handleDragEnd);
+        item.addEventListener('touchstart', function(e) { handleTouchStart(e, index); });
+        item.addEventListener('touchmove', handleTouchMove);
+        item.addEventListener('touchend', function(e) { handleTouchEnd(e, index); });
+    });
+}
+
 function updateQuickGrid() {
     if (!DOM.quickAccessGrid) return;
     
@@ -948,7 +1038,7 @@ function updateQuickGrid() {
     displayPeople = displayPeople.slice(0, 4);
 
     displayPeople.forEach((person, index) => {
-        const safeName = person.replace(/'/g, "\\'");
+        const attrPerson = escapeHtmlAttr(person);
         let displayName = person;
         if (displayName.length > 9) displayName = safeDisplayName(displayName).substring(0, 9) + '..';
 
@@ -960,26 +1050,19 @@ function updateQuickGrid() {
         html += `
         <div class="quick-item" 
              draggable="true" 
-             data-person="${safeName}"
-             data-index="${index}"
-             onclick="handleQuickItemClick(event, '${safeName}')"
-             ondragstart="handleDragStart(event, ${index})"
-             ondragover="handleDragOver(event)"
-             ondrop="handleDrop(event, ${index})"
-             ondragend="handleDragEnd(event)"
-             ontouchstart="handleTouchStart(event, ${index})"
-             ontouchmove="handleTouchMove(event)"
-             ontouchend="handleTouchEnd(event, ${index})">
+             data-person="${attrPerson}"
+             data-index="${index}">
             <span class="q-icon ${statusClass}">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="28px" height="28px">
                     <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                 </svg>
             </span>
-            <span class="q-name" data-fullname="${sanitizeHTML(person).replace(/"/g, '&quot;')}" title="${sanitizeHTML(person).replace(/"/g, '&quot;')}">${sanitizeHTML(displayName)}</span>
+            <span class="q-name display-name-el" data-fullname="${sanitizeHTML(person).replace(/"/g, '&quot;')}" title="${sanitizeHTML(person).replace(/"/g, '&quot;')}">${sanitizeHTML(displayName)}</span>
         </div>`;
     });
 
     DOM.quickAccessGrid.innerHTML = html;
+    wireQuickAccessGridItems();
 }
 
 function handleQuickItemClick(event, person) {
@@ -995,9 +1078,10 @@ function handleQuickItemClick(event, person) {
 
 function handleDragStart(event, index) {
     draggedIndex = index;
-    event.target.style.opacity = '0.5';
+    const el = event.currentTarget;
+    if (el) el.style.opacity = '0.5';
     event.dataTransfer.effectAllowed = 'move';
-    event.dataTransfer.setData('text/html', event.target.innerHTML);
+    event.dataTransfer.setData('text/html', el ? el.innerHTML : '');
 }
 
 function handleDragOver(event) {
@@ -1031,7 +1115,8 @@ function handleDrop(event, dropIndex) {
 }
 
 function handleDragEnd(event) {
-    event.target.style.opacity = '';
+    const el = event.currentTarget;
+    if (el) el.style.opacity = '';
     if (draggedIndex !== null) {
         justDragged = true;
         setTimeout(() => { justDragged = false; }, 100);
@@ -1246,7 +1331,8 @@ function applySingleDebtDefaultCategory(selectElement, person) {
 
 function maybeTriggerMainAutoAllocation() {
     if (!DOM.amount || !DOM.category) return;
-    if (document.getElementById('allocationOverlay')?.style.display === 'flex') return;
+    const allocEl = document.getElementById('allocationOverlay');
+    if (allocEl && !allocEl.classList.contains('u-hidden')) return;
 
     const person = currentPerson;
     const type = DOM.transactionType?.value || '';
@@ -1417,7 +1503,7 @@ function handleCategoryInputEnter(event) {
 function toggleShareOptions() {
     const options = document.getElementById('shareOptions');
     if (!options) return;
-    options.style.display = options.style.display === 'flex' ? 'none' : 'flex';
+    options.classList.toggle('share-options--visible', !options.classList.contains('share-options--visible'));
 }
 
 function copySummaryText() {
@@ -1453,7 +1539,8 @@ function copySummaryText() {
             document.body.removeChild(ta);
             showNotification('📋 Metin Kopyalandı', 'success');
         }
-        document.getElementById('shareOptions').style.display = 'none';
+        const shareOpt = document.getElementById('shareOptions');
+        if(shareOpt) shareOpt.classList.remove('share-options--visible');
     };
 
     doCopy(text);
@@ -1532,16 +1619,8 @@ function exportSummaryExcel() {
     XLSX.writeFile(wb, `${currentPerson}_Ozet_Durum.xlsx`);
     
     showNotification('✅ Excel İndirildi', 'success');
-    document.getElementById('shareOptions').style.display = 'none';
-}
-
-function openSelectedPersonIfAny() {
-    const select = DOM.personSelect;
-    if (!select) return;
-    const person = select.value;
-    if (person && (!DOM.personModal || DOM.personModal.style.display !== 'block')) {
-        openPersonModal(person);
-    }
+    const so = document.getElementById('shareOptions');
+    if (so) so.classList.remove('share-options--visible');
 }
 
 function openPersonModal(person) {
@@ -1554,7 +1633,7 @@ function openPersonModal(person) {
     setCurrentDate();
     
     const shareOpt = document.getElementById('shareOptions');
-    if(shareOpt) shareOpt.style.display = 'none';
+    if(shareOpt) shareOpt.classList.remove('share-options--visible');
 
     try { updateCategoryBalanceDisplay(person); } catch (e) {}
 
@@ -2024,7 +2103,8 @@ function initiateAllocation() {
     if (debts.length === 0) return;
 
     const content = document.getElementById('allocationDynamicContent');
-    document.getElementById('allocationOverlay').style.display = 'flex';
+    const allocOverlay = document.getElementById('allocationOverlay');
+    if (allocOverlay) allocOverlay.classList.remove('u-hidden');
     DOM.mainAppContainer?.classList.add('disable-events');
     document.body.classList.add("disable-events");
 
@@ -2176,7 +2256,7 @@ function getAllocatedTotal(excludeItem = null) {
 
 function closeAllocationOverlay() {
     const overlay = document.getElementById('allocationOverlay');
-    if (overlay) overlay.style.display = 'none';
+    if (overlay) overlay.classList.add('u-hidden');
     
     if (!document.querySelector('.modal.show') && !checkAnyMenuOpen()) {
         DOM.mainAppContainer?.classList.remove('disable-events');
@@ -2223,8 +2303,8 @@ function showAllocationDescriptionPopup(transactions, totalReceived, person) {
                     Açıklama Girmek İster misiniz?
                 </h3>
                 <div class="allocation-popup-buttons">
-                    <button onclick="finalizeAllocation(null)" class="allocation-popup-btn btn-cancel">Hayır</button>
-                    <button onclick="showDescriptionInput()" class="allocation-popup-btn btn-confirm">Evet</button>
+                    <button type="button" data-allocation-action="finalize-null" class="allocation-popup-btn btn-cancel">Hayır</button>
+                    <button type="button" data-allocation-action="show-desc-input" class="allocation-popup-btn btn-confirm">Evet</button>
                 </div>
             </div>
         </div>
@@ -2241,13 +2321,13 @@ function showDescriptionInput() {
     
     popup.innerHTML = `
         <div class="allocation-popup-box">
-            <h3 class="allocation-popup-title" style="margin-bottom: 15px; font-size: 1em;">
+            <h3 class="allocation-popup-title allocation-popup-title--tight">
                 Açıklama:
             </h3>
             <input type="text" id="allocationDescInput" class="allocation-popup-input" placeholder="Açıklama giriniz..." autofocus>
             <div class="allocation-popup-buttons">
-                <button onclick="closeAllocationDescPopup()" class="allocation-popup-btn btn-cancel">İptal</button>
-                <button onclick="finalizeAllocation(document.getElementById('allocationDescInput').value)" class="allocation-popup-btn btn-confirm">Kaydet</button>
+                <button type="button" data-allocation-action="close-desc-popup" class="allocation-popup-btn btn-cancel">İptal</button>
+                <button type="button" data-allocation-action="finalize-with-desc" class="allocation-popup-btn btn-confirm">Kaydet</button>
             </div>
         </div>
     `;
@@ -2470,7 +2550,8 @@ function clearTransactionForm() {
 
 function checkAnyMenuOpen() {
     const settings = document.getElementById('settingsMenu')?.style.display === 'block';
-    const colorSelection = document.getElementById('colorSelectionMenu')?.style.display === 'block';
+    const colorEl = document.getElementById('colorSelectionMenu');
+    const colorSelection = colorEl && (colorEl.style.display === 'block' || colorEl.style.display === 'flex');
     const notifications = DOM.notificationMenu?.style.display === 'block';
     
     return settings || colorSelection || notifications;
@@ -2839,7 +2920,11 @@ function populateCategoryEditor(person) {
     const editor = document.getElementById('categoryEditor');
     const listDiv = document.getElementById('categoryManagementList');
     if (!editor || !listDiv) return;
-    if (!person) { editor.style.display = 'none'; return; }
+    if (!person) {
+        editor.classList.add('category-editor-hidden');
+        editor.classList.remove('category-editor-visible');
+        return;
+    }
 
     listDiv.innerHTML = '';
     const categories = allData[person].categories || [];
@@ -2870,7 +2955,8 @@ function populateCategoryEditor(person) {
         item.appendChild(actions);
         listDiv.appendChild(item);
     });
-    editor.style.display = 'block';
+    editor.classList.remove('category-editor-hidden');
+    editor.classList.add('category-editor-visible');
 }
 function addCategoryFromManager() {
     const person = document.getElementById('categoryManagementPersonSelect').value;
@@ -2957,7 +3043,7 @@ function renderNotificationMenu() {
             item.style.fontSize = '0.85em';
             item.innerHTML = `
                 <span>${sanitizeHTML(notif.message)}</span>
-                <span class="delete-notif-btn" onclick="deleteNotification(${i})">✖</span>
+                <button type="button" class="delete-notif-btn" data-notification-index="${i}" aria-label="Bildirimi sil">✖</button>
             `;
             content.appendChild(item);
         }
@@ -3938,7 +4024,7 @@ function showPWAInstallBanner() {
     const banner = document.getElementById('pwaInstallBanner');
     if (!banner) return;
 
-    banner.style.display = 'block';
+    banner.classList.remove('u-hidden');
 
     // Install button
     const installBtn = document.getElementById('pwaInstallBtn');
@@ -3970,7 +4056,8 @@ function hidePWAInstallBanner() {
     if (banner) {
         banner.style.animation = 'slideDown 0.3s ease-out';
         setTimeout(() => {
-            banner.style.display = 'none';
+            banner.classList.add('u-hidden');
+            banner.style.animation = '';
         }, 300);
     }
 }
@@ -4104,14 +4191,17 @@ if ('serviceWorker' in navigator) {
             // Reload data to show synced changes
             await loadData();
             updateMainDisplay();
+            registerQuickOverlayDeferredListeners();
+            checkSiriParams();
         }
     });
 }
 
 /* --- Uygulama başlatma akışı ---
- * DOMContentLoaded: safe area CSS, ios-pwa sınıfı, diğer erken DOM bağımlı init'ler.
- * window load: DOM cache, event binding (menu, page, modal), tema, loadData → migrateOldDataSafely, updateMainDisplay, setCurrentDate.
- * Sıra: DOM hazır (DOMContentLoaded) → stil/class ayarları; belge + kaynaklar yüklü (load) → cache, event, veri, ilk render.
+ * DOMContentLoaded (bootstrapDomContentLoaded): safe area, ios-pwa, klavye, modal swipe,
+ * isim düzeltme + MutationObserver, mobil tarih.
+ * window load: initDOMCache, bind*, tema, loadData tamamlanınca migrate/updateMainDisplay/setCurrentDate,
+ * ardından hızlı tutar-kategori dinleyicileri ve Siri URL (allData hazır).
  */
 function initApp() {
     const root = document.documentElement;
@@ -4129,7 +4219,57 @@ function initApp() {
     }
 }
 
-document.addEventListener("DOMContentLoaded", initApp);
+function registerQuickOverlayDeferredListeners() {
+    if (quickOverlayAmountListenersRegistered) return;
+    const quickAmountInput = document.getElementById('quickAmount');
+    const quickCategorySelect = document.getElementById('quickCategory');
+
+    if (quickAmountInput) {
+        quickAmountInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === 'Tab') {
+                setTimeout(checkQuickAllocation, 50);
+            }
+        });
+
+        quickAmountInput.addEventListener('blur', () => {
+            setTimeout(checkQuickAllocation, 100);
+        });
+    }
+
+    if (quickCategorySelect) {
+        quickCategorySelect.addEventListener('mousedown', (e) => {
+            const type = document.getElementById('quickTransactionType')?.value;
+            const amount = deformatCurrency(document.getElementById('quickAmount')?.value || '0');
+            const person = quickPersonSelectedValue;
+            const debtCount = person ? getDebtorCategoriesForPerson(person).length : 0;
+
+            if (type === 'gelen' && amount > 0 && debtCount > 1) {
+                e.preventDefault();
+                checkQuickAllocation();
+            }
+        });
+
+        quickCategorySelect.addEventListener('focus', () => {
+            const type = document.getElementById('quickTransactionType')?.value;
+            const amount = deformatCurrency(document.getElementById('quickAmount')?.value || '0');
+
+            if (type === 'gelen' && amount > 0) {
+                checkQuickAllocation();
+            }
+        });
+    }
+    quickOverlayAmountListenersRegistered = true;
+}
+
+function bootstrapDomContentLoaded() {
+    initApp();
+    initPersonSelectKeyboardNav();
+    initModalSwipe();
+    initDisplayNamesAndObserver();
+    initMobileDateDisplay();
+}
+
+document.addEventListener('DOMContentLoaded', bootstrapDomContentLoaded);
 const closeMenuOutside = (event) => {
     if (!event.target.closest('.notification-icon-btn')) {
         const dropdowns = document.querySelectorAll('.dropdown-menu');
@@ -4296,7 +4436,7 @@ function importSystemFromJSON(event) {
 function showQuickTransactionOverlay() {
     
     const quickOverlayContainer = document.getElementById('quickOverlayContainer'); 
-    if (quickOverlayContainer) quickOverlayContainer.style.display = 'flex';
+    if (quickOverlayContainer) quickOverlayContainer.classList.remove('u-hidden');
     
     DOM.mainAppContainer?.classList.add('disable-events');
     document.body.classList.add("disable-events"); 
@@ -4314,7 +4454,7 @@ function showQuickTransactionOverlay() {
 function closeQuickTransactionOverlay() {
     
     const quickOverlayContainer = document.getElementById('quickOverlayContainer'); 
-    if (quickOverlayContainer) quickOverlayContainer.style.display = 'none';
+    if (quickOverlayContainer) quickOverlayContainer.classList.add('u-hidden');
     
     document.body.classList.remove("disable-events"); 
 
@@ -4338,8 +4478,8 @@ function populateQuickPersonList() {
     people.forEach(person => {
         const div = document.createElement('div');
         div.className = 'person-item quick-person-item';
+        div.setAttribute('data-quick-person', encodeURIComponent(person));
         div.textContent = person;
-        div.onclick = () => selectQuickPersonFromOverlay(person);
         list.appendChild(div);
     });
 
@@ -4347,7 +4487,6 @@ function populateQuickPersonList() {
     addBtn.className = 'person-item quick-person-item quick-add-person-btn';
     addBtn.textContent = '+';
     addBtn.title = 'Yeni Kişi Ekle';
-    addBtn.onclick = () => { closeQuickTransactionOverlay(); showPersonManagementModal(); };
     list.appendChild(addBtn);
 }
 
@@ -4359,9 +4498,9 @@ function filterQuickPersonList() {
         if (item.classList.contains('quick-add-person-btn')) return;
         const txt = item.textContent || item.innerText;
         if (txt.toLocaleUpperCase('tr-TR').indexOf(filter) > -1) {
-            item.style.display = "";
+            item.classList.remove('u-hidden');
         } else {
-            item.style.display = "none";
+            item.classList.add('u-hidden');
         }
     });
 }
@@ -4372,10 +4511,10 @@ function selectQuickPersonFromOverlay(person) {
     
     document.querySelector('.quick-panel-content').classList.add('filled-mode');
     
-    document.querySelector('.quick-search-wrapper').style.display = 'none';
-    document.getElementById('quickPersonList').style.display = 'none';
+    document.querySelector('.quick-search-wrapper')?.classList.add('u-hidden');
+    document.getElementById('quickPersonList')?.classList.add('u-hidden');
     
-    document.getElementById('quickTransactionForm').style.display = 'block';
+    document.getElementById('quickTransactionForm').classList.remove('u-hidden');
     document.getElementById('selectedPersonNameDisplay').textContent = person;
     
     populateCategorySelect(document.getElementById('quickCategory'), person);
@@ -4390,10 +4529,10 @@ function resetQuickPanel() {
     
     document.querySelector('.quick-panel-content').classList.remove('filled-mode');
     
-    document.getElementById('quickTransactionForm').style.display = 'none';
+    document.getElementById('quickTransactionForm').classList.add('u-hidden');
     
-    document.querySelector('.quick-search-wrapper').style.display = 'block';
-    document.getElementById('quickPersonList').style.display = 'block';
+    document.querySelector('.quick-search-wrapper')?.classList.remove('u-hidden');
+    document.getElementById('quickPersonList')?.classList.remove('u-hidden');
     document.getElementById('quickSearchInput').value = '';
     filterQuickPersonList(); 
 }
@@ -4446,48 +4585,7 @@ function checkQuickAllocation() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => {
-        const quickAmountInput = document.getElementById('quickAmount');
-        const quickCategorySelect = document.getElementById('quickCategory');
-        
-        if (quickAmountInput) {
-            quickAmountInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === 'Tab') {
-                    setTimeout(checkQuickAllocation, 50);
-                }
-            });
-            
-            quickAmountInput.addEventListener('blur', () => {
-                setTimeout(checkQuickAllocation, 100);
-            });
-        }
-        
-        if (quickCategorySelect) {
-            quickCategorySelect.addEventListener('mousedown', (e) => {
-                const type = document.getElementById('quickTransactionType')?.value;
-                const amount = deformatCurrency(document.getElementById('quickAmount')?.value || '0');
-                const person = quickPersonSelectedValue;
-                const debtCount = person ? getDebtorCategoriesForPerson(person).length : 0;
 
-                if (type === 'gelen' && amount > 0 && debtCount > 1) {
-                    e.preventDefault();
-                    checkQuickAllocation();
-                }
-            });
-            
-            quickCategorySelect.addEventListener('focus', () => {
-                const type = document.getElementById('quickTransactionType')?.value;
-                const amount = deformatCurrency(document.getElementById('quickAmount')?.value || '0');
-                
-                if (type === 'gelen' && amount > 0) {
-                    checkQuickAllocation();
-                }
-            });
-        }
-    }, 500);
-});
- 
 async function processQuickTransaction() {
     if(isProcessing) return; 
     
@@ -4654,22 +4752,6 @@ function closeContextMenu() {
     document.removeEventListener('click', closeContextMenu);
 }
 
-function injectThreeDotMenuStyles() {
-    if (document.getElementById('three-dot-menu-styles')) return;
-    
-    const style = document.createElement('style');
-    style.id = 'three-dot-menu-styles';
-    style.textContent = '.three-dot-menu {background: rgba(14, 21, 37, 0.98);border: 1px solid rgba(255, 255, 255, 0.4);border-radius: 12px;padding: 8px;min-width: 150px;box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);opacity: 0;transform: translateX(20px);transition: all 0.2s ease;}.three-dot-menu.show {opacity: 1;transform: translateX(0);}.three-dot-menu .menu-item {padding: 8px 15px;color: #e0e0e0;font-weight: 600;cursor: pointer;border-radius: 8px;display: flex;align-items: center;gap: 10px;transition: all 0.2s ease;}.three-dot-menu .menu-item:hover {transform: scale(1.05);}.three-dot-menu .menu-item[data-action="delete"]:hover {color: #d40000;}.three-dot-menu .menu-item span {font-size: 18px;}';
-    
-    document.head.appendChild(style);
-}
-
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', injectThreeDotMenuStyles);
-} else {
-    injectThreeDotMenuStyles();
-}
-
 let typingBuffer = '';
 let typingTimeout = null;
 
@@ -4730,12 +4812,6 @@ function findAndSelectPerson(searchText) {
             return;
         }
     }
-}
-
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initPersonSelectKeyboardNav);
-} else {
-    initPersonSelectKeyboardNav();
 }
 
 let modalSwipeStartX = 0;
@@ -4804,19 +4880,13 @@ function handleModalTouchEnd(e) {
         
         if (newIndex >= 0 && newIndex < tabOrder.length) {
             const newTabId = tabOrder[newIndex];
-            const newTabBtn = document.querySelector(`.tab-btn[onclick*="${newTabId}"]`);
-            if (newTabBtn) {  
-                newTabBtn.click();
+            const newTabBtn = document.querySelector(`#personModal .tab-btn[data-tab="${newTabId}"]`);
+            if (newTabBtn) {
+                openTab(null, newTabId, newTabBtn);
             }
         }
     }
 }
-
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initModalSwipe);
-} else {
-    initModalSwipe();
-} 
 
 function updateVersionDisplay() {
     const versionElement = document.querySelector('.version');
@@ -4845,77 +4915,68 @@ function updateVersionDisplay() {
     versionElement.textContent = 'v' + currentVersion + suffix;
 }
 
-(function(){
-  function applyFullName(el){
-    try{
-      if(!el) return;
-      var full = el.getAttribute('data-fullname') || el.getAttribute('data-name') || el.title || el.textContent || el.innerText || '';
-      if(full && full.length>1){
-        el.textContent = full;
-      }
-      el.style.whiteSpace = 'nowrap';
-      el.style.overflow = 'visible';
-      el.style.textOverflow = 'clip';
-      el.style.minWidth = '86px';
-      el.style.maxWidth = '240px';
-      el.style.display = 'inline-block';
-      el.style.padding = '0 6px';
-    }catch(e){
-      console && console.warn && console.warn('applyFullName error', e);
-    }
-  }
-
-  function fixAll(){
-    var items = document.querySelectorAll('.q-name, .quick-item .q-name, .user-name, .display-name');
-    items.forEach(function(el){
-      applyFullName(el);
-      if(el && (!el.title || el.title.length<2)) el.title = el.getAttribute('data-fullname') || el.textContent || el.innerText || el.title;
-    });
-  }
-
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', fixAll);
-  } else {
-    setTimeout(fixAll, 50);
-  } 
-
-  var observerTimeout = null;
-  var obs = new MutationObserver(function(mutations){
-    if(observerTimeout) clearTimeout(observerTimeout);
-    observerTimeout = setTimeout(function(){
-      mutations.forEach(function(m){
-        if(m.addedNodes && m.addedNodes.length){
-          m.addedNodes.forEach(function(node){
-            if(node.nodeType===1){
-              if(node.matches && (node.matches('.q-name') || node.querySelector('.q-name'))){
-                var el = node.matches('.q-name') ? node : node.querySelector('.q-name');
-                applyFullName(el);
-              } else {
-                var inner = node.querySelectorAll && node.querySelectorAll('.q-name');
-                inner && inner.forEach(function(el){ applyFullName(el); });
-              }
+function initDisplayNamesAndObserver() {
+    function applyFullName(el) {
+        try {
+            if (!el) return;
+            el.classList.add('display-name-el');
+            var full = el.getAttribute('data-fullname') || el.getAttribute('data-name') || el.title || el.textContent || el.innerText || '';
+            if (full && full.length > 1) {
+                el.textContent = full;
             }
-          });
+        } catch (e) {
+            if (console && console.warn) console.warn('applyFullName error', e);
         }
-        if(m.type === 'attributes' && m.target && (m.target.classList && m.target.classList.contains('q-name'))){
-          applyFullName(m.target);
-        }
-      });
-    }, 50);
-  });
+    }
 
-  var quickGrid = document.getElementById('quickAccessGrid');
-  if(quickGrid) {
-    obs.observe(quickGrid, {
-      childList: true,
-      subtree: true,
-      attributes: true,
-      attributeFilter: ['class','data-name','data-fullname','title']
+    function refreshDisplayNameElements() {
+        var items = document.querySelectorAll('.q-name, .quick-item .q-name, .user-name, .display-name');
+        items.forEach(function(el) {
+            applyFullName(el);
+            if (el && (!el.title || el.title.length < 2)) {
+                el.title = el.getAttribute('data-fullname') || el.textContent || el.innerText || el.title;
+            }
+        });
+    }
+
+    setTimeout(refreshDisplayNameElements, 50);
+
+    var observerTimeout = null;
+    var obs = new MutationObserver(function(mutations) {
+        if (observerTimeout) clearTimeout(observerTimeout);
+        observerTimeout = setTimeout(function() {
+            mutations.forEach(function(m) {
+                if (m.addedNodes && m.addedNodes.length) {
+                    m.addedNodes.forEach(function(node) {
+                        if (node.nodeType === 1) {
+                            if (node.matches && (node.matches('.q-name') || node.querySelector('.q-name'))) {
+                                var el = node.matches('.q-name') ? node : node.querySelector('.q-name');
+                                applyFullName(el);
+                            } else {
+                                var inner = node.querySelectorAll && node.querySelectorAll('.q-name');
+                                if (inner) inner.forEach(function(el) { applyFullName(el); });
+                            }
+                        }
+                    });
+                }
+                if (m.type === 'attributes' && m.target && (m.target.classList && m.target.classList.contains('q-name'))) {
+                    applyFullName(m.target);
+                }
+            });
+        }, 50);
     });
-  }
 
-  window.__karmotors_forceFixNames = fixAll;
-})();
+    var quickGrid = document.getElementById('quickAccessGrid');
+    if (quickGrid) {
+        obs.observe(quickGrid, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['class', 'data-name', 'data-fullname', 'title']
+        });
+    }
+}
+
 function initMobileDateDisplay() {
     var isNarrow = window.innerWidth <= 800;
     
@@ -5059,12 +5120,6 @@ function updateAllMobileDateDisplays() {
     }
 }
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initMobileDateDisplay);
-} else {
-    initMobileDateDisplay();
-}
-
 function checkSiriParams() {
     const params = new URLSearchParams(window.location.search);
     
@@ -5075,10 +5130,10 @@ function checkSiriParams() {
         const desc = params.get('desc') || '';
         
         window.history.replaceState({}, document.title, window.location.pathname);
-        
-        setTimeout(() => {
+
+        queueMicrotask(function() {
             showSiriConfirmModal(person, amount, type, desc);
-        }, 500);
+        });
     }
 }
 
@@ -5086,52 +5141,53 @@ function showSiriConfirmModal(person, amount, type, desc) {
     const matchedPerson = findMatchingPerson(person);
     const typeText = type === 'gelen' ? 'Gelen' : 'Giden';
     const typeClass = type === 'gelen' ? 'text-income' : 'text-expense';
-    
+    const personDisplayClass = matchedPerson ? 'siri-confirm-value' : 'siri-confirm-value siri-confirm-value--missing';
+    const personDisplayText = matchedPerson ? sanitizeHTML(matchedPerson) : 'Bulunamadı';
+
     const modalHtml = `
-        <div id="siriConfirmModal" class="modal" style="display:flex; z-index:9999;">
-            <div class="modal-content" style="max-width:350px; padding:20px;">
-                <div class="modal-header" style="border-bottom:none; padding-bottom:10px;">
-                    <h2 style="margin:0; font-size:1.2em; display:flex; align-items:center; gap:8px;">
+        <div id="siriConfirmModal" class="modal siri-confirm-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>
                         🎤 Sesli Kayıt Onayı
                     </h2>
                 </div>
-                <div class="modal-body" style="padding:15px 0;">
-                    <div style="background:rgba(255,255,255,0.05); border-radius:12px; padding:15px; margin-bottom:15px;">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
-                            <span style="color:#78909c;">Kişi:</span>
-                            <span style="color:#e0e0e0; font-weight:600;" id="siriPersonDisplay">${matchedPerson || '<span style="color:#d40000;">Bulunamadı</span>'}</span>
+                <div class="modal-body">
+                    <div class="siri-confirm-summary">
+                        <div class="siri-confirm-row">
+                            <span class="siri-confirm-label">Kişi:</span>
+                            <span id="siriPersonDisplay" class="${personDisplayClass}">${personDisplayText}</span>
                         </div>
-                        <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
-                            <span style="color:#78909c;">Tutar:</span>
-                            <span style="color:#e0e0e0; font-weight:600;">${formatAmount(parseFloat(amount) || 0)}</span>
+                        <div class="siri-confirm-row">
+                            <span class="siri-confirm-label">Tutar:</span>
+                            <span class="siri-confirm-value">${formatAmount(parseFloat(amount) || 0)}</span>
                         </div>
-                        <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
-                            <span style="color:#78909c;">Tip:</span>
+                        <div class="siri-confirm-row">
+                            <span class="siri-confirm-label">Tip:</span>
                             <span class="${typeClass}" style="font-weight:600;">${typeText}</span>
                         </div>
                         ${desc ? `
-                        <div style="display:flex; justify-content:space-between;">
-                            <span style="color:#78909c;">Açıklama:</span>
-                            <span style="color:#e0e0e0;">${sanitizeHTML(desc)}</span>
+                        <div class="siri-confirm-row">
+                            <span class="siri-confirm-label">Açıklama:</span>
+                            <span class="siri-confirm-value">${sanitizeHTML(desc)}</span>
                         </div>
                         ` : ''}
                     </div>
                     
                     ${!matchedPerson ? `
-                    <div style="background:rgba(255,23,68,0.1); border:1px solid rgba(255,23,68,0.3); border-radius:8px; padding:10px; margin-bottom:15px;">
-                        <span style="color:#d40000; font-size:0.9em;">⚠️ "${sanitizeHTML(person)}" kişisi bulunamadı. Lütfen kişi seçin:</span>
-                        <select id="siriPersonSelect" style="width:100%; margin-top:8px; padding:10px; border-radius:8px; background:#1a2332; color:#e0e0e0; border:1px solid rgba(255,255,255,0.2);">
+                    <div class="siri-confirm-warn">
+                        <span class="siri-confirm-warn-text">⚠️ "${sanitizeHTML(person)}" kişisi bulunamadı. Lütfen kişi seçin:</span>
+                        <select id="siriPersonSelect" class="siri-person-select">
                             <option value="">Kişi Seçin...</option>
                         </select>
                     </div>
                     ` : ''}
                     
-                    <div style="display:flex; gap:10px;">
-                        <button onclick="closeSiriModal()" class="btn" style="flex:1; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);">
+                    <div class="siri-confirm-actions">
+                        <button type="button" class="btn siri-confirm-btn-secondary" data-siri-action="cancel">
                             ❌ İptal
                         </button>
-                        <button onclick="confirmSiriTransaction('${matchedPerson || ''}', ${parseFloat(amount) || 0}, '${type}', '${desc.replace(/'/g, "\\'")}')" 
-                                class="btn btn-success" style="flex:1;" ${!matchedPerson ? 'id="siriConfirmBtn"' : ''}>
+                        <button type="button" class="btn btn-success" data-siri-action="confirm">
                             ✅ Onayla
                         </button>
                     </div>
@@ -5139,25 +5195,47 @@ function showSiriConfirmModal(person, amount, type, desc) {
             </div>
         </div>
     `;
-    
+
     document.body.insertAdjacentHTML('beforeend', modalHtml);
-    
+
+    const root = document.getElementById('siriConfirmModal');
+    if (!root) return;
+
+    const cancelBtn = root.querySelector('[data-siri-action="cancel"]');
+    if (cancelBtn) cancelBtn.addEventListener('click', closeSiriModal);
+
+    const amountNum = parseFloat(amount) || 0;
+    const confirmBtn = root.querySelector('[data-siri-action="confirm"]');
+    if (confirmBtn) {
+        confirmBtn.addEventListener('click', function() {
+            let resolved = matchedPerson;
+            if (!resolved) {
+                const sel = document.getElementById('siriPersonSelect');
+                resolved = sel ? sel.value : '';
+            }
+            confirmSiriTransaction(resolved, amountNum, type, desc);
+        });
+    }
+
     if (!matchedPerson) {
         const select = document.getElementById('siriPersonSelect');
         if (select && allData) {
             Object.keys(allData).sort().forEach(p => {
+                if (p === 'metadata') return;
                 const opt = document.createElement('option');
                 opt.value = p;
                 opt.textContent = p;
                 select.appendChild(opt);
             });
-            
+
             select.addEventListener('change', function() {
-                const btn = document.getElementById('siriConfirmBtn');
                 const display = document.getElementById('siriPersonDisplay');
+                if (!display) return;
                 if (this.value) {
-                    btn.onclick = () => confirmSiriTransaction(this.value, parseFloat(amount) || 0, type, desc);
-                    display.innerHTML = `<span style="color:#00e676;">${sanitizeHTML(this.value)}</span>`;
+                    display.innerHTML = '<span class="siri-confirm-value--ok">' + sanitizeHTML(this.value) + '</span>';
+                } else {
+                    display.textContent = 'Bulunamadı';
+                    display.className = 'siri-confirm-value siri-confirm-value--missing';
                 }
             });
         }
@@ -5218,13 +5296,6 @@ function confirmSiriTransaction(person, amount, type, desc) {
     
     updateMainDisplay();
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(checkSiriParams, 1000);
-});
-
-
-
 
 
 
