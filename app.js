@@ -2420,7 +2420,7 @@ function updateAllocationTotals() {
     });
 
     if (allocatedTotal > totalAmount) {
-        showNotification('Dağıtılan tutar gelen paradan fazla!', 'error');
+        showNotification(VALIDATION_MSG.allocationOverTotal, 'error');
     }
 
     const remainingAmount = totalAmount - allocatedTotal;
@@ -2495,7 +2495,7 @@ async function confirmAllocation() {
     }
 
     if (allocatedTotal > totalReceived + 0.01) {
-        showNotification('Dağıtılan tutar gelen paradan fazla!', 'error');
+        showNotification(VALIDATION_MSG.allocationOverTotal, 'error');
         return;
     }
 
@@ -2582,14 +2582,50 @@ async function finalizeAllocation(description) {
     }
 }
 
+/** Form doğrulama — kısa, tutarlı kullanıcı mesajları (showNotification ile). */
+var VALIDATION_MSG = {
+    selectPerson: 'Kişi seçin',
+    validAmount: 'Geçerli bir tutar girin',
+    selectCategory: 'Kategori seçin',
+    selectTransType: 'İşlem tipi seçin',
+    validDate: 'Geçerli bir tarih seçin',
+    enterName: 'İsim girin',
+    duplicatePerson: 'Bu isim zaten var',
+    duplicateCategory: 'Bu isimde kategori zaten var',
+    enterCategoryName: 'Kategori adı girin',
+    allocationOverTotal: 'Dağıtılan tutar, gelen tutardan fazla olamaz'
+};
+
+function isValidPositiveAmount(amount) {
+    var n = Number(amount);
+    return !isNaN(n) && isFinite(n) && n > 0;
+}
+
+function isValidOptionalIsoDate(str) {
+    if (!str) return true;
+    var s = String(str).trim();
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) return false;
+    var p = s.split('-');
+    var year = parseInt(p[0], 10);
+    var month = parseInt(p[1], 10);
+    var day = parseInt(p[2], 10);
+    if (month < 1 || month > 12 || day < 1 || day > 31) return false;
+    var d = new Date(year, month - 1, day);
+    return d.getFullYear() === year && d.getMonth() === month - 1 && d.getDate() === day;
+}
+
 async function processSingleTransaction() {
     if(isProcessing) return;
-    
+
+    if (!currentPerson || !allData[currentPerson]) {
+        return showNotification(VALIDATION_MSG.selectPerson, 'error');
+    }
+
     const amount = deformatCurrency(DOM.amount?.value || '0');
     let category = DOM.category?.value || '';
     const transType = DOM.transactionType?.value || '';
-    if (amount === 0) return showNotification('Tutar giriniz!', 'error');
-    if (!transType) return showNotification('İşlem tipi seçiniz!', 'error');
+    if (!isValidPositiveAmount(amount)) return showNotification(VALIDATION_MSG.validAmount, 'error');
+    if (!transType) return showNotification(VALIDATION_MSG.selectTransType, 'error');
 
     if (transType === 'gelen') {
         const debts = getDebtorCategoriesForPerson(currentPerson);
@@ -2600,7 +2636,12 @@ async function processSingleTransaction() {
         }
     }
 
-    if (!category) return showNotification('Kategori seçiniz!', 'error');
+    if (!category) return showNotification(VALIDATION_MSG.selectCategory, 'error');
+
+    const dateStr = DOM.dateInput?.value || '';
+    if (dateStr && !isValidOptionalIsoDate(dateStr)) {
+        return showNotification(VALIDATION_MSG.validDate, 'error');
+    }
 
     let desc = DOM.description?.value?.trim() || '';
     desc = formatTitleCase(desc); 
@@ -2708,26 +2749,36 @@ function editTransaction(id) {
 }
 
 async function saveEditedTransaction() {
-    if (!confirm('Düzenlemeyi Kaydetmek İstediğinizden Emin misiniz?')) return;
+    if (isProcessing) return;
 
-    if(isProcessing) return; 
-    isProcessing = true;
-    
     const person = currentPerson;
-    
-    deleteTransaction(editingTransactionId, true); 
-    
+    if (!person || !allData[person]) {
+        return showNotification(VALIDATION_MSG.selectPerson, 'error');
+    }
+
     const type = document.getElementById('editTransactionType').value;
     const amount = deformatCurrency(document.getElementById('editAmount').value);
     const cat = document.getElementById('editCategory').value;
-    
+    const dateStr = document.getElementById('editDateInput').value;
+
+    if (!isValidPositiveAmount(amount)) return showNotification(VALIDATION_MSG.validAmount, 'error');
+    if (!type) return showNotification(VALIDATION_MSG.selectTransType, 'error');
+    if (!cat) return showNotification(VALIDATION_MSG.selectCategory, 'error');
+    if (dateStr && !isValidOptionalIsoDate(dateStr)) {
+        return showNotification(VALIDATION_MSG.validDate, 'error');
+    }
+
+    if (!confirm('Düzenlemeyi Kaydetmek İstediğinizden Emin misiniz?')) return;
+
+    isProcessing = true;
+
     let desc = document.getElementById('editDescription').value;
     desc = formatTitleCase(desc);
 
-    const dateStr = document.getElementById('editDateInput').value;
     const date = dateStr ? (dateStr + 'T12:00:00.000') : getLocalTimeISO();
-    
+
     try {
+        deleteTransaction(editingTransactionId, true);
         addTransaction(person, type, amount, cat, desc, date);
         queueSave();
         closeCurrentModal(document.getElementById('editTransactionModal'));
@@ -2910,12 +2961,12 @@ async function addNewPerson() {
     const name = nameInput.value.trim();
     
     if (!name) {
-        showNotification('İsim boş olamaz!', 'error');
+        showNotification(VALIDATION_MSG.enterName, 'error');
         return;
     }
     
     if (allData[name]) {
-        showNotification('Bu kişi zaten var!', 'error');
+        showNotification(VALIDATION_MSG.duplicatePerson, 'error');
         return;
     }
     
@@ -2994,18 +3045,20 @@ function toggleFav(p) {
 
 function editPersonName(oldName) {
     const newName = prompt("Yeni ismi giriniz:", oldName);
-    if (newName && newName.trim() !== "" && newName !== oldName) {
-        if (allData[newName.trim()]) {
-            showNotification('Bu isimde başka biri zaten var!', 'error');
-            return;
-        }
-        allData[newName.trim()] = allData[oldName];
-        delete allData[oldName];
-        queueSave();
-        showPersonManagementModal();
-        updateMainDisplay();
-        showNotification('İsim güncellendi', 'success');
+    if (newName === null) return;
+    const trimmed = newName.trim();
+    if (!trimmed) return showNotification(VALIDATION_MSG.enterName, 'error');
+    if (trimmed === oldName) return;
+    if (allData[trimmed]) {
+        showNotification(VALIDATION_MSG.duplicatePerson, 'error');
+        return;
     }
+    allData[trimmed] = allData[oldName];
+    delete allData[oldName];
+    queueSave();
+    showPersonManagementModal();
+    updateMainDisplay();
+    showNotification('İsim güncellendi', 'success');
 }
 
 function deletePersonByName(personName) {
@@ -3081,8 +3134,11 @@ function populateCategoryEditor(person) {
 function addCategoryFromManager() {
     const person = document.getElementById('categoryManagementPersonSelect').value;
     const categoryName = document.getElementById('newManagedCategoryInput').value.trim();
-    if (!person || !categoryName) return showNotification('Bilgileri kontrol edin', 'error');
-    if (allData[person].categories.includes(categoryName)) return showNotification('Zaten var', 'error');
+    if (!person) return showNotification(VALIDATION_MSG.selectPerson, 'error');
+    if (!categoryName) return showNotification(VALIDATION_MSG.enterCategoryName, 'error');
+    if (allData[person].categories.includes(categoryName)) {
+        return showNotification(VALIDATION_MSG.duplicateCategory, 'error');
+    }
 
     allData[person].categories.push(categoryName);
     allData[person].categoryBalances[categoryName] = 0;
@@ -3096,12 +3152,13 @@ function addCategoryFromManager() {
 function editCategoryName(person, oldName) {
     const newName = prompt("Yeni kategori ismini giriniz:", oldName);
     
-    if (!newName || newName.trim() === "" || newName === oldName) return;
-    
+    if (newName === null) return;
     const cleanNewName = newName.trim();
+    if (!cleanNewName) return showNotification(VALIDATION_MSG.enterCategoryName, 'error');
+    if (cleanNewName === oldName) return;
     
     if (allData[person].categories.includes(cleanNewName)) {
-        showNotification('Bu isimde kategori zaten var!', 'error');
+        showNotification(VALIDATION_MSG.duplicateCategory, 'error');
         return;
     }
 
@@ -3320,7 +3377,7 @@ function createCategorySummaryData(person, allTransactions, periodTransactions, 
 function exportToExcel() {
     if (exportInProgress) return showNotification("⚠️ Rapor hazırlanıyor...", "warning");
     const person = currentPerson;
-    if (!person) return showNotification('Önce kişi seçmelisiniz.', 'error');
+    if (!person) return showNotification(VALIDATION_MSG.selectPerson, 'error');
     
     exportInProgress = true;
     
@@ -3497,7 +3554,7 @@ function exportToExcel() {
 
 function showMonthlySummaryModal() {
     const person = currentPerson;
-    if (!person) return showNotification('Kişi seçiniz', 'error');
+    if (!person) return showNotification(VALIDATION_MSG.selectPerson, 'error');
     
     const ySel = document.getElementById('summaryYearSelect');
     const mSel = document.getElementById('summaryMonthSelect');
@@ -3526,7 +3583,7 @@ async function exportMonthlySummary() {
     const year = document.getElementById('summaryYearSelect').value;
     const monthIndex = document.getElementById('summaryMonthSelect').value;
 
-    if (!person || !year || monthIndex === "") return showNotification('Lütfen Tarih Seçiniz', 'error');
+    if (!person || !year || monthIndex === "") return showNotification(VALIDATION_MSG.validDate, 'error');
 
     exportInProgress = true;
     const btn = document.getElementById('generateReportBtn');
@@ -4627,7 +4684,7 @@ function checkQuickAllocation() {
     const person = quickPersonSelectedValue;
     const amount = deformatCurrency(document.getElementById('quickAmount')?.value || '0');
 
-    if (type !== 'gelen' || !person || amount <= 0) return;
+    if (type !== 'gelen' || !person || !isValidPositiveAmount(amount)) return;
     if (!allData[person]) return;
 
     const debts = getDebtorCategoriesForPerson(person);
@@ -4664,9 +4721,10 @@ async function processQuickTransaction() {
     let category = document.getElementById('quickCategory').value;
     const type = document.getElementById('quickTransactionType').value;
 
-    if (!person) return showNotification('Kişi seçiniz!', 'error');
-    if (amount === 0) return showNotification('Tutar giriniz!', 'error');
-    if (!type) return showNotification('İşlem tipi seçiniz!', 'error');
+    if (!person) return showNotification(VALIDATION_MSG.selectPerson, 'error');
+    if (!allData[person]) return showNotification(VALIDATION_MSG.selectPerson, 'error');
+    if (!isValidPositiveAmount(amount)) return showNotification(VALIDATION_MSG.validAmount, 'error');
+    if (!type) return showNotification(VALIDATION_MSG.selectTransType, 'error');
 
     let desc = document.getElementById('quickDescription').value.trim();
     desc = formatTitleCase(desc); 
@@ -4698,7 +4756,7 @@ async function processQuickTransaction() {
         }
     }
 
-    if (!category) return showNotification('Kategori seçiniz!', 'error');
+    if (!category) return showNotification(VALIDATION_MSG.selectCategory, 'error');
  
     isProcessing = true;
     const btn = document.querySelector('#quickTransactionForm .btn-success');
@@ -5183,12 +5241,12 @@ function closeSiriModal() {
 
 function confirmSiriTransaction(person, amount, type, desc) {
     if (!person) {
-        showNotification('Lütfen kişi seçin!', 'error');
+        showNotification(VALIDATION_MSG.selectPerson, 'error');
         return;
     }
     
-    if (amount <= 0) {
-        showNotification('Geçersiz tutar!', 'error');
+    if (!isValidPositiveAmount(amount)) {
+        showNotification(VALIDATION_MSG.validAmount, 'error');
         return;
     }
     
