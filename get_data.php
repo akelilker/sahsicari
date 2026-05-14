@@ -23,6 +23,22 @@ function isValidJsonObjectOrArray(string $text): bool {
     return is_array($decoded);
 }
 
+function getBackupSortKey(string $filePath): int {
+    $fileName = basename($filePath);
+    if (preg_match('/^(?:veriler|backup)_(\d{4})-(\d{2})-(\d{2})_(\d{2})-(\d{2})(?:-(\d{2}))?/', $fileName, $matches)) {
+        $year = (int) $matches[1];
+        $month = (int) $matches[2];
+        $day = (int) $matches[3];
+        $hour = (int) $matches[4];
+        $minute = (int) $matches[5];
+        $second = isset($matches[6]) ? (int) $matches[6] : 0;
+        return gmmktime($hour, $minute, $second, $month, $day, $year);
+    }
+
+    $mtime = @filemtime($filePath);
+    return $mtime !== false ? (int) $mtime : 0;
+}
+
 function getBackupCandidates(string $backupDir): array {
     $patterns = [
         $backupDir . '/veriler_*.json',
@@ -39,10 +55,21 @@ function getBackupCandidates(string $backupDir): array {
 
     $files = array_values(array_unique($files));
     usort($files, function($a, $b) {
-        return filemtime($b) <=> filemtime($a);
+        $timeCompare = getBackupSortKey($b) <=> getBackupSortKey($a);
+        if ($timeCompare !== 0) return $timeCompare;
+
+        $mtimeCompare = (@filemtime($b) ?: 0) <=> (@filemtime($a) ?: 0);
+        if ($mtimeCompare !== 0) return $mtimeCompare;
+
+        return strcmp(basename($b), basename($a));
     });
 
     return $files;
+}
+
+function tryRestoreMainFileFromBackup(string $mainFile, string $backupFile): void {
+    if (file_exists($mainFile)) return;
+    @copy($backupFile, $mainFile);
 }
 
 // 1) Ana dosya var ve geçerli JSON ise dön (source: main)
@@ -65,6 +92,7 @@ if ($backupFiles) {
     foreach ($backupFiles as $bf) {
         $bcontent = @file_get_contents($bf);
         if ($bcontent !== false && isValidJsonObjectOrArray($bcontent)) {
+            tryRestoreMainFileFromBackup($mainFile, $bf);
             header('X-Data-Source: backup');
             $mtime = @filemtime($bf);
             if ($mtime !== false) {
