@@ -18,6 +18,28 @@
     display: none !important;
 }
 
+/* Dağıtım kalan tutar rengi (updateAllocationTotals — classList) */
+#allocationRemainingDisplay.allocation-remaining--balanced {
+    color: #66bb6a;
+}
+#allocationRemainingDisplay.allocation-remaining--positive {
+    color: #ffd54f;
+}
+#allocationRemainingDisplay.allocation-remaining--negative {
+    color: #d40000;
+}
+
+/* Bildirim geçmişi menü satırları */
+.notif-menu-item {
+    font-size: 0.85em;
+}
+.notif-menu-item--success {
+    color: #81c784;
+}
+.notif-menu-item--error {
+    color: #d40000;
+}
+
 /* Özet paylaşım satırı — toggleShareOptions ile class üzerinden */
 #shareOptions {
     display: none;
@@ -1239,6 +1261,10 @@ button.delete-notif-btn {
     box-shadow: 0 0 0 2px rgba(66, 165, 245, 0.22);
 }
 
+.person-select-trigger.person-select-trigger--match {
+    border-color: #42a5f5 !important;
+}
+
 .person-select-chevron {
     position: absolute;
     right: 13px;
@@ -1624,6 +1650,10 @@ button.delete-notif-btn {
     background: rgba(66, 165, 245, 0.2);
     border: 1px dashed rgba(66, 165, 245, 0.5);
     transform: scale(1.05);
+}
+
+.quick-item.quick-item--dragging {
+    opacity: 0.5;
 }
 
 .q-icon {

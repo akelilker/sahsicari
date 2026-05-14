@@ -574,7 +574,7 @@ window.addEventListener('load', async function() {
     await loadGlowTheme();
     updateServerStatus('', '📡 Veriler yükleniyor...');
 
-    loadData().then(async () => {
+    loadData().then(async (loadResult) => {
         const savedNotifications = await advancedStorage.getItem('sahsiHesapTakibiNotifications');
         if (savedNotifications) notificationHistory = JSON.parse(savedNotifications);
 
@@ -583,7 +583,9 @@ window.addEventListener('load', async function() {
         setCurrentDate();
 
         registerQuickOverlayDeferredListeners();
-        checkSiriParams();
+        if (loadResult && loadResult.ok && loadResult.hasPeopleData) {
+            checkSiriParams();
+        }
     });
 });
 
@@ -740,6 +742,12 @@ function loadDataFromServer() {
     });
 }
 
+/** @typedef {{ ok: boolean, hasPeopleData: boolean, source: string }} LoadDataResult */
+
+/**
+ * Veriyi yükler. Siri / kişi eşlemesi için: `ok && hasPeopleData` anlamlıdır.
+ * @returns {Promise<LoadDataResult>}
+ */
 async function loadData() {
     let localData = null;
     try {
@@ -769,12 +777,13 @@ async function loadData() {
                 } catch (pushErr) {
                     updateServerStatus('error', 'Yerel veri sunucuya gonderilemedi');
                 }
-                return true;
+                const hasPD = hasPersistedPeopleData(allData);
+                return { ok: hasPD, hasPeopleData: hasPD, source: 'local-unsynced-reconciled' };
             }
             allData = serverData;
             hasLoadedServerData = true;
             updateServerStatus('success', serverSource === 'backup' ? 'Yedek veriden yuklendi' : 'Sunucudan yuklendi');
-            return true;
+            return { ok: true, hasPeopleData: true, source: serverSource === 'backup' ? 'backup' : 'server' };
         }
         if (isMetadataOnlyServerData) {
             updateServerStatus('error', 'Sunucuda yalnizca metadata var, veri yuklenemedi');
@@ -787,15 +796,20 @@ async function loadData() {
             hasLoadedServerData = false;
             updateServerStatus(isMetadataOnlyServerData || serverSource === 'default' ? 'error' : 'success', isMetadataOnlyServerData ? 'Sunucuda yalnizca metadata var, veri yuklenemedi' : (serverSource === 'default' ? 'Sunucuda veri veya yedek bulunamadi' : 'Yeni sistem hazir'));
         }
-        return true;
+        const hasPD = hasPersistedPeopleData(allData);
+        const source = localData
+            ? 'local-fallback'
+            : (isMetadataOnlyServerData ? 'metadata-only-empty' : (serverSource === 'default' ? 'empty-server' : 'new-system'));
+        return { ok: hasPD, hasPeopleData: hasPD, source };
     } catch (error) {
         if (localData) {
             allData = localData;
             updateServerStatus('error', 'Sunucuya ulasilamadi, yerel veri yuklendi');
-        } else {
-            updateServerStatus('error', 'Baglanti hatasi');
+            const hasPD = hasPersistedPeopleData(allData);
+            return { ok: true, hasPeopleData: hasPD, source: 'offline-local' };
         }
-        return false;
+        updateServerStatus('error', 'Baglanti hatasi');
+        return { ok: false, hasPeopleData: hasPersistedPeopleData(allData), source: 'fatal' };
     }
 }
 
@@ -1079,7 +1093,7 @@ function handleQuickItemClick(event, person) {
 function handleDragStart(event, index) {
     draggedIndex = index;
     const el = event.currentTarget;
-    if (el) el.style.opacity = '0.5';
+    if (el) el.classList.add('quick-item--dragging');
     event.dataTransfer.effectAllowed = 'move';
     event.dataTransfer.setData('text/html', el ? el.innerHTML : '');
 }
@@ -1116,7 +1130,7 @@ function handleDrop(event, dropIndex) {
 
 function handleDragEnd(event) {
     const el = event.currentTarget;
-    if (el) el.style.opacity = '';
+    if (el) el.classList.remove('quick-item--dragging');
     if (draggedIndex !== null) {
         justDragged = true;
         setTimeout(() => { justDragged = false; }, 100);
@@ -1148,7 +1162,7 @@ function handleTouchMove(event) {
         event.preventDefault();
         
         const draggedEl = document.querySelector(`.quick-item[data-index="${touchDraggedIndex}"]`);
-        if (draggedEl) draggedEl.style.opacity = '0.5';
+        if (draggedEl) draggedEl.classList.add('quick-item--dragging');
         
         const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
         const targetItem = elementBelow?.closest('.quick-item');
@@ -1163,8 +1177,7 @@ function handleTouchMove(event) {
 
 function handleTouchEnd(event, originalDropIndex) {
     document.querySelectorAll('.quick-item').forEach(el => {
-        el.classList.remove('drag-over');
-        el.style.opacity = '';
+        el.classList.remove('drag-over', 'quick-item--dragging');
     });
     
     if (!isTouchDragging) {
@@ -1308,7 +1321,7 @@ function updateGelenAllocateButtonVisibility() {
     const btn = document.getElementById('gelenAllocateBtn');
     if (!btn) return;
     // Manual allocation button is deprecated; keep hidden for backward compatibility.
-    btn.style.display = 'none';
+    btn.classList.add('u-hidden');
 }
 
 function getDebtorCategoriesForPerson(person) {
@@ -1644,8 +1657,6 @@ function openPersonModal(person) {
 
     openModal('personModal');
     updateGelenAllocateButtonVisibility();
-
-    setTimeout(() => initModalSwipe(), 100);
 }
 
 function updatePersonTotalInfo(person) {
@@ -2222,9 +2233,10 @@ function updateAllocationTotals() {
     
     if(displayEl) {
         displayEl.textContent = formatAmount(remainingAmount);
-        if(remainingAmount === 0) displayEl.style.color = '#66bb6a';
-        else if (remainingAmount > 0) displayEl.style.color = '#ffd54f';
-        else displayEl.style.color = '#d40000';
+        displayEl.classList.remove('allocation-remaining--balanced', 'allocation-remaining--positive', 'allocation-remaining--negative');
+        if (remainingAmount === 0) displayEl.classList.add('allocation-remaining--balanced');
+        else if (remainingAmount > 0) displayEl.classList.add('allocation-remaining--positive');
+        else displayEl.classList.add('allocation-remaining--negative');
     }
 }
 
@@ -3037,10 +3049,8 @@ function renderNotificationMenu() {
         for (let i = notificationHistory.length - 1; i >= 0; i--) {
             const notif = notificationHistory[i];
             const item = document.createElement('div');
-            const color = notif.type === 'success' ? '#81c784' : '#d40000';
-            
-            item.style.color = color;
-            item.style.fontSize = '0.85em';
+            item.className = 'notif-menu-item ' + (notif.type === 'success' ? 'notif-menu-item--success' : 'notif-menu-item--error');
+
             item.innerHTML = `
                 <span>${sanitizeHTML(notif.message)}</span>
                 <button type="button" class="delete-notif-btn" data-notification-index="${i}" aria-label="Bildirimi sil">✖</button>
@@ -4189,10 +4199,12 @@ if ('serviceWorker' in navigator) {
             console.log('Background sync completed:', event.data.syncedCount, 'items');
             await showNotification(`${event.data.syncedCount} değişiklik senkronize edildi`, 'success');
             // Reload data to show synced changes
-            await loadData();
+            const loadResult = await loadData();
             updateMainDisplay();
             registerQuickOverlayDeferredListeners();
-            checkSiriParams();
+            if (loadResult && loadResult.ok && loadResult.hasPeopleData) {
+                checkSiriParams();
+            }
         }
     });
 }
@@ -4804,10 +4816,12 @@ function findAndSelectPerson(searchText) {
                 renderCustomPersonSelectOptions(options[i].value);
             }
 
-            if (DOM.personSelectTrigger) DOM.personSelectTrigger.style.borderColor = '#42a5f5';
-            setTimeout(() => {
-                if (DOM.personSelectTrigger) DOM.personSelectTrigger.style.borderColor = '';
-            }, 300);
+            if (DOM.personSelectTrigger) {
+                DOM.personSelectTrigger.classList.add('person-select-trigger--match');
+                setTimeout(function() {
+                    if (DOM.personSelectTrigger) DOM.personSelectTrigger.classList.remove('person-select-trigger--match');
+                }, 300);
+            }
             
             return;
         }
@@ -4825,10 +4839,11 @@ const tabOrder = ['yeniIslem', 'islemGecmisi', 'kategoriDurumu', 'raporlar'];
 function initModalSwipe() {
     const modal = document.getElementById('personModal');
     if (!modal) return;
-    
+
     const modalContent = modal.querySelector('.modal-content');
-    if (!modalContent) return;
-    
+    if (!modalContent || modalContent.dataset.modalSwipeBound === '1') return;
+    modalContent.dataset.modalSwipeBound = '1';
+
     modalContent.addEventListener('touchstart', handleModalTouchStart, { passive: true });
     modalContent.addEventListener('touchmove', handleModalTouchMove, { passive: true });
     modalContent.addEventListener('touchend', handleModalTouchEnd, { passive: true });
