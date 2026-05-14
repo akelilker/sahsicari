@@ -4577,16 +4577,6 @@ label[for="editDateInput"] {
         box-shadow: none;
     }
 
-    .summary-card,
-    .quick-access-section,
-    .debt-status-section,
-    .control-panel {
-        border-color: rgba(214, 224, 232, 0.74);
-        box-shadow:
-            0 0 0 1px rgba(255, 255, 255, 0.08),
-            0 8px 18px rgba(0, 0, 0, 0.28);
-    }
-
     .quick-item {
         box-shadow: none;
         transform: none;
@@ -5285,6 +5275,15 @@ label[for="editDateInput"] {
     body {
         background: #0c1628;
     }
+    .summary-card,
+    .debt-status-section,
+    .debt-status-section h3,
+    .control-panel,
+    .control-panel h3,
+    .control-panel .btn,
+    .control-panel .file-upload-btn {
+        border-color: var(--frame-gray);
+    }
     .container {
         background: rgba(12, 18, 32, 0.97);
     }
@@ -5304,8 +5303,7 @@ label[for="editDateInput"] {
         margin-top: 5px;
     }
     .quick-access-section {
-        background: rgba(10, 16, 30, 0.85);
-        border: 1px solid rgba(214, 224, 232, 0.72);
+        background: transparent;
         margin-bottom: 3px; /* Favori kişiler ile Cari Kayıt arası 3px */
     }
     .quick-access-section h3 {
