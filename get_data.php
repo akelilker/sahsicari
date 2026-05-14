@@ -23,6 +23,25 @@ function isValidJsonObjectOrArray(string $text): bool {
     return is_array($decoded);
 }
 
+function decodeJsonArray(string $text): ?array {
+    $decoded = json_decode($text, true);
+    if (json_last_error() !== JSON_ERROR_NONE || !is_array($decoded)) {
+        return null;
+    }
+    return $decoded;
+}
+
+function countPersistedPeople(array $data): int {
+    $count = 0;
+    foreach ($data as $key => $value) {
+        if ($key === 'metadata' || !is_array($value)) {
+            continue;
+        }
+        $count++;
+    }
+    return $count;
+}
+
 function getBackupSortKey(string $filePath): int {
     $fileName = basename($filePath);
     if (preg_match('/^(?:veriler|backup)_(\d{4})-(\d{2})-(\d{2})_(\d{2})-(\d{2})(?:-(\d{2}))?/', $fileName, $matches)) {
@@ -75,7 +94,8 @@ function tryRestoreMainFileFromBackup(string $mainFile, string $backupFile): voi
 // 1) Ana dosya var ve geçerli JSON ise dön (source: main)
 if (file_exists($mainFile)) {
     $content = @file_get_contents($mainFile);
-    if ($content !== false && isValidJsonObjectOrArray($content)) {
+    $decodedMain = $content !== false ? decodeJsonArray($content) : null;
+    if (is_array($decodedMain) && countPersistedPeople($decodedMain) > 0) {
         header('X-Data-Source: main');
         $mtime = @filemtime($mainFile);
         if ($mtime !== false) {
@@ -91,7 +111,8 @@ $backupFiles = getBackupCandidates($backupDir);
 if ($backupFiles) {
     foreach ($backupFiles as $bf) {
         $bcontent = @file_get_contents($bf);
-        if ($bcontent !== false && isValidJsonObjectOrArray($bcontent)) {
+        $decodedBackup = $bcontent !== false ? decodeJsonArray($bcontent) : null;
+        if (is_array($decodedBackup) && countPersistedPeople($decodedBackup) > 0) {
             tryRestoreMainFileFromBackup($mainFile, $bf);
             header('X-Data-Source: backup');
             $mtime = @filemtime($bf);
