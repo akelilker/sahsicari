@@ -485,6 +485,7 @@ function updateServerStatus(type, message) {
     const dot = DOM.statusDot;
     const text = DOM.serverStatusText;
     if (!dot || !text) return;
+    const safeMessage = (typeof message === 'string' && message.trim()) ? message : 'Sistem hazir';
 
     if (statusDotHideTimer) {
         clearTimeout(statusDotHideTimer);
@@ -498,24 +499,24 @@ function updateServerStatus(type, message) {
     if (type === 'success') {
         dot.classList.add('online');
         text.classList.add('text-online'); 
-        text.textContent = 'Sistem hazır'; 
+        text.textContent = safeMessage; 
         statusDotHideTimer = setTimeout(() => {
             if (DOM.statusDot) DOM.statusDot.classList.add('hidden');
         }, 10000);
     } else if (type === 'error') {
         dot.classList.add('offline');
         text.classList.add('text-offline'); 
-        text.textContent = 'Sistem hazır';
+        text.textContent = safeMessage;
     } else {
         dot.classList.add('syncing');
         text.classList.add('text-online');
-        text.textContent = 'Sistem hazır';
+        text.textContent = safeMessage;
         text.style.color = '#ffea00'; 
     }
 }
 
 async function testServerConnection() {
-    updateServerStatus('', '🔄 Bağlantı test ediliyor...');
+    updateServerStatus('', 'Baglanti test ediliyor...');
     try {
         const response = await fetchWithTimeout('get_data.php?test=1&t=' + Date.now(), { 
             method: 'GET', 
@@ -526,16 +527,19 @@ async function testServerConnection() {
         
         if (response.ok) {
             const text = await response.text();
-            if (text.trim().startsWith('{')) { 
+            const dataSource = response.headers.get('X-Data-Source') || '';
+            if (dataSource === 'default') {
+                updateServerStatus('error', 'Sunucuda veri veya yedek bulunamadi');
+            } else if (text.trim().startsWith('{')) { 
                 updateServerStatus('success', 'Sunucu baglantisi basarili');
             } else {
                 updateServerStatus('error', 'Sunucu cevabi gecersiz'); 
             }
         } else {
-            updateServerStatus('error', `❌ HTTP Hatası: ${response.status}`);
+            updateServerStatus('error', `HTTP hatasi: ${response.status}`);
         }
     } catch (error) {
-        updateServerStatus('error', error && error.name === 'AbortError' ? '❌ Bağlantı zaman aşımı' : '❌ Sunucuya Ulaşılamadı');
+        updateServerStatus('error', error && error.name === 'AbortError' ? 'Baglanti zaman asimi' : 'Sunucuya ulasilamadi');
     }
 }
 
@@ -607,6 +611,7 @@ function loadDataFromServer() {
     })
     .then(async response => {
         const text = await response.text();
+        const source = response.headers.get('X-Data-Source') || '';
         if (!response.ok) {
             let msg = 'HTTP ' + response.status;
             try {
@@ -616,13 +621,13 @@ function loadDataFromServer() {
             console.warn('get_data.php hatası:', msg);
             throw new Error(msg);
         }
-        return text;
+        return { text, source };
     })
-    .then(text => {
+    .then(({ text, source }) => {
         try {
             const result = JSON.parse(text);
-            if (result.status === 'success' && result.data) return result.data;
-            if (typeof result === 'object') return result;
+            if (result.status === 'success' && result.data) return { data: result.data, source: source || 'main' };
+            if (typeof result === 'object') return { data: result, source };
             
             throw new Error('Veri alınamadı');
         } catch (e) { throw new Error('Sunucu hatası: ' + text); }
@@ -637,39 +642,45 @@ async function loadData() {
     } catch (_) {}
 
     try {
-        const serverData = await loadDataFromServer();
+        const serverResult = await loadDataFromServer();
+        const serverData = serverResult && serverResult.data ? serverResult.data : {};
+        const serverSource = serverResult && serverResult.source ? serverResult.source : '';
         if (serverData && Object.keys(serverData).length > 0) {
             if (localData && localData.metadata && localData.metadata.unsynced === true) {
                 allData = localData;
                 hasLoadedServerData = false;
-                updateServerStatus('', '🔄 Yerel değişiklikler korunuyor, sunucuya gönderiliyor...');
+                updateServerStatus('', 'Yerel degisiklikler korunuyor, sunucuya gonderiliyor...');
                 try {
                     await saveDataToServer(localData, false);
                     allData.metadata.unsynced = false;
                     await advancedStorage.removeItem('sahsiHesapTakibiData');
-                    updateServerStatus('success', '✅ Yerel veri sunucuya gönderildi');
+                    updateServerStatus('success', 'Yerel veri sunucuya gonderildi');
                 } catch (pushErr) {
-                    updateServerStatus('error', '❌ Yerel veri sunucuya gönderilemedi');
+                    updateServerStatus('error', 'Yerel veri sunucuya gonderilemedi');
                 }
                 return true;
             }
             allData = serverData;
             hasLoadedServerData = true;
-            updateServerStatus('success', '✅ Sunucudan yüklendi');
+            updateServerStatus('success', serverSource === 'backup' ? 'Yedek veriden yuklendi' : 'Sunucudan yuklendi');
             return true;
         }
         if (localData) {
             allData = localData;
             hasLoadedServerData = false;
-            updateServerStatus('success', '✅ Yerel veri yüklendi');
+            updateServerStatus(serverSource === 'default' ? 'error' : 'success', serverSource === 'default' ? 'Sunucuda veri bulunamadi, yerel veri yuklendi' : 'Yerel veri yuklendi');
         } else {
             hasLoadedServerData = false;
-            updateServerStatus('success', '✅ Yeni sistem hazır');
+            updateServerStatus(serverSource === 'default' ? 'error' : 'success', serverSource === 'default' ? 'Sunucuda veri veya yedek bulunamadi' : 'Yeni sistem hazir');
         }
         return true;
     } catch (error) {
-        updateServerStatus('error', '❌ Bağlantı hatası');
-        if (localData) allData = localData;
+        if (localData) {
+            allData = localData;
+            updateServerStatus('error', 'Sunucuya ulasilamadi, yerel veri yuklendi');
+        } else {
+            updateServerStatus('error', 'Baglanti hatasi');
+        }
         return false;
     }
 }
