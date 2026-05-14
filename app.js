@@ -191,6 +191,8 @@ function initDOMCache() {
             }
         });
     }
+
+    syncCustomPersonSelectUI();
 }
 
 function syncZeroBalanceToggleText() {
@@ -4676,6 +4678,16 @@ function initPersonSelectKeyboardNav() {
     if (!personTrigger) return;
     
     personTrigger.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggleCustomPersonSelect();
+            return;
+        }
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            openCustomPersonSelect();
+            return;
+        }
         if (e.key.length === 1 && /[a-züğşçöıİ]/i.test(e.key)) {
             e.preventDefault();
             
@@ -4703,10 +4715,16 @@ function findAndSelectPerson(searchText) {
         
         if (personName.startsWith(searchText)) {
             personSelect.selectedIndex = i;
-            
-            personSelect.style.borderColor = '#42a5f5';
+            syncCustomPersonSelectUI();
+            openCustomPersonSelect();
+            if (DOM.personSelectSearch) {
+                DOM.personSelectSearch.value = options[i].value;
+                renderCustomPersonSelectOptions(options[i].value);
+            }
+
+            if (DOM.personSelectTrigger) DOM.personSelectTrigger.style.borderColor = '#42a5f5';
             setTimeout(() => {
-                personSelect.style.borderColor = '';
+                if (DOM.personSelectTrigger) DOM.personSelectTrigger.style.borderColor = '';
             }, 300);
             
             return;
