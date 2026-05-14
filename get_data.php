@@ -1,7 +1,8 @@
 <?php
 /**
  * get_data.php – Veri yükleme endpoint.
- * Akış: ana dosya (veriler.json) geçerliyse onu dön → geçersizse yedeklerden en sonuncuyu dene → yoksa boş obje.
+ * Akış: ana dosya (veriler.json) geçerliyse onu dön → geçersizse yedeklerden en sonuncu geçerli dosyayı dene → yoksa boş obje.
+ * Not: geçmişte/manuel alınmış yedeklerde "backup_*.json" adı da görülebilir; fallback her iki deseni de destekler.
  * Response gövdesi geriye uyumlu kalır; metadata isteğe bağlı X-Data-Source / X-Data-Timestamp header ile verilir.
  */
 error_reporting(0);
@@ -22,6 +23,28 @@ function isValidJsonObjectOrArray(string $text): bool {
     return is_array($decoded);
 }
 
+function getBackupCandidates(string $backupDir): array {
+    $patterns = [
+        $backupDir . '/veriler_*.json',
+        $backupDir . '/backup_*.json'
+    ];
+
+    $files = [];
+    foreach ($patterns as $pattern) {
+        $matches = glob($pattern);
+        if (is_array($matches) && !empty($matches)) {
+            $files = array_merge($files, $matches);
+        }
+    }
+
+    $files = array_values(array_unique($files));
+    usort($files, function($a, $b) {
+        return filemtime($b) <=> filemtime($a);
+    });
+
+    return $files;
+}
+
 // 1) Ana dosya var ve geçerli JSON ise dön (source: main)
 if (file_exists($mainFile)) {
     $content = @file_get_contents($mainFile);
@@ -37,12 +60,8 @@ if (file_exists($mainFile)) {
 }
 
 // 2) Ana dosya yok veya bozuk: yedeklerden en güncel geçerli dosyayı kullan (source: backup)
-$backupFiles = glob($backupDir . '/veriler_*.json');
+$backupFiles = getBackupCandidates($backupDir);
 if ($backupFiles) {
-    usort($backupFiles, function($a, $b) {
-        return filemtime($b) - filemtime($a);
-    });
-
     foreach ($backupFiles as $bf) {
         $bcontent = @file_get_contents($bf);
         if ($bcontent !== false && isValidJsonObjectOrArray($bcontent)) {
