@@ -281,6 +281,93 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     navigator.serviceWorker.register('service_worker.js?v=' + APP_VERSION).catch(console.error);
 }
 
+/** Ayarlar / bildirim açılır menüleri — görünürlük yalnızca sınıf ile */
+const MENU_DROPDOWN_OPEN_CLASS = 'dropdown-menu--open';
+const COLOR_MENU_OPEN_CLASS = 'color-selection-menu--open';
+
+function setMenuBackdropActive(active) {
+    const backdrop = document.getElementById('menuBackdrop');
+    if (!backdrop) return;
+    backdrop.classList.toggle('active', !!active);
+}
+
+function anchorDropdownToIcon(menuEl, iconId, opts) {
+    const icon = document.getElementById(iconId);
+    if (!menuEl || !icon) return false;
+    const r = icon.getBoundingClientRect();
+    const isMobile = window.innerWidth <= 768;
+    const topOff = isMobile ? opts.mobileTop : opts.desktopTop;
+    const rightOff = isMobile ? opts.mobileRight : opts.desktopRight;
+    const top = Math.round(r.bottom - topOff);
+    const right = Math.round(window.innerWidth - r.right - rightOff);
+    ['top', 'right', 'left', 'bottom', 'position'].forEach(function(p) { menuEl.style.removeProperty(p); });
+    menuEl.style.setProperty('--anchor-menu-top', top + 'px');
+    menuEl.style.setProperty('--anchor-menu-right', right + 'px');
+    return true;
+}
+
+function closeSettingsAndNotificationMenus() {
+    DOM.settingsMenu?.classList.remove(MENU_DROPDOWN_OPEN_CLASS);
+    DOM.notificationMenu?.classList.remove(MENU_DROPDOWN_OPEN_CLASS);
+    setMenuBackdropActive(false);
+}
+
+function closeColorSelectionMenuFromUI() {
+    document.getElementById('colorSelectionMenu')?.classList.remove(COLOR_MENU_OPEN_CLASS);
+}
+
+function onMemoryOverlayPointerClick(e) {
+    const overlay = e.currentTarget;
+    const yes = e.target.closest('.alert-buttons .btn-yes');
+    const no = e.target.closest('.alert-buttons .btn-no');
+    if (no) {
+        e.preventDefault();
+        closeMemoryOverlay();
+        return;
+    }
+    if (!yes) return;
+    e.preventDefault();
+    if (overlay.dataset.memoryYesPhase === 'finalize') {
+        if (!yes.disabled) {
+            yes.disabled = true;
+            finalizeClear();
+        }
+    } else {
+        attemptBackupAndClear();
+    }
+}
+
+function initMemoryOverlayListeners() {
+    const overlay = document.getElementById('customMemoryOverlay');
+    if (!overlay || overlay.dataset.pointerUiBound === '1') return;
+    overlay.dataset.pointerUiBound = '1';
+    overlay.addEventListener('click', onMemoryOverlayPointerClick);
+}
+
+async function onPwaInstallButtonClick() {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    hidePWAInstallBanner();
+}
+
+function onPwaInstallCloseClick() {
+    localStorage.setItem('pwaInstallDismissed', 'true');
+    pwaInstallBannerDismissed = true;
+    hidePWAInstallBanner();
+}
+
+function initPwaInstallBannerListeners() {
+    const installBtn = document.getElementById('pwaInstallBtn');
+    const closeBtn = document.getElementById('pwaInstallClose');
+    if (!installBtn || installBtn.dataset.bound === '1') return;
+    installBtn.dataset.bound = '1';
+    if (closeBtn) closeBtn.dataset.bound = '1';
+    installBtn.addEventListener('click', onPwaInstallButtonClick);
+    if (closeBtn) closeBtn.addEventListener('click', onPwaInstallCloseClick);
+}
+
 function bindMenuEvents() {
     const menuBackdrop = document.getElementById('menuBackdrop');
     if (menuBackdrop) {
@@ -293,6 +380,7 @@ function bindMenuEvents() {
     if (settingsIcon) settingsIcon.addEventListener('click', toggleSettingsMenu);
     const notificationIcon = document.getElementById('notificationIcon');
     if (notificationIcon) notificationIcon.addEventListener('click', toggleNotificationMenu);
+    initMemoryOverlayListeners();
     const settingsMenu = document.getElementById('settingsMenu');
     if (settingsMenu) {
         settingsMenu.addEventListener('click', function(e) {
@@ -398,6 +486,8 @@ function bindPageEvents() {
     if (processQuickTransactionBtn) processQuickTransactionBtn.addEventListener('click', processQuickTransaction);
     const resetQuickPanelBtn = document.getElementById('resetQuickPanelBtn');
     if (resetQuickPanelBtn) resetQuickPanelBtn.addEventListener('click', resetQuickPanel);
+
+    initPwaInstallBannerListeners();
 
     const allocationOverlayBackdrop = document.getElementById('allocationOverlayBackdrop');
     if (allocationOverlayBackdrop) {
@@ -529,8 +619,6 @@ function bindModalEvents() {
     if (editAmount) editAmount.addEventListener('input', function() { formatCurrency(this); });
     const saveEditedTransactionBtn = document.getElementById('saveEditedTransactionBtn');
     if (saveEditedTransactionBtn) saveEditedTransactionBtn.addEventListener('click', saveEditedTransaction);
-    const memoryOverlayNoBtn = document.getElementById('memoryOverlayNoBtn');
-    if (memoryOverlayNoBtn) memoryOverlayNoBtn.addEventListener('click', closeMemoryOverlay);
     if (DOM.categoryDetailStartDate) {
         DOM.categoryDetailStartDate.addEventListener('change', function() {
             syncCategoryDetailDateRange('start');
@@ -552,7 +640,7 @@ function bindModalEvents() {
     const colorSelectionMenu = document.getElementById('colorSelectionMenu');
     if (colorSelectionMenu) {
         colorSelectionMenu.addEventListener('click', function(e) {
-            if (e.target === colorSelectionMenu) colorSelectionMenu.style.display = 'none';
+            if (e.target === colorSelectionMenu) closeColorSelectionMenuFromUI();
         });
     }
     const colorBubbles = document.getElementById('colorBubbles');
@@ -1469,9 +1557,8 @@ function openModal(modalId) {
     closeAllModals();
     const modal = document.getElementById(modalId);
     if (!modal) return;
-    modal.style.display = 'block';
-    setTimeout(() => modal.classList.add('show'), 10);
-    
+    setTimeout(function() { modal.classList.add('show'); }, 10);
+
     DOM.mainAppContainer?.classList.add('disable-events');
     document.body.classList.add("disable-events"); 
 }
@@ -1723,14 +1810,12 @@ function closeCurrentModal(el) {
         const modalId = modal.id;
         
         modal.classList.remove('show');
-        modal.style.display = 'none';
 
         document.body.classList.remove('modal-open-ios');
         
         if ((modalId === 'editTransactionModal' || modalId === 'categoryDetailModal') && currentPerson) {
             const personModal = document.getElementById('personModal');
             if (personModal) {
-                personModal.style.display = 'block';
                 personModal.classList.add('show');
                 DOM.mainAppContainer?.classList.add('disable-events');
                 document.body.classList.add("disable-events");
@@ -1740,7 +1825,6 @@ function closeCurrentModal(el) {
         if (modalId === 'monthlySummaryModal' && currentPerson) {
             const personModal = document.getElementById('personModal');
             if (personModal) {
-                personModal.style.display = 'block';
                 personModal.classList.add('show');
                 DOM.mainAppContainer?.classList.add('disable-events');
                 document.body.classList.add("disable-events");
@@ -1752,7 +1836,6 @@ function closeCurrentModal(el) {
         if (modalId === 'categoryManagementModal' && currentPerson) {
             const personModal = document.getElementById('personModal');
             if (personModal) {
-                personModal.style.display = 'block';
                 personModal.classList.add('show');
                 DOM.mainAppContainer?.classList.add('disable-events');
                 document.body.classList.add("disable-events");
@@ -1775,28 +1858,17 @@ function closeAllModals() {
     
     document.querySelectorAll('.modal').forEach(m => {
         m.classList.remove('show');
-        m.style.display = 'none';
     });
     
     document.body.classList.remove('modal-open-ios');
-if(DOM.settingsMenu) DOM.settingsMenu.style.display = 'none';
-    
-    const colorMenu = document.getElementById('colorSelectionMenu');
-    if(colorMenu) colorMenu.style.display = 'none';
-    
-    if(DOM.notificationMenu) DOM.notificationMenu.style.display = 'none';
+    closeSettingsAndNotificationMenus();
+    closeColorSelectionMenuFromUI();
 
-    const backdrop = document.getElementById('menuBackdrop');
-    if(backdrop) {
-        backdrop.classList.remove('active');
-        backdrop.style.display = 'none';
-    }
-    
     closeQuickTransactionOverlay();
     closeMemoryOverlay();
-    
+
     closeAllocationOverlay();
-    
+
     DOM.mainAppContainer?.classList.remove('disable-events');
     document.body.classList.remove("disable-events"); 
     
@@ -1906,7 +1978,7 @@ function showCategoryDetails(categoryName) {
     renderCategoryDetailContent();
     
     modal.dataset.category = categoryName;
-    modal.style.display = 'block';
+    modal.classList.add('show');
     
     DOM.mainAppContainer?.classList.add('disable-events');
     document.body.classList.add("disable-events"); 
@@ -2561,148 +2633,73 @@ function clearTransactionForm() {
 }
 
 function checkAnyMenuOpen() {
-    const settings = document.getElementById('settingsMenu')?.style.display === 'block';
     const colorEl = document.getElementById('colorSelectionMenu');
-    const colorSelection = colorEl && (colorEl.style.display === 'block' || colorEl.style.display === 'flex');
-    const notifications = DOM.notificationMenu?.style.display === 'block';
-    
+    const settings = !!(DOM.settingsMenu && DOM.settingsMenu.classList.contains(MENU_DROPDOWN_OPEN_CLASS));
+    const colorSelection = !!(colorEl && colorEl.classList.contains(COLOR_MENU_OPEN_CLASS));
+    const notifications = !!(DOM.notificationMenu && DOM.notificationMenu.classList.contains(MENU_DROPDOWN_OPEN_CLASS));
+
     return settings || colorSelection || notifications;
 }
 
 function toggleSettingsMenu() {
-    document.getElementById('colorSelectionMenu')?.style.setProperty('display', 'none');
-    if(DOM.notificationMenu) DOM.notificationMenu.style.display = 'none';
+    closeColorSelectionMenuFromUI();
+    if (DOM.notificationMenu) DOM.notificationMenu.classList.remove(MENU_DROPDOWN_OPEN_CLASS);
 
     const m = DOM.settingsMenu;
-    const backdrop = document.getElementById('menuBackdrop');
-    
-    if(m) {
-        const isCurrentlyOpen = m.style.display === 'block';
-        
-        if (isCurrentlyOpen) {
-            m.style.display = 'none';
-            if (backdrop) {
-                backdrop.classList.remove('active');
-                backdrop.style.display = 'none';
-            }
-            DOM.mainAppContainer?.classList.remove('disable-events');
-            document.body.classList.remove("disable-events");
-        } else {
-            const __icon = document.getElementById('settingsIcon');
-            if (__icon) {
-                const r = __icon.getBoundingClientRect();
-                const isMobile = window.innerWidth <= 768;
-                m.style.position = 'fixed';
-                m.style.top = Math.round(r.bottom - (isMobile ? 10 : 10)) + 'px';
-                m.style.right = Math.round(window.innerWidth - r.right - (isMobile ? 62 : 48)) + 'px';
-                m.style.left = 'auto';
-            }
-            m.style.display = 'block';
-            
-            if (backdrop) {
-                backdrop.classList.add('active');
-                backdrop.style.display = 'block';
-            }
-            DOM.mainAppContainer?.classList.add('disable-events');
-            document.body.classList.add("disable-events");
-        }
+    if (!m) return;
+
+    const isCurrentlyOpen = m.classList.contains(MENU_DROPDOWN_OPEN_CLASS);
+
+    if (isCurrentlyOpen) {
+        m.classList.remove(MENU_DROPDOWN_OPEN_CLASS);
+        setMenuBackdropActive(false);
+        DOM.mainAppContainer?.classList.remove('disable-events');
+        document.body.classList.remove("disable-events");
+    } else {
+        anchorDropdownToIcon(m, 'settingsIcon', { mobileTop: 10, mobileRight: 62, desktopTop: 10, desktopRight: 48 });
+        m.classList.add(MENU_DROPDOWN_OPEN_CLASS);
+        setMenuBackdropActive(true);
+        DOM.mainAppContainer?.classList.add('disable-events');
+        document.body.classList.add("disable-events");
     }
 }
 
 function closeAllMenus() {
-    if(DOM.settingsMenu) DOM.settingsMenu.style.display = 'none';
-    
-    const colorMenu = document.getElementById('colorSelectionMenu');
-    if(colorMenu) colorMenu.style.display = 'none';
-    
-    if(DOM.notificationMenu) DOM.notificationMenu.style.display = 'none';
+    closeSettingsAndNotificationMenus();
+    closeColorSelectionMenuFromUI();
 
-    const backdrop = document.getElementById('menuBackdrop');
-    if(backdrop) {
-        backdrop.classList.remove('active');
-        backdrop.style.display = 'none';
-    }
-    
     closeQuickTransactionOverlay();
     closeMemoryOverlay();
-    
+
     closeAllocationOverlay();
-    
+
     DOM.mainAppContainer?.classList.remove('disable-events');
     document.body.classList.remove("disable-events"); 
 }
 
 function showColorSelectionMenu() {
-    if(DOM.settingsMenu) DOM.settingsMenu.style.display = 'none';
-    
-    const backdrop = document.getElementById('menuBackdrop');
-    if(backdrop) {
-        backdrop.classList.remove('active');
-        backdrop.style.display = 'none';
-    }
-    
+    if (DOM.settingsMenu) DOM.settingsMenu.classList.remove(MENU_DROPDOWN_OPEN_CLASS);
+
+    setMenuBackdropActive(false);
+
     DOM.mainAppContainer?.classList.remove('disable-events');
-    document.body.classList.remove("disable-events"); 
-    
+    document.body.classList.remove("disable-events");
+
     const colorMenu = document.getElementById('colorSelectionMenu');
     const colorBubbles = document.getElementById('colorBubbles');
-    
-    if(colorMenu && colorBubbles) {
-        const isMobile = window.innerWidth < 600;
-        
-        if(isMobile) {
-            colorMenu.style.cssText = `
-                display: block;
-                position: fixed;
-                top: 0; left: 0; right: 0; bottom: 0;
-                background: transparent;
-                z-index: 999999;
-            `;
-            colorBubbles.style.cssText = `
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                display: flex;
-                flex-direction: row;
-                flex-wrap: wrap;
-                justify-content: center;
-                align-items: center;
-                gap: 10px;
-                background: rgba(20,28,45,0.95);
-                padding: 15px 20px;
-                border-radius: 16px;
-                box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-            `;
-        } else {
-            colorMenu.style.cssText = `
-                display: flex;
-                position: fixed;
-                top: 0; left: 0; right: 0; bottom: 0;
-                background: transparent;
-                z-index: 999999;
-                justify-content: center;
-                align-items: center;
-            `;
-            colorBubbles.style.cssText = `
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 15px;
-                background: rgba(20,28,45,0.95);
-                padding: 20px;
-                border-radius: 16px;
-                box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-            `;
-        }
+
+    if (colorMenu && colorBubbles) {
+        colorMenu.removeAttribute('style');
+        colorBubbles.removeAttribute('style');
+        colorMenu.classList.add(COLOR_MENU_OPEN_CLASS);
     }
 }
 
 document.addEventListener('click', function(e) {
     const colorMenu = document.getElementById('colorSelectionMenu');
-    if(colorMenu && (colorMenu.style.display === 'block' || colorMenu.style.display === 'flex')) {
-        if(!e.target.closest('#colorBubbles') && !e.target.closest('[data-action="color-menu"]')) {
-            colorMenu.style.display = 'none';
+    if (colorMenu && colorMenu.classList.contains(COLOR_MENU_OPEN_CLASS)) {
+        if (!e.target.closest('#colorBubbles') && !e.target.closest('[data-action="color-menu"]')) {
+            closeColorSelectionMenuFromUI();
         }
     }
 });
@@ -2730,41 +2727,28 @@ async function loadGlowTheme() {
 }
 
 function toggleNotificationMenu() {
-    if(document.getElementById('settingsMenu')) document.getElementById('settingsMenu').style.display = 'none';
-    if(document.getElementById('colorSelectionMenu')) document.getElementById('colorSelectionMenu').style.display = 'none';
+    if (DOM.settingsMenu) DOM.settingsMenu.classList.remove(MENU_DROPDOWN_OPEN_CLASS);
+    closeColorSelectionMenuFromUI();
 
     const menu = DOM.notificationMenu;
-    const backdrop = document.getElementById('menuBackdrop');
-    
-    if (menu) { 
-        const isCurrentlyOpen = menu.style.display === 'block';
-        if(isCurrentlyOpen) {
-            menu.style.display = 'none';
-            
-            backdrop?.classList.remove('active');
-            if(backdrop) backdrop.style.display = 'none'; 
-            
-            DOM.mainAppContainer?.classList.remove('disable-events');
-            document.body.classList.remove("disable-events"); 
-        } else {
-            const __icon = document.getElementById('notificationIcon');
-            if (__icon) {
-                const r = __icon.getBoundingClientRect();
-                const isMobile = window.innerWidth <= 768;
-                menu.style.position = 'fixed';
-                menu.style.top = Math.round(r.bottom - (isMobile ? 11 : 13)) + 'px';
-                menu.style.right = Math.round(window.innerWidth - r.right - (isMobile ? 19 : 17)) + 'px';
-                menu.style.left = 'auto';
-            }
-            menu.style.display = 'block';
+    if (!menu) return;
 
-            backdrop?.classList.add('active');
-            if(backdrop) backdrop.style.display = 'block'; 
-            
-            DOM.mainAppContainer?.classList.add('disable-events');
-            document.body.classList.add("disable-events"); 
-            renderNotificationMenu();
-        }
+    const isCurrentlyOpen = menu.classList.contains(MENU_DROPDOWN_OPEN_CLASS);
+
+    if (isCurrentlyOpen) {
+        menu.classList.remove(MENU_DROPDOWN_OPEN_CLASS);
+        setMenuBackdropActive(false);
+
+        DOM.mainAppContainer?.classList.remove('disable-events');
+        document.body.classList.remove("disable-events");
+    } else {
+        anchorDropdownToIcon(menu, 'notificationIcon', { mobileTop: 11, mobileRight: 19, desktopTop: 13, desktopRight: 17 });
+        menu.classList.add(MENU_DROPDOWN_OPEN_CLASS);
+        setMenuBackdropActive(true);
+
+        DOM.mainAppContainer?.classList.add('disable-events');
+        document.body.classList.add("disable-events");
+        renderNotificationMenu();
     }
 }
 
@@ -2772,16 +2756,16 @@ document.addEventListener('click', function(e) {
     const settingsBtn = document.getElementById('settingsIcon');
     const notifBtn = document.getElementById('notificationIcon');
     const backdrop = document.getElementById('menuBackdrop');
-    
-    const openMenus = document.querySelectorAll('.dropdown-menu[style*="display: block"]');
-    
+
+    const openMenus = document.querySelectorAll('.dropdown-menu.' + MENU_DROPDOWN_OPEN_CLASS);
+
     let isClickInsideMenu = false;
     openMenus.forEach(menu => {
         if (menu.contains(e.target)) {
             isClickInsideMenu = true;
         }
     });
-    
+
     const isClickOnAnyButton = e.target === settingsBtn || settingsBtn?.contains(e.target) || e.target === notifBtn || notifBtn?.contains(e.target);
     const isClickOnBackdrop = e.target === backdrop;
 
@@ -2837,7 +2821,7 @@ async function addNewPerson() {
 function showPersonManagementModal() {
     if (typeof closeAllMenus === 'function') closeAllMenus();
     const sm = document.getElementById('settingsMenu');
-    if (sm) sm.style.display = 'none';
+    if (sm) sm.classList.remove(MENU_DROPDOWN_OPEN_CLASS);
     openModal('personManagementModal');
 
     const list = document.getElementById('personManagementList');
@@ -2917,7 +2901,7 @@ function deletePersonByName(personName) {
 
 function showCategoryManagementModal(opts) {
     const settingsMenu = document.getElementById('settingsMenu');
-    if (settingsMenu) settingsMenu.style.display = 'none';
+    if (settingsMenu) settingsMenu.classList.remove(MENU_DROPDOWN_OPEN_CLASS);
     openModal('categoryManagementModal');
     const sel = document.getElementById('categoryManagementPersonSelect');
     populatePersonSelect(sel);
@@ -3858,59 +3842,60 @@ async function exportStyledCategoryDetailToExcel(person, categoryName, transacti
 function showMemoryOverlay(title, message, icon) {
     document.getElementById('memAlertTitle').textContent = title;
     const safeMsg = String(message).split(/<br\s*\/?>/i).map(function (s) { return sanitizeHTML(s); }).join('<br>');
-    document.getElementById('memAlertMessage').innerHTML = safeMsg; 
-    if(DOM.memAlertIcon) DOM.memAlertIcon.textContent = icon;
+    document.getElementById('memAlertMessage').innerHTML = safeMsg;
+    if (DOM.memAlertIcon) DOM.memAlertIcon.textContent = icon;
 
     const overlay = document.getElementById('customMemoryOverlay');
-    overlay.style.display = 'flex';
-    setTimeout(() => overlay.classList.add('show'), 10);
-    
+    delete overlay.dataset.memoryYesPhase;
+    overlay.classList.remove('error-state');
+    setTimeout(function() { overlay.classList.add('show'); }, 10);
+
     DOM.mainAppContainer?.classList.add('disable-events');
-    document.body.classList.add("disable-events"); 
+    document.body.classList.add("disable-events");
 }
 
 function closeMemoryOverlay() {
     const overlay = document.getElementById('customMemoryOverlay');
     overlay.classList.remove('show');
     overlay.classList.remove('error-state');
-    
+    delete overlay.dataset.memoryYesPhase;
+
     const yesBtn = overlay.querySelector('.btn-yes');
-    if(yesBtn) {
-        yesBtn.onclick = attemptBackupAndClear; 
+    if (yesBtn) {
         yesBtn.textContent = 'EVET';
         yesBtn.disabled = false;
-        yesBtn.style.display = '';
+        yesBtn.classList.remove('u-hidden');
     }
     const noBtn = overlay.querySelector('.btn-no');
-    if (noBtn) noBtn.style.display = '';
+    if (noBtn) {
+        noBtn.disabled = false;
+        noBtn.classList.remove('u-hidden');
+    }
 
-    setTimeout(() => {
-        overlay.style.display = 'none';
-        
+    setTimeout(function() {
         if (!document.querySelector('.modal.show') && !checkAnyMenuOpen()) {
-             DOM.mainAppContainer?.classList.remove('disable-events');
-             document.body.classList.remove("disable-events"); 
+            DOM.mainAppContainer?.classList.remove('disable-events');
+            document.body.classList.remove("disable-events");
         }
     }, 300);
 }
 
 function initiateMemoryClear() {
     toggleSettingsMenu();
-    
+
     showMemoryOverlay(
         "⚠️ DİKKAT",
         "Tarayıcı Belleğini Temizlemek İstediğinizden Emin misiniz?<br>Önce Sunucu Yedeklemesi Denenecektir!",
         "🧹"
     );
-    
+
     const yesBtn = document.querySelector('#customMemoryOverlay .btn-yes');
     if (yesBtn) {
-        yesBtn.onclick = attemptBackupAndClear;
         yesBtn.textContent = "EVET";
-        yesBtn.style.display = "";
+        yesBtn.classList.remove('u-hidden');
     }
     const noBtn = document.querySelector('#customMemoryOverlay .btn-no');
-    if (noBtn) noBtn.onclick = closeMemoryOverlay;
+    if (noBtn) noBtn.classList.remove('u-hidden');
 } 
 
 const BACKUP_TIMEOUT_MS = 5000;
@@ -3933,13 +3918,15 @@ async function attemptBackupAndClear() {
 
     function showBackupFailedAndOfferClear() {
         const overlay = document.getElementById('customMemoryOverlay');
-        if (overlay) overlay.classList.add('error-state');
+        if (overlay) {
+            overlay.classList.add('error-state');
+            overlay.dataset.memoryYesPhase = 'finalize';
+        }
         if (alertTitle) alertTitle.textContent = "⚠️ YEDEKLEME BAŞARISIZ!";
         if (alertMessage) alertMessage.innerHTML = 'Sunucuya Yedeklenemedi.<br>Devam Etmek İstediğinize Emin misiniz?';
         if (yesBtn) {
             yesBtn.disabled = false;
             yesBtn.textContent = "EVET, SİL";
-            yesBtn.onclick = () => { if (yesBtn) yesBtn.disabled = true; finalizeClear(); };
         }
         if (noBtn) noBtn.disabled = false;
     }
@@ -3963,14 +3950,14 @@ async function attemptBackupAndClear() {
             alertTitle.textContent = "Yedekleme Başarılı ✅";
             alertMessage.innerHTML = "Sunucuya kaydedildi. Şimdi bellek temizlenecek...";
             if(yesBtn) yesBtn.textContent = "TEMİZLENİYOR...";
-            if(noBtn) noBtn.style.display = "none";
+            if(noBtn) noBtn.classList.add('u-hidden');
             setTimeout(() => finalizeClear(), 800);
             
         } else {
             alertTitle.textContent = "Yedekleme Gerekmiyor";
             alertMessage.innerHTML = "Yerel veri bulunamadı. Bellek temizleniyor...";
             if(yesBtn) yesBtn.textContent = "TEMİZLENİYOR...";
-            if(noBtn) noBtn.style.display = "none";
+            if(noBtn) noBtn.classList.add('u-hidden');
             setTimeout(() => finalizeClear(), 600);
         }
         
@@ -3985,7 +3972,7 @@ function finalizeClear() {
     const btn = overlay?.querySelector('.btn-yes');
     const noBtn = overlay?.querySelector('.btn-no');
     if (btn) btn.innerText = 'TEMİZLENİYOR...';
-    if (noBtn) noBtn.style.display = 'none';
+    if (noBtn) noBtn.classList.add('u-hidden');
 
     const alertTitle = document.getElementById('memAlertTitle');
     const alertMessage = document.getElementById('memAlertMessage');
@@ -4035,30 +4022,6 @@ function showPWAInstallBanner() {
     if (!banner) return;
 
     banner.classList.remove('u-hidden');
-
-    // Install button
-    const installBtn = document.getElementById('pwaInstallBtn');
-    if (installBtn) {
-        installBtn.onclick = async () => {
-            if (!deferredPrompt) return;
-
-            deferredPrompt.prompt();
-            await deferredPrompt.userChoice;
-
-            deferredPrompt = null;
-            hidePWAInstallBanner();
-        };
-    }
-
-    // Close button
-    const closeBtn = document.getElementById('pwaInstallClose');
-    if (closeBtn) {
-        closeBtn.onclick = () => {
-            localStorage.setItem('pwaInstallDismissed', 'true');
-            pwaInstallBannerDismissed = true;
-            hidePWAInstallBanner();
-        };
-    }
 }
 
 function hidePWAInstallBanner() {
@@ -4287,7 +4250,7 @@ const closeMenuOutside = (event) => {
         const dropdowns = document.querySelectorAll('.dropdown-menu');
         let hasOpenMenu = false;
         dropdowns.forEach(openDropdown => {
-            if (openDropdown.style.display === 'block' && !openDropdown.contains(event.target)) {
+            if (openDropdown.classList.contains(MENU_DROPDOWN_OPEN_CLASS) && !openDropdown.contains(event.target)) {
                 hasOpenMenu = true;
             }
         });
@@ -4298,9 +4261,9 @@ const closeMenuOutside = (event) => {
 };
 
 document.addEventListener('touchstart', (event) => {
-    const hasOpenMenu = document.querySelector('.dropdown-menu[style*="display: block"]');
-    if(hasOpenMenu && !event.target.closest('.dropdown-menu') && !event.target.closest('.notification-icon-btn')) {
-         closeMenuOutside(event);
+    const hasOpenMenu = document.querySelector('.dropdown-menu.' + MENU_DROPDOWN_OPEN_CLASS);
+    if (hasOpenMenu && !event.target.closest('.dropdown-menu') && !event.target.closest('.notification-icon-btn')) {
+        closeMenuOutside(event);
     }
 }, {passive: true});
 

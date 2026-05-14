@@ -51,24 +51,44 @@
     display: flex;
 }
 
-/* Renk menüsü: index’teki sabit çerçeve (açılışta JS hâlâ cssText ile mobil/desktop ayırır) */
-#colorSelectionMenu {
+/* Renk menüsü — görünürlük yalnızca .color-selection-menu--open (app.js: cssText yok) */
+#colorSelectionMenu.color-selection-menu {
     display: none;
+    box-sizing: border-box;
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     background: transparent;
     z-index: 999999;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
+    flex-direction: column;
 }
-#colorBubbles {
+#colorSelectionMenu.color-selection-menu.color-selection-menu--open {
+    display: flex;
+}
+#colorSelectionMenu.color-selection-menu--open #colorBubbles.color-selection-menu__bubbles {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: 15px;
+    padding: 20px;
+    background: rgba(20, 28, 45, 0.95);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+@media (max-width: 599px) {
+    #colorSelectionMenu.color-selection-menu--open #colorBubbles.color-selection-menu__bubbles {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 15px 20px;
+        max-width: min(350px, 92vw);
+    }
 }
 
 /* İşlem geçmişi üç nokta menüsü (önceden injectThreeDotMenuStyles ile ekleniyordu) */
@@ -938,6 +958,14 @@ body.ios-pwa .debt-controls select {
     position: fixed;
     z-index: 9999;
     transform: none;
+    top: var(--anchor-menu-top, auto);
+    right: var(--anchor-menu-right, 12px);
+    left: auto;
+}
+
+#settingsMenu.dropdown-menu--open,
+#notificationMenu.dropdown-menu--open {
+    display: block !important;
 }
 
 #settingsMenu {
@@ -953,36 +981,6 @@ body.ios-pwa .debt-controls select {
     background: transparent;
     border: none;
     box-shadow: none;
-}
-
-#colorSelectionMenu {
-    background: transparent;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    position: fixed !important;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 10000;
-    display: none;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-}
-
-#colorBubbles {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    gap: 15px;
-    padding: 20px;
-    max-width: 350px;
-    background: transparent;
-    border: none;
-    margin: auto;
 }
 
 #notificationMenu div {
