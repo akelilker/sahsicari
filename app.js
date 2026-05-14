@@ -71,6 +71,12 @@ const GLOW_THEMES = ['white', 'blue', 'lila', 'green', 'red', 'gold', 'cyan', 'n
 
 const DOM = {
     personSelect: null,
+    personSelectShell: null,
+    personSelectTrigger: null,
+    personSelectLabel: null,
+    personSelectMenu: null,
+    personSelectSearch: null,
+    personSelectOptions: null,
     transactionType: null,
     amount: null,
     category: null,
@@ -111,6 +117,12 @@ const DOM = {
 
 function initDOMCache() {
     DOM.personSelect = document.getElementById('personSelect');
+    DOM.personSelectShell = document.getElementById('personSelectShell');
+    DOM.personSelectTrigger = document.getElementById('personSelectTrigger');
+    DOM.personSelectLabel = document.getElementById('personSelectLabel');
+    DOM.personSelectMenu = document.getElementById('personSelectMenu');
+    DOM.personSelectSearch = document.getElementById('personSelectSearch');
+    DOM.personSelectOptions = document.getElementById('personSelectOptions');
     DOM.transactionType = document.getElementById('transactionType');
     DOM.amount = document.getElementById('amount');
     DOM.category = document.getElementById('category');
@@ -292,7 +304,24 @@ function bindPageEvents() {
     const personSelect = document.getElementById('personSelect');
     if (personSelect) {
         personSelect.addEventListener('change', selectPerson);
-        personSelect.addEventListener('click', openSelectedPersonIfAny);
+        personSelect.addEventListener('change', syncCustomPersonSelectUI);
+    }
+    if (DOM.personSelectTrigger) {
+        DOM.personSelectTrigger.addEventListener('click', function(e) {
+            e.preventDefault();
+            toggleCustomPersonSelect();
+        });
+    }
+    if (DOM.personSelectSearch) {
+        DOM.personSelectSearch.addEventListener('input', function() {
+            renderCustomPersonSelectOptions(this.value);
+        });
+        DOM.personSelectSearch.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeCustomPersonSelect();
+                DOM.personSelectTrigger?.focus();
+            }
+        });
     }
     const addPersonBtn = document.getElementById('addPersonBtn');
     if (addPersonBtn) addPersonBtn.addEventListener('click', showAddPersonModal);
@@ -304,6 +333,13 @@ function bindPageEvents() {
     if (exportJsonBtn) exportJsonBtn.addEventListener('click', exportSystemToJSON);
     const systemImportFile = document.getElementById('systemImportFile');
     if (systemImportFile) systemImportFile.addEventListener('change', importSystemFromJSON);
+
+    document.addEventListener('click', function(e) {
+        if (!DOM.personSelectShell || DOM.personSelectMenu?.hidden) return;
+        if (!DOM.personSelectShell.contains(e.target)) {
+            closeCustomPersonSelect();
+        }
+    });
 
     const quickOverlayBackdrop = document.getElementById('quickOverlayBackdrop');
     if (quickOverlayBackdrop) {
@@ -1236,6 +1272,96 @@ function populatePersonSelect(selectElement, sortedPeople = null) {
         selectElement.add(new Option(person, person));
     });
     selectElement.value = currentVal;
+    syncCustomPersonSelectUI();
+}
+
+function syncCustomPersonSelectLabel() {
+    if (!DOM.personSelect || !DOM.personSelectLabel) return;
+    const selectedOption = DOM.personSelect.options[DOM.personSelect.selectedIndex];
+    DOM.personSelectLabel.textContent = selectedOption ? selectedOption.textContent.trim() : 'Kişi Seçiniz...';
+}
+
+function closeCustomPersonSelect() {
+    if (!DOM.personSelectShell || !DOM.personSelectMenu || !DOM.personSelectTrigger) return;
+    DOM.personSelectShell.classList.remove('open');
+    DOM.personSelectMenu.hidden = true;
+    DOM.personSelectTrigger.setAttribute('aria-expanded', 'false');
+    if (DOM.personSelectSearch) DOM.personSelectSearch.value = '';
+}
+
+function renderCustomPersonSelectOptions(filterText = '') {
+    if (!DOM.personSelect || !DOM.personSelectOptions) return;
+
+    const fragment = document.createDocumentFragment();
+    const normalizedFilter = (filterText || '').trim().toLocaleLowerCase('tr-TR');
+    const options = Array.from(DOM.personSelect.options || []).slice(1);
+    const matchingOptions = options.filter(option => option.value.toLocaleLowerCase('tr-TR').includes(normalizedFilter));
+
+    const placeholderBtn = document.createElement('button');
+    placeholderBtn.type = 'button';
+    placeholderBtn.className = 'person-select-option';
+    if (!DOM.personSelect.value) placeholderBtn.classList.add('is-selected');
+    placeholderBtn.textContent = 'Kişi Seçiniz...';
+    placeholderBtn.addEventListener('click', function() {
+        if (DOM.personSelect) DOM.personSelect.value = '';
+        syncCustomPersonSelectUI();
+        closeCustomPersonSelect();
+        DOM.personSelectTrigger?.focus();
+    });
+    fragment.appendChild(placeholderBtn);
+
+    if (!matchingOptions.length) {
+        const emptyState = document.createElement('div');
+        emptyState.className = 'person-select-empty';
+        emptyState.textContent = 'Eşleşen kişi bulunamadı';
+        fragment.appendChild(emptyState);
+    } else {
+        matchingOptions.forEach(option => {
+            const item = document.createElement('button');
+            item.type = 'button';
+            item.className = 'person-select-option';
+            item.textContent = option.textContent.trim();
+            item.setAttribute('role', 'option');
+            if (option.value === DOM.personSelect.value) item.classList.add('is-selected');
+            item.addEventListener('click', function() {
+                DOM.personSelect.value = option.value;
+                syncCustomPersonSelectUI();
+                closeCustomPersonSelect();
+                selectPerson();
+            });
+            fragment.appendChild(item);
+        });
+    }
+
+    DOM.personSelectOptions.innerHTML = '';
+    DOM.personSelectOptions.appendChild(fragment);
+}
+
+function openCustomPersonSelect() {
+    if (!DOM.personSelectShell || !DOM.personSelectMenu || !DOM.personSelectTrigger) return;
+    DOM.personSelectShell.classList.add('open');
+    DOM.personSelectMenu.hidden = false;
+    DOM.personSelectTrigger.setAttribute('aria-expanded', 'true');
+    renderCustomPersonSelectOptions(DOM.personSelectSearch?.value || '');
+    if (DOM.personSelectSearch) {
+        DOM.personSelectSearch.focus();
+        DOM.personSelectSearch.select();
+    }
+}
+
+function toggleCustomPersonSelect() {
+    if (!DOM.personSelectMenu || DOM.personSelectMenu.hidden) {
+        openCustomPersonSelect();
+    } else {
+        closeCustomPersonSelect();
+    }
+}
+
+function syncCustomPersonSelectUI() {
+    syncCustomPersonSelectLabel();
+    if (DOM.personSelectShell?.classList.contains('open')) {
+        renderCustomPersonSelectOptions(DOM.personSelectSearch?.value || '');
+    }
 }
 
 function openModal(modalId) {
@@ -4546,10 +4672,10 @@ let typingBuffer = '';
 let typingTimeout = null;
 
 function initPersonSelectKeyboardNav() {
-    const personSelect = document.getElementById('personSelect');
-    if (!personSelect) return;
+    const personTrigger = document.getElementById('personSelectTrigger');
+    if (!personTrigger) return;
     
-    personSelect.addEventListener('keydown', function(e) {
+    personTrigger.addEventListener('keydown', function(e) {
         if (e.key.length === 1 && /[a-züğşçöıİ]/i.test(e.key)) {
             e.preventDefault();
             

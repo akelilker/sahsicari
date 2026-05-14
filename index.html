@@ -84,9 +84,21 @@
             <h3>CARİ KAYIT İŞLEMLERİ</h3>
             <div class="debt-controls">
                 <label for="personSelect" class="sr-only">Kişi</label>
-                <select id="personSelect">
+                <div class="person-select-shell" id="personSelectShell">
+                    <select id="personSelect" class="person-select-native" tabindex="-1" aria-hidden="true">
                     <option value=""> Kişi Seçiniz...</option>
-                </select>
+                    </select>
+                    <button type="button" id="personSelectTrigger" class="person-select-trigger" aria-haspopup="listbox" aria-expanded="false">
+                        <span id="personSelectLabel">KiÅŸi SeÃ§iniz...</span>
+                        <span class="person-select-chevron" aria-hidden="true"></span>
+                    </button>
+                    <div id="personSelectMenu" class="person-select-menu" hidden>
+                        <div class="person-select-search-wrap">
+                            <input type="text" id="personSelectSearch" class="person-select-search" placeholder="KiÅŸi ara..." autocomplete="off" aria-label="KiÅŸi ara">
+                        </div>
+                        <div id="personSelectOptions" class="person-select-options" role="listbox" aria-label="KiÅŸi listesi"></div>
+                    </div>
+                </div>
                 <button type="button" class="add-person-btn" id="addPersonBtn">+</button>
             </div>
         </div>
