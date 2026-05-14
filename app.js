@@ -1894,6 +1894,136 @@ function openTab(e, id, activeBtn) {
     if (id === 'raporlar') renderReportPreview();
 }
 
+/** Liste altı “ilk N…” notu; metin uygulama tarafından üretilir, sanitizeHTML ile kaçışlanır. */
+function renderListTruncationNote(plainText) {
+    return '<div class="list-truncation-note" role="status">' + sanitizeHTML(plainText) + '</div>';
+}
+
+function renderTransactionHistoryHeaderHtml() {
+    return '<h4 class="transaction-history-title">Son İşlemler</h4>';
+}
+
+function renderReportPreviewSummaryHtml(totalCount, totalAmount) {
+    const formattedTotal = formatAmount(Math.abs(totalAmount));
+    const direction = totalAmount > 0 ? '(Alacak)' : (totalAmount < 0 ? '(Borç)' : '');
+    var balClass = 'report-preview-summary-balance--neutral';
+    if (totalAmount > 0.01) balClass = 'report-preview-summary-balance--credit';
+    else if (totalAmount < -0.01) balClass = 'report-preview-summary-balance--debt';
+    return (
+        '<span class="report-preview-summary-count">' + totalCount + ' İşlem</span>' +
+        '<span class="report-preview-summary-sep" aria-hidden="true">|</span> ' +
+        '<span class="report-preview-summary-balance ' + balClass + '">' + sanitizeHTML(formattedTotal + ' ' + direction) + '</span>'
+    );
+}
+
+function renderReportPreviewItemHtml(t) {
+    const dateShort = formatDateTR(new Date(t.date));
+    const amountClass = t.type === 'giden' ? 'text-expense' : 'text-income';
+    const descHtml = t.description
+        ? '<div class="report-preview-desc">' + sanitizeHTML(t.description) + '</div>'
+        : '';
+    return (
+        '<div class="report-preview-item">' +
+        '<div class="report-preview-main">' +
+        '<div class="report-preview-topline">' +
+        '<span class="report-preview-date">' + dateShort + '</span>' +
+        '<span class="report-preview-category">' + sanitizeHTML(t.category) + '</span>' +
+        '</div>' +
+        descHtml +
+        '</div>' +
+        '<span class="report-preview-amount ' + amountClass + '">' + formatAmount(t.amount) + '</span>' +
+        '</div>'
+    );
+}
+
+function buildSiriConfirmModalHtml(person, amount, type, desc, matchedPerson) {
+    const typeText = type === 'gelen' ? 'Gelen' : 'Giden';
+    const typeClass = type === 'gelen' ? 'text-income' : 'text-expense';
+    const personDisplayClass = matchedPerson ? 'siri-confirm-value' : 'siri-confirm-value siri-confirm-value--missing';
+    const personDisplayText = matchedPerson ? sanitizeHTML(matchedPerson) : 'Bulunamadı';
+    const descRows = desc
+        ? '<div class="siri-confirm-row"><span class="siri-confirm-label">Açıklama:</span><span class="siri-confirm-value">' + sanitizeHTML(desc) + '</span></div>'
+        : '';
+    const warnBlock = !matchedPerson
+        ? '<div class="siri-confirm-warn"><span class="siri-confirm-warn-text">⚠️ "' + sanitizeHTML(person) + '" kişisi bulunamadı. Lütfen kişi seçin:</span>' +
+          '<select id="siriPersonSelect" class="siri-person-select"><option value="">Kişi Seçin...</option></select></div>'
+        : '';
+    return (
+        '<div id="siriConfirmModal" class="modal siri-confirm-modal">' +
+        '<div class="modal-content">' +
+        '<div class="modal-header"><h2>🎤 Sesli Kayıt Onayı</h2></div>' +
+        '<div class="modal-body">' +
+        '<div class="siri-confirm-summary">' +
+        '<div class="siri-confirm-row"><span class="siri-confirm-label">Kişi:</span><span id="siriPersonDisplay" class="' + personDisplayClass + '">' + personDisplayText + '</span></div>' +
+        '<div class="siri-confirm-row"><span class="siri-confirm-label">Tutar:</span><span class="siri-confirm-value">' + formatAmount(parseFloat(amount) || 0) + '</span></div>' +
+        '<div class="siri-confirm-row"><span class="siri-confirm-label">Tip:</span><span class="' + typeClass + ' siri-confirm-type-emphasis">' + typeText + '</span></div>' +
+        descRows +
+        '</div>' +
+        warnBlock +
+        '<div class="siri-confirm-actions">' +
+        '<button type="button" class="btn siri-confirm-btn-secondary" data-siri-action="cancel">❌ İptal</button>' +
+        '<button type="button" class="btn btn-success" data-siri-action="confirm">✅ Onayla</button>' +
+        '</div></div></div></div>'
+    );
+}
+
+function bindSiriConfirmModal(root, matchedPerson, amountNum, type, desc) {
+    const cancelBtn = root.querySelector('[data-siri-action="cancel"]');
+    if (cancelBtn) cancelBtn.addEventListener('click', closeSiriModal);
+
+    const confirmBtn = root.querySelector('[data-siri-action="confirm"]');
+    if (confirmBtn) {
+        confirmBtn.addEventListener('click', function() {
+            var resolved = matchedPerson;
+            if (!resolved) {
+                const sel = document.getElementById('siriPersonSelect');
+                resolved = sel ? sel.value : '';
+            }
+            confirmSiriTransaction(resolved, amountNum, type, desc);
+        });
+    }
+
+    if (!matchedPerson) {
+        const select = document.getElementById('siriPersonSelect');
+        if (select && allData) {
+            Object.keys(allData).sort().forEach(function(p) {
+                if (p === 'metadata') return;
+                const opt = document.createElement('option');
+                opt.value = p;
+                opt.textContent = p;
+                select.appendChild(opt);
+            });
+
+            select.addEventListener('change', function() {
+                const display = document.getElementById('siriPersonDisplay');
+                if (!display) return;
+                if (this.value) {
+                    display.innerHTML = '<span class="siri-confirm-value--ok">' + sanitizeHTML(this.value) + '</span>';
+                } else {
+                    display.textContent = 'Bulunamadı';
+                    display.className = 'siri-confirm-value siri-confirm-value--missing';
+                }
+            });
+        }
+    }
+}
+
+function createNotificationMenuItemElement(notif, index) {
+    const item = document.createElement('div');
+    item.className = 'notif-menu-item ' + (notif.type === 'success' ? 'notif-menu-item--success' : 'notif-menu-item--error');
+    const span = document.createElement('span');
+    span.textContent = notif.message == null ? '' : String(notif.message);
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'delete-notif-btn';
+    btn.setAttribute('data-notification-index', String(index));
+    btn.setAttribute('aria-label', 'Bildirimi sil');
+    btn.textContent = '✖';
+    item.appendChild(span);
+    item.appendChild(btn);
+    return item;
+}
+
 function updateTransactionHistory() {
     if(!DOM.transactionHistory) return;
     
@@ -1907,11 +2037,13 @@ function updateTransactionHistory() {
 
     const MAX_HISTORY_ITEMS = 200;
     const displayTxs = txs.length > MAX_HISTORY_ITEMS ? txs.slice(0, MAX_HISTORY_ITEMS) : txs;
-    
-    let html = '<h4 style="color:#b0bec5; margin-bottom:5px; font-size:0.9em; font-weight:600; padding-left:2px;">Son İşlemler</h4>';
-    displayTxs.forEach(t => { html += renderTransactionHistoryItem(t); });
+
+    var html = renderTransactionHistoryHeaderHtml();
+    displayTxs.forEach(function(t) { html += renderTransactionHistoryItem(t); });
     if (txs.length > MAX_HISTORY_ITEMS) {
-        html += '<div style="text-align:center;color:#78909c;font-size:0.85em;padding:8px;border-top:1px solid rgba(255,255,255,0.05);">İlk ' + MAX_HISTORY_ITEMS + ' işlem gösteriliyor (toplam ' + txs.length + '). Tümünü görmek için Raporlar sekmesini kullanın.</div>';
+        html += renderListTruncationNote(
+            'İlk ' + MAX_HISTORY_ITEMS + ' işlem gösteriliyor (toplam ' + txs.length + '). Tümünü görmek için Raporlar sekmesini kullanın.'
+        );
     }
     
     DOM.transactionHistory.innerHTML = html;
@@ -2005,15 +2137,53 @@ function formatDateDDMMYYYY(dateValue) {
     return String(date.getDate()).padStart(2, '0') + '.' + String(date.getMonth() + 1).padStart(2, '0') + '.' + date.getFullYear();
 }
 
+/** yyyy-mm-dd → formatDateTR; boş/geçersiz → ''. */
+function displayTrFromIsoValue(isoValue) {
+    if (!isoValue) return '';
+    const d = new Date(isoValue);
+    if (isNaN(d.getTime())) return '';
+    return formatDateTR(d);
+}
+
+function openNativeDatePicker(inputEl, ev) {
+    if (ev && typeof ev.preventDefault === 'function') ev.preventDefault();
+    if (!inputEl) return;
+    if (typeof inputEl.showPicker === 'function') {
+        inputEl.showPicker();
+    } else {
+        inputEl.focus();
+        inputEl.click();
+    }
+}
+
+/**
+ * type=date input ile eş mobil span (dd.mm.yyyy değil, formatDateTR).
+ * emptyMode: 'today' boşta bugün; 'skip' boşta dokunma.
+ */
+function syncMobileTrDateDisplay(inputEl, displayEl, emptyMode) {
+    if (!inputEl || !displayEl) return;
+    const v = inputEl.value;
+    const tr = displayTrFromIsoValue(v);
+    if (tr) {
+        displayEl.textContent = tr;
+    } else if (emptyMode === 'today') {
+        displayEl.textContent = formatDateTR(new Date());
+    }
+}
+
+function getNewTransactionMobileDateDisplayEl() {
+    return document.querySelector('.mobile-date-display') || document.querySelector('.current-date-display');
+}
+
+function syncIsoInputToDdmmPlaceholderDisplay(inputEl, displayEl) {
+    if (!displayEl) return;
+    const val = inputEl ? inputEl.value : '';
+    displayEl.textContent = val ? formatDateDDMMYYYY(val) : '__.__.____';
+}
+
 function syncCategoryDetailDateDisplays() {
-    if (DOM.categoryDetailStartDisplay) {
-        const startValue = DOM.categoryDetailStartDate ? DOM.categoryDetailStartDate.value : '';
-        DOM.categoryDetailStartDisplay.textContent = startValue ? formatDateDDMMYYYY(startValue) : '__.__.____';
-    }
-    if (DOM.categoryDetailEndDisplay) {
-        const endValue = DOM.categoryDetailEndDate ? DOM.categoryDetailEndDate.value : '';
-        DOM.categoryDetailEndDisplay.textContent = endValue ? formatDateDDMMYYYY(endValue) : '__.__.____';
-    }
+    syncIsoInputToDdmmPlaceholderDisplay(DOM.categoryDetailStartDate, DOM.categoryDetailStartDisplay);
+    syncIsoInputToDdmmPlaceholderDisplay(DOM.categoryDetailEndDate, DOM.categoryDetailEndDisplay);
 }
 
 function syncCategoryDetailDateRange(changedField) {
@@ -2528,11 +2698,12 @@ function editTransaction(id) {
     const d = new Date(t.date);
     document.getElementById('editDateInput').value = d.toISOString().split('T')[0];
     
+    const editDateInput = document.getElementById('editDateInput');
     const editDateDisplay = document.getElementById('editMobileDateDisplay');
     if (editDateDisplay && window.innerWidth <= 800) {
-        editDateDisplay.textContent = formatDateTR(d);
+        syncMobileTrDateDisplay(editDateInput, editDateDisplay, 'skip');
     }
-    
+
     openModal('editTransactionModal');
 }
 
@@ -2982,18 +3153,10 @@ function renderNotificationMenu() {
     content.innerHTML = '';
     if (notificationHistory.length === 0) {
         content.innerHTML = renderEmptyState('Henüz bildirim yok.');
-    } else {
-        for (let i = notificationHistory.length - 1; i >= 0; i--) {
-            const notif = notificationHistory[i];
-            const item = document.createElement('div');
-            item.className = 'notif-menu-item ' + (notif.type === 'success' ? 'notif-menu-item--success' : 'notif-menu-item--error');
-
-            item.innerHTML = `
-                <span>${sanitizeHTML(notif.message)}</span>
-                <button type="button" class="delete-notif-btn" data-notification-index="${i}" aria-label="Bildirimi sil">✖</button>
-            `;
-            content.appendChild(item);
-        }
+        return;
+    }
+    for (let i = notificationHistory.length - 1; i >= 0; i--) {
+        content.appendChild(createNotificationMenuItemElement(notificationHistory[i], i));
     }
 }
 
@@ -3080,14 +3243,7 @@ function renderReportPreview() {
     let totalAmount = 0;
     periodTransactions.forEach(t => totalAmount += (t.type === 'giden' ? -t.amount : t.amount));
 
-    const formattedTotal = formatAmount(Math.abs(totalAmount));
-    const direction = totalAmount > 0 ? '(Alacak)' : (totalAmount < 0 ? '(Borç)' : '');
-    const color = totalAmount > 0 ? '#00e676' : (totalAmount < 0 ? '#d40000' : '#b0bec5');
-
-    summaryContainer.innerHTML = `
-        <span style="color:#e0e0e0;">${totalCount} İşlem</span> | 
-        <span style="color:${color};">${formattedTotal} ${direction}</span> 
-    `;
+    summaryContainer.innerHTML = renderReportPreviewSummaryHtml(totalCount, totalAmount);
 
     if (totalCount === 0) {
         listContainer.innerHTML = renderEmptyState('Kriterlere uygun kayıt yok.');
@@ -3099,27 +3255,13 @@ function renderReportPreview() {
     const displayTxs = sortedTxs.length > MAX_REPORT_ITEMS ? sortedTxs.slice(0, MAX_REPORT_ITEMS) : sortedTxs;
 
     let html = '';
-    displayTxs.forEach(t => {
-        const dateShort = formatDateTR(new Date(t.date));
-        const amountClass = t.type === 'giden' ? 'text-expense' : 'text-income';
-        const descHtml = t.description
-            ? `<div class="report-preview-desc">${sanitizeHTML(t.description)}</div>`
-            : '';
-
-        html += `
-        <div class="report-preview-item">
-            <div class="report-preview-main">
-                <div class="report-preview-topline">
-                    <span class="report-preview-date">${dateShort}</span>
-                    <span class="report-preview-category">${sanitizeHTML(t.category)}</span>
-                </div>
-                ${descHtml}
-            </div>
-            <span class="report-preview-amount ${amountClass}">${formatAmount(t.amount)}</span>
-        </div>`;
+    displayTxs.forEach(function(t) {
+        html += renderReportPreviewItemHtml(t);
     });
     if (sortedTxs.length > MAX_REPORT_ITEMS) {
-        html += '<div style="text-align:center;color:#78909c;font-size:0.85em;padding:8px;border-top:1px solid rgba(255,255,255,0.05);">İlk ' + MAX_REPORT_ITEMS + ' işlem gösteriliyor (toplam ' + sortedTxs.length + '). Excel ile tümünü indirebilirsiniz.</div>';
+        html += renderListTruncationNote(
+            'İlk ' + MAX_REPORT_ITEMS + ' işlem gösteriliyor (toplam ' + sortedTxs.length + '). Excel ile tümünü indirebilirsiniz.'
+        );
     }
 
     listContainer.innerHTML = html;
@@ -4909,145 +5051,81 @@ function initDisplayNamesAndObserver() {
 
 function initMobileDateDisplay() {
     var isNarrow = window.innerWidth <= 800;
-    
+
     if (isNarrow) {
-    const dateInput = document.getElementById('dateInput');
-    const dateDisplay = document.querySelector('.mobile-date-display') || document.querySelector('.current-date-display');
-    
-    if (dateInput && dateDisplay) {
-        function updateMainDateDisplay() {
-            const value = dateInput.value;
-            if (value) {
-                dateDisplay.textContent = formatDateTR(new Date(value));
-            } else {
-                dateDisplay.textContent = formatDateTR(new Date());
+        const dateInput = document.getElementById('dateInput');
+        const dateDisplay = getNewTransactionMobileDateDisplayEl();
+
+        if (dateInput && dateDisplay) {
+            function updateMainDateDisplay() {
+                syncMobileTrDateDisplay(dateInput, dateDisplay, 'today');
+            }
+
+            updateMainDateDisplay();
+            dateInput.addEventListener('change', updateMainDateDisplay);
+
+            const dateRow = dateInput.closest('.date-row-transparent');
+            if (dateRow) {
+                dateRow.addEventListener('click', function(e) {
+                    if (e.target !== dateInput) {
+                        openNativeDatePicker(dateInput, null);
+                    }
+                });
             }
         }
-        
-        updateMainDateDisplay();
-        dateInput.addEventListener('change', updateMainDateDisplay);
-        
-        const dateRow = dateInput.closest('.date-row-transparent');
-        if (dateRow) {
-            dateRow.addEventListener('click', (e) => {
-                if (e.target !== dateInput) {
-                    if (typeof dateInput.showPicker === 'function') {
-                        dateInput.showPicker();
-                    } else {
-                        dateInput.focus();
-                        dateInput.click();
+
+        const editDateInput = document.getElementById('editDateInput');
+        const editDateDisplay = document.getElementById('editMobileDateDisplay');
+
+        if (editDateInput && editDateDisplay) {
+            function updateEditDateDisplay() {
+                syncMobileTrDateDisplay(editDateInput, editDateDisplay, 'skip');
+            }
+
+            editDateInput.addEventListener('change', updateEditDateDisplay);
+
+            const editDateSection = editDateInput.closest('.date-section-inline');
+            if (editDateSection) {
+                editDateSection.addEventListener('click', function(e) {
+                    if (e.target !== editDateInput && !e.target.matches('label')) {
+                        openNativeDatePicker(editDateInput, null);
                     }
-                }
-            });
-        }
-    }
-    
-    const editDateInput = document.getElementById('editDateInput');
-    const editDateDisplay = document.getElementById('editMobileDateDisplay');
-    
-    if (editDateInput && editDateDisplay) {
-        function updateEditDateDisplay() {
-            const value = editDateInput.value;
-            if (value) {
-                editDateDisplay.textContent = formatDateTR(new Date(value));
+                });
             }
         }
-        
-        editDateInput.addEventListener('change', updateEditDateDisplay);
-        
-        const editDateSection = editDateInput.closest('.date-section-inline');
-        if (editDateSection) {
-            editDateSection.addEventListener('click', (e) => {
-                if (e.target !== editDateInput && !e.target.matches('label')) {
-                    if (typeof editDateInput.showPicker === 'function') {
-                        editDateInput.showPicker();
-                    } else {
-                        editDateInput.focus();
-                        editDateInput.click();
-                    }
-                }
-            });
-        }
     }
-    }
-    
+
     /* Rapor tarihleri: her viewport'ta; takvim SADECE span veya label tıklanınca açılsın (grup listener yok) */
     const startDateInput = document.getElementById('startDate');
     const startDateDisplay = document.getElementById('startDateDisplay');
     const endDateInput = document.getElementById('endDate');
     const endDateDisplay = document.getElementById('endDateDisplay');
-    
-    if (startDateInput && startDateDisplay) {
-        function updateStartDateDisplay() {
-            const value = startDateInput.value;
-            if (value) {
-                startDateDisplay.textContent = formatDateTR(new Date(value));
-            }
+
+    function wireReportDateInputAndPicker(inputEl, displayEl, labelForAttr) {
+        if (!inputEl || !displayEl) return;
+        function onChange() {
+            syncMobileTrDateDisplay(inputEl, displayEl, 'skip');
         }
-        startDateInput.addEventListener('change', updateStartDateDisplay);
-        function openStartPicker(e) {
-            e.preventDefault();
-            if (typeof startDateInput.showPicker === 'function') {
-                startDateInput.showPicker();
-            } else {
-                startDateInput.focus();
-                startDateInput.click();
-            }
+        inputEl.addEventListener('change', onChange);
+        function onOpen(e) {
+            openNativeDatePicker(inputEl, e);
         }
-        startDateDisplay.addEventListener('click', openStartPicker);
-        var startLabel = document.querySelector('label[for="startDate"]');
-        if (startLabel) startLabel.addEventListener('click', openStartPicker);
+        displayEl.addEventListener('click', onOpen);
+        var lab = document.querySelector('label[for="' + labelForAttr + '"]');
+        if (lab) lab.addEventListener('click', onOpen);
     }
-    
-    if (endDateInput && endDateDisplay) {
-        function updateEndDateDisplay() {
-            const value = endDateInput.value;
-            if (value) {
-                endDateDisplay.textContent = formatDateTR(new Date(value));
-            }
-        }
-        endDateInput.addEventListener('change', updateEndDateDisplay);
-        function openEndPicker(e) {
-            e.preventDefault();
-            if (typeof endDateInput.showPicker === 'function') {
-                endDateInput.showPicker();
-            } else {
-                endDateInput.focus();
-                endDateInput.click();
-            }
-        }
-        endDateDisplay.addEventListener('click', openEndPicker);
-        var endLabel = document.querySelector('label[for="endDate"]');
-        if (endLabel) endLabel.addEventListener('click', openEndPicker);
-    }
+
+    wireReportDateInputAndPicker(startDateInput, startDateDisplay, 'startDate');
+    wireReportDateInputAndPicker(endDateInput, endDateDisplay, 'endDate');
 }
 
 function updateAllMobileDateDisplays() {
     if (window.innerWidth > 800) return;
-    
-    const dateInput = document.getElementById('dateInput');
-    const dateDisplay = document.querySelector('.mobile-date-display');
-    if (dateInput && dateDisplay && dateInput.value) {
-        dateDisplay.textContent = formatDateTR(new Date(dateInput.value));
-    }
-    
-    const editDateInput = document.getElementById('editDateInput');
-    const editDateDisplay = document.getElementById('editMobileDateDisplay');
-    if (editDateInput && editDateDisplay && editDateInput.value) {
-        editDateDisplay.textContent = formatDateTR(new Date(editDateInput.value));
-    } 
-    
-    const startDateInput = document.getElementById('startDate');
-    const startDateDisplay = document.getElementById('startDateDisplay');
-    if (startDateInput && startDateDisplay && startDateInput.value) {
-        startDateDisplay.textContent = formatDateTR(new Date(startDateInput.value));
-    }
-    
-    const endDateInput = document.getElementById('endDate');
-    const endDateDisplay = document.getElementById('endDateDisplay');
-    if (endDateInput && endDateDisplay && endDateInput.value) {
-        endDateDisplay.textContent = formatDateTR(new Date(endDateInput.value));
-    }
+
+    syncMobileTrDateDisplay(document.getElementById('dateInput'), getNewTransactionMobileDateDisplayEl(), 'skip');
+    syncMobileTrDateDisplay(document.getElementById('editDateInput'), document.getElementById('editMobileDateDisplay'), 'skip');
+    syncMobileTrDateDisplay(document.getElementById('startDate'), document.getElementById('startDateDisplay'), 'skip');
+    syncMobileTrDateDisplay(document.getElementById('endDate'), document.getElementById('endDateDisplay'), 'skip');
 }
 
 function checkSiriParams() {
@@ -5069,107 +5147,13 @@ function checkSiriParams() {
 
 function showSiriConfirmModal(person, amount, type, desc) {
     const matchedPerson = findMatchingPerson(person);
-    const typeText = type === 'gelen' ? 'Gelen' : 'Giden';
-    const typeClass = type === 'gelen' ? 'text-income' : 'text-expense';
-    const personDisplayClass = matchedPerson ? 'siri-confirm-value' : 'siri-confirm-value siri-confirm-value--missing';
-    const personDisplayText = matchedPerson ? sanitizeHTML(matchedPerson) : 'Bulunamadı';
-
-    const modalHtml = `
-        <div id="siriConfirmModal" class="modal siri-confirm-modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>
-                        🎤 Sesli Kayıt Onayı
-                    </h2>
-                </div>
-                <div class="modal-body">
-                    <div class="siri-confirm-summary">
-                        <div class="siri-confirm-row">
-                            <span class="siri-confirm-label">Kişi:</span>
-                            <span id="siriPersonDisplay" class="${personDisplayClass}">${personDisplayText}</span>
-                        </div>
-                        <div class="siri-confirm-row">
-                            <span class="siri-confirm-label">Tutar:</span>
-                            <span class="siri-confirm-value">${formatAmount(parseFloat(amount) || 0)}</span>
-                        </div>
-                        <div class="siri-confirm-row">
-                            <span class="siri-confirm-label">Tip:</span>
-                            <span class="${typeClass}" style="font-weight:600;">${typeText}</span>
-                        </div>
-                        ${desc ? `
-                        <div class="siri-confirm-row">
-                            <span class="siri-confirm-label">Açıklama:</span>
-                            <span class="siri-confirm-value">${sanitizeHTML(desc)}</span>
-                        </div>
-                        ` : ''}
-                    </div>
-                    
-                    ${!matchedPerson ? `
-                    <div class="siri-confirm-warn">
-                        <span class="siri-confirm-warn-text">⚠️ "${sanitizeHTML(person)}" kişisi bulunamadı. Lütfen kişi seçin:</span>
-                        <select id="siriPersonSelect" class="siri-person-select">
-                            <option value="">Kişi Seçin...</option>
-                        </select>
-                    </div>
-                    ` : ''}
-                    
-                    <div class="siri-confirm-actions">
-                        <button type="button" class="btn siri-confirm-btn-secondary" data-siri-action="cancel">
-                            ❌ İptal
-                        </button>
-                        <button type="button" class="btn btn-success" data-siri-action="confirm">
-                            ✅ Onayla
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    document.body.insertAdjacentHTML('beforeend', buildSiriConfirmModalHtml(person, amount, type, desc, matchedPerson));
 
     const root = document.getElementById('siriConfirmModal');
     if (!root) return;
 
-    const cancelBtn = root.querySelector('[data-siri-action="cancel"]');
-    if (cancelBtn) cancelBtn.addEventListener('click', closeSiriModal);
-
     const amountNum = parseFloat(amount) || 0;
-    const confirmBtn = root.querySelector('[data-siri-action="confirm"]');
-    if (confirmBtn) {
-        confirmBtn.addEventListener('click', function() {
-            let resolved = matchedPerson;
-            if (!resolved) {
-                const sel = document.getElementById('siriPersonSelect');
-                resolved = sel ? sel.value : '';
-            }
-            confirmSiriTransaction(resolved, amountNum, type, desc);
-        });
-    }
-
-    if (!matchedPerson) {
-        const select = document.getElementById('siriPersonSelect');
-        if (select && allData) {
-            Object.keys(allData).sort().forEach(p => {
-                if (p === 'metadata') return;
-                const opt = document.createElement('option');
-                opt.value = p;
-                opt.textContent = p;
-                select.appendChild(opt);
-            });
-
-            select.addEventListener('change', function() {
-                const display = document.getElementById('siriPersonDisplay');
-                if (!display) return;
-                if (this.value) {
-                    display.innerHTML = '<span class="siri-confirm-value--ok">' + sanitizeHTML(this.value) + '</span>';
-                } else {
-                    display.textContent = 'Bulunamadı';
-                    display.className = 'siri-confirm-value siri-confirm-value--missing';
-                }
-            });
-        }
-    }
+    bindSiriConfirmModal(root, matchedPerson, amountNum, type, desc);
 }
 
 function findMatchingPerson(searchName) {

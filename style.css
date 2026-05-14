@@ -248,6 +248,9 @@
 .siri-confirm-value--ok {
     color: #00e676;
 }
+.siri-confirm-type-emphasis {
+    font-weight: 600;
+}
 .siri-confirm-warn {
     background: rgba(255, 23, 68, 0.1);
     border: 1px solid rgba(255, 23, 68, 0.3);
@@ -2430,6 +2433,22 @@ overflow: hidden;
     display: flex !important;
 }
 
+/* İşlem geçmişi başlığı + liste kısaltma notu (app.js string’lerinden sınıfa) */
+.transaction-history-title {
+    color: #b0bec5;
+    margin-bottom: 5px;
+    font-size: 0.9em;
+    font-weight: 600;
+    padding-left: 2px;
+}
+.list-truncation-note {
+    text-align: center;
+    color: #78909c;
+    font-size: 0.85em;
+    padding: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
 .history-container {
     flex: 1;
     display: flex;
@@ -4299,6 +4318,25 @@ select option {
     margin-top: 8px;
     padding: 4px 0;
     font-size: 14px;
+}
+.report-preview-summary-count {
+    color: #e0e0e0;
+}
+.report-preview-summary-sep {
+    color: rgba(255, 255, 255, 0.35);
+    margin: 0 4px;
+}
+.report-preview-summary-balance {
+    font-weight: 600;
+}
+.report-preview-summary-balance--credit {
+    color: #00e676;
+}
+.report-preview-summary-balance--debt {
+    color: #d40000;
+}
+.report-preview-summary-balance--neutral {
+    color: #b0bec5;
 }
 
 .report-preview-item {
