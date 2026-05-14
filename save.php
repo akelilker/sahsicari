@@ -54,8 +54,8 @@ $force = (isset($_GET['force']) && $_GET['force'] === 'true');
 $input = file_get_contents('php://input');
 $newData = json_decode($input, true);
 
-// --- 1) Input validate: geçerli JSON ve en az bir kişi
-if (!is_array($newData) || count($newData) === 0) {
+// --- 1) Input validate: geçerli JSON ve metadata dışında en az bir kişi
+if (!is_array($newData) || countPersistedPeople($newData) === 0) {
     http_response_code(400);
     echo json_encode(["status" => "error", "message" => "Gecersiz veri"], JSON_UNESCAPED_UNICODE);
     exit;

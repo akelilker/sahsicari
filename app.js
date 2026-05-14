@@ -189,6 +189,16 @@ function syncZeroBalanceToggleText() {
 }
 let saveTimer = null;
 let statusDotHideTimer = null;
+
+function getPersistedPeopleCount(data) {
+    if (!data || typeof data !== 'object') return 0;
+    return Object.keys(data).filter(key => key !== 'metadata' && data[key] && typeof data[key] === 'object' && !Array.isArray(data[key])).length;
+}
+
+function hasPersistedPeopleData(data) {
+    return getPersistedPeopleCount(data) > 0;
+}
+
 async function queueServerSyncPayload(payload) {
     try {
         const db = await openIndexedDB();
@@ -219,7 +229,7 @@ function queueSave() {
         if (!allData.metadata) allData.metadata = {};
         allData.metadata.lastUpdate = new Date().toISOString();
         try {
-            if (Object.keys(allData).length > 0 && navigator.onLine) {
+            if (hasPersistedPeopleData(allData) && navigator.onLine) {
                 await saveDataToServer(allData, false);
                 allData.metadata.unsynced = false;
                 await advancedStorage.removeItem('sahsiHesapTakibiData');
@@ -544,7 +554,7 @@ async function testServerConnection() {
 }
 
 function saveDataToServer(data, force = false) {
-    if (!data || typeof data !== 'object' || Object.keys(data).length === 0) {
+    if (!data || typeof data !== 'object' || !hasPersistedPeopleData(data)) {
         console.warn("GUVENLIK: Bos veya hatali veri kaydedilmeye calisildi! Islem iptal edildi.");
         return Promise.reject("Bos veri korumasi: Kayit iptal edildi.");
     }
@@ -641,11 +651,16 @@ async function loadData() {
         if (savedData) localData = JSON.parse(savedData);
     } catch (_) {}
 
+    if (!hasPersistedPeopleData(localData)) {
+        localData = null;
+    }
+
     try {
         const serverResult = await loadDataFromServer();
         const serverData = serverResult && serverResult.data ? serverResult.data : {};
         const serverSource = serverResult && serverResult.source ? serverResult.source : '';
-        if (serverData && Object.keys(serverData).length > 0) {
+        const isMetadataOnlyServerData = (serverSource === 'main' || serverSource === 'backup') && !hasPersistedPeopleData(serverData);
+        if (hasPersistedPeopleData(serverData)) {
             if (localData && localData.metadata && localData.metadata.unsynced === true) {
                 allData = localData;
                 hasLoadedServerData = false;
@@ -665,13 +680,16 @@ async function loadData() {
             updateServerStatus('success', serverSource === 'backup' ? 'Yedek veriden yuklendi' : 'Sunucudan yuklendi');
             return true;
         }
+        if (isMetadataOnlyServerData) {
+            updateServerStatus('error', 'Sunucuda yalnizca metadata var, veri yuklenemedi');
+        }
         if (localData) {
             allData = localData;
             hasLoadedServerData = false;
-            updateServerStatus(serverSource === 'default' ? 'error' : 'success', serverSource === 'default' ? 'Sunucuda veri bulunamadi, yerel veri yuklendi' : 'Yerel veri yuklendi');
+            updateServerStatus(isMetadataOnlyServerData || serverSource === 'default' ? 'error' : 'success', isMetadataOnlyServerData ? 'Sunucuda yalnizca metadata var, yerel veri yuklendi' : (serverSource === 'default' ? 'Sunucuda veri bulunamadi, yerel veri yuklendi' : 'Yerel veri yuklendi'));
         } else {
             hasLoadedServerData = false;
-            updateServerStatus(serverSource === 'default' ? 'error' : 'success', serverSource === 'default' ? 'Sunucuda veri veya yedek bulunamadi' : 'Yeni sistem hazir');
+            updateServerStatus(isMetadataOnlyServerData || serverSource === 'default' ? 'error' : 'success', isMetadataOnlyServerData ? 'Sunucuda yalnizca metadata var, veri yuklenemedi' : (serverSource === 'default' ? 'Sunucuda veri veya yedek bulunamadi' : 'Yeni sistem hazir'));
         }
         return true;
     } catch (error) {
