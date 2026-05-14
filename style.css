@@ -128,6 +128,20 @@
     font-size: 18px;
 }
 
+/* Bağlam menüsü: görünürlük .show; dikey konum --ctx-menu-top (işlem satırı) */
+.three-dot-menu.three-dot-menu--ctx-abs {
+    position: absolute;
+    right: 10px;
+    z-index: 5000;
+    top: var(--ctx-menu-top, 0);
+}
+.three-dot-menu.three-dot-menu--ctx-fixed {
+    position: fixed;
+    right: 10px;
+    z-index: 5000;
+    top: var(--ctx-menu-top, 0);
+}
+
 /* findBalanceSource() dinamik modal */
 .balance-source-modal-shell {
     max-width: 90%;
@@ -1868,6 +1882,12 @@ body:has(.modal.show) .container::after {
     opacity: 1;
 }
 
+#serverStatusText.text-status-syncing {
+    color: #ffea00;
+    text-shadow: 0 0 8px rgba(255, 234, 0, 0.45);
+    animation: statusSyncPulse 1s ease-in-out infinite;
+}
+
 @keyframes versionEmbed {
     0% { opacity: 1; text-shadow: 0 0 10px rgba(207, 216, 220, 0.8); }
     50% { opacity: 1; text-shadow: 0 0 15px rgba(207, 216, 220, 1); }
@@ -2397,8 +2417,8 @@ overflow: hidden;
     word-wrap: break-word;
 }
 
-.modal-body .tab-content {
-    display: flex;
+#personModal .modal-body .tab-content {
+    display: none;
     flex-direction: column;
     height: auto;
     min-height: min-content;
@@ -2406,7 +2426,7 @@ overflow: hidden;
     overscroll-behavior-y: contain;
     -webkit-overscroll-behavior-y: contain;
 }
-.modal-body .tab-content[style*="display: block"] {
+#personModal .modal-body .tab-content.tab-content--visible {
     display: flex !important;
 }
 

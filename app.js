@@ -193,8 +193,11 @@ function initDOMCache() {
         syncZeroBalanceToggleText();
         zeroToggle.addEventListener('change', () => {
             syncZeroBalanceToggleText();
-            if (currentPerson && document.getElementById('kategoriDurumu').style.display === 'block') {
-                updateCategoryBalanceDisplay(currentPerson);
+            if (currentPerson) {
+                const kd = document.getElementById('kategoriDurumu');
+                if (kd && kd.classList.contains(TAB_CONTENT_VISIBLE_CLASS)) {
+                    updateCategoryBalanceDisplay(currentPerson);
+                }
             }
         });
     }
@@ -284,6 +287,8 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
 /** Ayarlar / bildirim açılır menüleri — görünürlük yalnızca sınıf ile */
 const MENU_DROPDOWN_OPEN_CLASS = 'dropdown-menu--open';
 const COLOR_MENU_OPEN_CLASS = 'color-selection-menu--open';
+/** Kişi modalı sekmeleri — görünürlük yalnızca bu sınıf ile (inline display yok) */
+const TAB_CONTENT_VISIBLE_CLASS = 'tab-content--visible';
 
 function setMenuBackdropActive(active) {
     const backdrop = document.getElementById('menuBackdrop');
@@ -300,7 +305,7 @@ function anchorDropdownToIcon(menuEl, iconId, opts) {
     const rightOff = isMobile ? opts.mobileRight : opts.desktopRight;
     const top = Math.round(r.bottom - topOff);
     const right = Math.round(window.innerWidth - r.right - rightOff);
-    ['top', 'right', 'left', 'bottom', 'position'].forEach(function(p) { menuEl.style.removeProperty(p); });
+    ['top', 'right', 'left', 'bottom'].forEach(function(p) { menuEl.style.removeProperty(p); });
     menuEl.style.setProperty('--anchor-menu-top', top + 'px');
     menuEl.style.setProperty('--anchor-menu-right', right + 'px');
     return true;
@@ -689,25 +694,23 @@ function updateServerStatus(type, message) {
     }
     
     dot.className = 'status-dot';
-    text.className = ''; 
-    text.style.color = ''; 
+    text.className = '';
 
     if (type === 'success') {
         dot.classList.add('online');
-        text.classList.add('text-online'); 
-        text.textContent = safeMessage; 
+        text.classList.add('text-online');
+        text.textContent = safeMessage;
         statusDotHideTimer = setTimeout(() => {
             if (DOM.statusDot) DOM.statusDot.classList.add('hidden');
         }, 10000);
     } else if (type === 'error') {
         dot.classList.add('offline');
-        text.classList.add('text-offline'); 
+        text.classList.add('text-offline');
         text.textContent = safeMessage;
     } else {
         dot.classList.add('syncing');
-        text.classList.add('text-online');
+        text.classList.add('text-status-syncing');
         text.textContent = safeMessage;
-        text.style.color = '#ffea00'; 
     }
 }
 
@@ -1876,10 +1879,15 @@ function closeAllModals() {
 }
 
 function openTab(e, id, activeBtn) {
-    document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    const personModalBody = document.querySelector('#personModal .modal-body');
+    if (personModalBody) {
+        personModalBody.querySelectorAll('.tab-content').forEach(function(t) {
+            t.classList.remove(TAB_CONTENT_VISIBLE_CLASS);
+        });
+    }
+    document.querySelectorAll('#personModal .tab-btn').forEach(function(b) { b.classList.remove('active'); });
     const panel = document.getElementById(id);
-    if (panel) panel.style.display = 'block';
+    if (panel) panel.classList.add(TAB_CONTENT_VISIBLE_CLASS);
     const btn = activeBtn || (e && e.currentTarget);
     if (btn) btn.classList.add('active');
     if (id === 'kategoriDurumu') updateCategoryBalanceDisplay(currentPerson);
@@ -1983,61 +1991,6 @@ function showCategoryDetails(categoryName) {
     DOM.mainAppContainer?.classList.add('disable-events');
     document.body.classList.add("disable-events"); 
     return;
-    /*
-
-    currentCategoryDetailState.person = person;
-    currentCategoryDetailState.category = categoryName;
-    currentCategoryDetailState.allTransactions = catTxs;
-    currentCategoryDetailState.filteredTransactions = [...catTxs];
-    currentCategoryDetailState.openingBalance = 0;
-
-    if (catTxs.length === 0) {
-        contentEl.innerHTML = renderEmptyState('İşlem yok');
-    } else {
-        let runningBalance = 0;
-        let rows = [];
-        catTxs.forEach(t => {
-            if (t.type === 'giden') runningBalance += t.amount; else runningBalance -= t.amount;
-            rows.push(`
-                <tr>
-                    <td>${formatDateTR(new Date(t.date))}</td>
-                    <td class="val-gelen">${t.type==='gelen' ? formatNumber(t.amount) : ''}</td>
-                    <td class="val-giden">${t.type==='giden' ? formatNumber(t.amount) : ''}</td>
-                    <td class="val-bakiye">${formatNumber(runningBalance)}</td>
-                    <td>${sanitizeHTML(t.description || '')}</td>
-                </tr>
-            `);
-        });
-
-        contentEl.innerHTML = `
-            <table class="detail-table" style="width:100%; border-collapse:collapse;">
-                <thead>
-                    <tr><th>Tarih</th><th>Gelen</th><th>Giden</th><th>Bakiye</th><th>Açıklama</th></tr>
-                </thead>
-                <tbody>${rows.reverse().join('')}</tbody>
-            </table>
-        `;
-    }
-    
-    modal.dataset.category = categoryName;
-    modal.style.display = 'block';
-    
-    DOM.mainAppContainer?.classList.add('disable-events');
-    document.body.classList.add("disable-events"); 
-
-    const excelBtn = document.getElementById('exportCategoryExcelBtn');
-    if (excelBtn) {
-        const newBtn = excelBtn.cloneNode(true);
-        excelBtn.parentNode.replaceChild(newBtn, excelBtn);
-        
-        newBtn.onclick = () => {
-            showNotification('⚠️ Rapor hazırlanıyor...', 'warning');
-            setTimeout(() => {
-                exportStyledCategoryDetailToExcel(person, categoryName, currentCategoryTransactions);
-            }, 100);
-        };
-    }
-    */
 }
 
 function formatDateForInput(dateValue) {
@@ -4652,7 +4605,7 @@ function showTransactionContextMenu(event, transaction, person, historyItem) {
     
     const menu = document.createElement('div');
     menu.className = 'three-dot-menu';
-    
+
     const editItem = document.createElement('div');
     editItem.className = 'menu-item';
     editItem.setAttribute('data-action', 'edit');
@@ -4668,23 +4621,22 @@ function showTransactionContextMenu(event, transaction, person, historyItem) {
     
     const modal = historyItem.closest('.modal');
     const rect = historyItem.getBoundingClientRect();
-    
+
     if (modal) {
         const modalBody = modal.querySelector('.modal-body');
-        const modalBodyRect = modalBody.getBoundingClientRect();
-        
-        menu.style.position = 'absolute';
-        menu.style.top = (rect.top - modalBodyRect.top + modalBody.scrollTop) + 'px';
-        menu.style.right = '10px';
-        menu.style.zIndex = '5000';
-        
-        modalBody.appendChild(menu);
+        if (modalBody) {
+            const modalBodyRect = modalBody.getBoundingClientRect();
+            menu.classList.add('three-dot-menu--ctx-abs');
+            menu.style.setProperty('--ctx-menu-top', (rect.top - modalBodyRect.top + modalBody.scrollTop) + 'px');
+            modalBody.appendChild(menu);
+        } else {
+            menu.classList.add('three-dot-menu--ctx-fixed');
+            menu.style.setProperty('--ctx-menu-top', rect.top + 'px');
+            document.body.appendChild(menu);
+        }
     } else {
-        menu.style.position = 'fixed';
-        menu.style.top = rect.top + 'px';
-        menu.style.right = '10px';
-        menu.style.zIndex = '5000';
-        
+        menu.classList.add('three-dot-menu--ctx-fixed');
+        menu.style.setProperty('--ctx-menu-top', rect.top + 'px');
         document.body.appendChild(menu);
     }
     
@@ -4840,7 +4792,7 @@ function handleModalTouchEnd(e) {
     const minSwipeDistance = 60;
     
     if (isHorizontalSwipe && Math.abs(diffX) > minSwipeDistance) {
-        const activeTab = document.querySelector('.tab-content[style*="display: block"]');
+        const activeTab = document.querySelector('#personModal .tab-content.' + TAB_CONTENT_VISIBLE_CLASS);
         if (!activeTab) return;
         
         const currentTabId = activeTab.id;
