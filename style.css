@@ -505,7 +505,7 @@
   --black-50: rgba(0, 0, 0, 0.5);
   --gray-40: rgba(180, 190, 200, 0.65);
   /* Mobil / PWA: kirli görünmeyen net çerçeve rengi (nötr gri) */
-  --frame-gray: rgba(200, 208, 216, 0.82);
+  --frame-gray: rgba(232, 238, 247, 0.9);
   /* Cari Kayıt / Veriler yeşil kutusu (tek kaynak) */
   --green-panel-rgb: 9, 138, 20;
 }
@@ -1185,7 +1185,7 @@ button.delete-notif-btn {
     margin-bottom: 1px;
     border: 1px solid rgba(255, 255, 255, 0.38);
     flex-shrink: 0;
-    box-shadow: none !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 4px 14px rgba(0,0,0,0.24);
     background-clip: padding-box;
     overflow: visible !important;
 }
@@ -1474,7 +1474,7 @@ button.delete-notif-btn {
             rgba(var(--green-panel-rgb), 0.02) 72%,
             transparent 100%
         );
-    box-shadow: none !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 4px 14px rgba(0,0,0,0.24);
     background-clip: padding-box;
 }
 
@@ -1518,8 +1518,9 @@ button.delete-notif-btn {
 /* Veriler bölümü butonları: net çerçeve, yeşil buton üzerinde görünmesin (opak koyu arka plan) */
 .control-panel .btn,
 .control-panel .file-upload-btn {
-    border: 1px solid rgba(255, 255, 255, 0.38);
-    background: rgba(14, 21, 37, 0.95);
+    border: 1px solid rgba(232, 238, 247, 0.62);
+    background: rgba(14, 21, 37, 0.72);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 2px 8px rgba(0,0,0,0.28);
 }
 /* Veriler: Genel Durum, Yedek Al, Yedekten Geri Yükle — metin büyüklüğü aynı */
 .control-panel .general-status-btn,
@@ -4402,6 +4403,18 @@ label[for="editDateInput"] {
 }
 
 @media screen and (max-width: 768px) {
+    .header h1,
+    .summary-card,
+    .debt-status-section,
+    .debt-status-section h3,
+    .control-panel,
+    .control-panel h3,
+    .control-panel .btn,
+    .control-panel .file-upload-btn,
+    .debt-controls select {
+        border-color: var(--frame-gray);
+    }
+
     #colorBubbles {
         column-gap: 19px;
         row-gap: 21px;
@@ -4564,9 +4577,13 @@ label[for="editDateInput"] {
 
     .control-panel {
         padding: 13px 8px 10px 8px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 5px;
     }
 
     .control-panel h3 {
+        grid-column: 1 / -1;
         padding-top: 6px;
         padding-bottom: 6px;
         font-size: 0.9em;
@@ -4579,16 +4596,20 @@ label[for="editDateInput"] {
     .control-panel .file-upload-btn {
         font-size: 12px;
         min-height: 32px;
+        width: 100%;
     }
 
     .control-panel .general-status-btn {
-        margin-bottom: 8px;
+        grid-column: 1;
+        margin: 0;
     }
 
     .control-panel-grid {
-        grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
-        gap: 5px;
-        margin-top: 4px;
+        display: contents;
+    }
+
+    .control-panel .control-panel-grid .btn {
+        grid-column: 2;
     }
 
     .control-panel .control-panel-grid .btn,
@@ -4601,9 +4622,14 @@ label[for="editDateInput"] {
         padding-left: 10px;
         padding-right: 10px;
         font-size: 12px;
-        white-space: normal;
+        white-space: nowrap;
         line-height: 1.2;
         text-align: center;
+    }
+
+    .control-panel .file-upload {
+        grid-column: 1 / -1;
+        height: auto;
     }
 
     .header,
