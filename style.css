@@ -4600,7 +4600,10 @@ label[for="editDateInput"] {
     .control-panel .file-upload-btn {
         padding-left: 10px;
         padding-right: 10px;
-        white-space: nowrap;
+        font-size: 12px;
+        white-space: normal;
+        line-height: 1.2;
+        text-align: center;
     }
 
     .header,
