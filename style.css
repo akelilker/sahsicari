@@ -505,7 +505,7 @@
   --black-50: rgba(0, 0, 0, 0.5);
   --gray-40: rgba(180, 190, 200, 0.65);
   /* Mobil / PWA: kirli görünmeyen net çerçeve rengi (nötr gri) */
-  --frame-gray: rgba(232, 238, 247, 0.9);
+  --frame-gray: rgba(200, 208, 216, 0.82);
   /* Cari Kayıt / Veriler yeşil kutusu (tek kaynak) */
   --green-panel-rgb: 9, 138, 20;
 }
@@ -1518,9 +1518,9 @@ button.delete-notif-btn {
 /* Veriler bölümü butonları: net çerçeve, yeşil buton üzerinde görünmesin (opak koyu arka plan) */
 .control-panel .btn,
 .control-panel .file-upload-btn {
-    border: 1px solid rgba(232, 238, 247, 0.62);
-    background: rgba(14, 21, 37, 0.72);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 2px 8px rgba(0,0,0,0.28);
+    border: 1px solid var(--frame-gray);
+    background: rgba(14, 21, 37, 0.95);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
 }
 /* Veriler: Genel Durum, Yedek Al, Yedekten Geri Yükle — metin büyüklüğü aynı */
 .control-panel .general-status-btn,
