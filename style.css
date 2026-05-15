@@ -5360,6 +5360,7 @@ label[for="editDateInput"] {
     body {
         background: #0c1628;
     }
+    .header h1,
     .summary-card,
     .debt-status-section,
     .debt-status-section h3,
@@ -5382,6 +5383,7 @@ label[for="editDateInput"] {
     /* Ana başlık alanı iç dikey yükseklik +4px, yatay çizgi altına 3px boşluk */
     .header h1 {
         padding: 4px 0 18px 0;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.09), 0 2px 7px rgba(0,0,0,0.16);
     }
     /* Ayarlar/zil ile bilgi kutuları arası = üst çerçeve (5px) */
     .total-summary {
