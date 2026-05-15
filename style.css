@@ -5365,7 +5365,6 @@ label[for="editDateInput"] {
     body {
         background: #0c1628;
     }
-    .header h1,
     .summary-card,
     .debt-status-section,
     .debt-status-section h3,
@@ -5377,7 +5376,8 @@ label[for="editDateInput"] {
     }
     .control-panel .btn,
     .control-panel .file-upload-btn {
-        border-color: var(--panel-chrome-button-border);
+        border-color: var(--frame-gray);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     }
     .container {
         background: rgba(12, 18, 32, 0.97);
@@ -5392,7 +5392,6 @@ label[for="editDateInput"] {
     /* Ana başlık alanı iç dikey yükseklik +4px, yatay çizgi altına 3px boşluk */
     .header h1 {
         padding: 4px 0 18px 0;
-        box-shadow: inset 0 1px 0 rgba(255,255,255,0.09), 0 2px 7px rgba(0,0,0,0.16);
     }
     /* Ayarlar/zil ile bilgi kutuları arası = üst çerçeve (5px) */
     .total-summary {
