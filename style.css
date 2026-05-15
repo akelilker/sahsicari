@@ -4561,7 +4561,7 @@ label[for="editDateInput"] {
     }
 
     .control-panel {
-        padding: 14px 8px;
+        padding: 13px 8px 10px 8px;
     }
 
     .control-panel h3 {
@@ -4569,7 +4569,23 @@ label[for="editDateInput"] {
         padding-bottom: 6px;
         font-size: 0.9em;
         margin-bottom: 0;
-        margin: -14px -8px 6px -8px;
+        margin: -13px -8px 5px -8px;
+    }
+
+    .control-panel .general-status-btn,
+    .control-panel .control-panel-grid .btn,
+    .control-panel .file-upload-btn {
+        font-size: 12px;
+        min-height: 32px;
+    }
+
+    .control-panel .general-status-btn {
+        margin-bottom: 8px;
+    }
+
+    .control-panel-grid {
+        gap: 5px;
+        margin-top: 4px;
     }
 
     .header,
