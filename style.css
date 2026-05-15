@@ -4425,6 +4425,11 @@ label[for="editDateInput"] {
         box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 2px 8px var(--panel-chrome-shadow);
     }
 
+    .control-panel .btn,
+    .control-panel .file-upload-btn {
+        border-color: var(--panel-chrome-border);
+    }
+
     .debt-status-section h3,
     .control-panel h3 {
         border-top-color: var(--panel-chrome-line);
@@ -4608,7 +4613,7 @@ label[for="editDateInput"] {
         padding-bottom: 7px;
         font-size: 0.9em;
         margin-bottom: 0;
-        margin: -12px -8px 7px -8px;
+        margin: -9px -8px 7px -8px;
     }
 
     .control-panel .general-status-btn,
