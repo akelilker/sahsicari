@@ -5431,10 +5431,12 @@ label[for="editDateInput"] {
         background-clip: padding-box;
     }
     .control-panel h3 {
-        margin: -7px -8px 8px -8px;
-        padding-top: 6px;
-        padding-bottom: 6px;
-        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 32px;
+        margin: -7px -8px 10px -8px;
+        padding: 0 0 1px 0;
         line-height: 1;
     }
     .quick-item {
