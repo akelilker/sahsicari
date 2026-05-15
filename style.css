@@ -5412,6 +5412,7 @@ label[for="editDateInput"] {
     }
     /* Veriler kutusu: aynı yeşil ton, sadece parlak */
     .control-panel {
+        padding-top: 7px;
         background: linear-gradient(
                 to bottom,
                 rgba(255, 255, 255, 0.12) 0%,
@@ -5425,9 +5426,16 @@ label[for="editDateInput"] {
                 rgba(var(--green-panel-rgb), 0.06) 50%,
                 rgba(var(--green-panel-rgb), 0.02) 72%,
                 transparent 100%
-            );
+        );
         box-shadow: none !important;
         background-clip: padding-box;
+    }
+    .control-panel h3 {
+        margin: -7px -8px 8px -8px;
+        padding-top: 6px;
+        padding-bottom: 6px;
+        margin-bottom: 8px;
+        line-height: 1;
     }
     .quick-item {
         box-shadow: none;
