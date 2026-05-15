@@ -508,7 +508,7 @@
   --frame-gray: rgba(200, 208, 216, 0.82);
   /* Mobilde Cari Kayıt/Veriler için daha ince krom çizgi tonu */
   --panel-chrome-border: rgba(194, 201, 209, 0.62);
-  --panel-chrome-button-border: rgba(186, 194, 202, 0.46);
+  --panel-chrome-button-border: rgba(212, 220, 228, 0.68);
   --panel-chrome-line: rgba(221, 226, 232, 0.52);
   --panel-chrome-shadow: rgba(0, 0, 0, 0.18);
   /* Cari Kayıt / Veriler yeşil kutusu (tek kaynak) */
@@ -1285,6 +1285,10 @@ button.delete-notif-btn {
     border-color: #42a5f5 !important;
 }
 
+.person-select-label--placeholder {
+    color: rgba(215, 230, 239, 0.58);
+}
+
 .person-select-chevron {
     position: absolute;
     right: 13px;
@@ -1524,8 +1528,8 @@ button.delete-notif-btn {
 .control-panel .btn,
 .control-panel .file-upload-btn {
     border: 1px solid var(--panel-chrome-button-border);
-    background: rgba(14, 21, 37, 0.95);
-    box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+    background: rgba(12, 18, 32, 0.94);
+    box-shadow: none;
 }
 /* Veriler: Genel Durum, Yedek Al, Yedekten Geri Yükle — metin büyüklüğü aynı */
 .control-panel .general-status-btn,
@@ -5376,8 +5380,8 @@ label[for="editDateInput"] {
     }
     .control-panel .btn,
     .control-panel .file-upload-btn {
-        border-color: var(--frame-gray);
-        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        border-color: var(--panel-chrome-button-border);
+        box-shadow: none;
     }
     .container {
         background: rgba(12, 18, 32, 0.97);

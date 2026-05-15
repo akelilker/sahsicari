@@ -1470,7 +1470,10 @@ function populatePersonSelect(selectElement, sortedPeople = null) {
 function syncCustomPersonSelectLabel() {
     if (!DOM.personSelect || !DOM.personSelectLabel) return;
     const selectedOption = DOM.personSelect.options[DOM.personSelect.selectedIndex];
-    DOM.personSelectLabel.textContent = selectedOption ? selectedOption.textContent.trim() : 'Kişi Seçiniz...';
+    const labelText = selectedOption ? selectedOption.textContent.trim() : 'Kişi Seçiniz...';
+    const isPlaceholder = !DOM.personSelect.value;
+    DOM.personSelectLabel.textContent = labelText;
+    DOM.personSelectLabel.classList.toggle('person-select-label--placeholder', isPlaceholder);
 }
 
 function closeCustomPersonSelect() {
