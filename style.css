@@ -905,10 +905,10 @@ body.quick-overlay-open .quick-overlay-backdrop {
     box-sizing: border-box;
     margin: 0 auto;
     margin-bottom: 2px;
-    border: 1px solid rgba(255, 255, 255, 0.38);
+    border: 1px solid var(--frame-gray);
     border-radius: 12px;
     background: rgba(10, 16, 30, 0.92);
-    box-shadow: none;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 4px 14px rgba(0, 0, 0, 0.28);
     padding: 2px 0 13px 0;
     position: relative;
     color: #ffffff;
@@ -5512,6 +5512,7 @@ label[for="editDateInput"] {
     body {
         background: #0c1628;
     }
+    .header h1,
     .summary-card,
     .debt-status-section,
     .debt-status-section h3,
@@ -5520,6 +5521,9 @@ label[for="editDateInput"] {
     .control-panel .btn,
     .control-panel .file-upload-btn {
         border-color: var(--frame-gray);
+    }
+    .header h1 {
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 4px 14px rgba(0, 0, 0, 0.28);
     }
     .control-panel .btn,
     .control-panel .file-upload-btn {
