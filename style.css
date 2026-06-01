@@ -799,6 +799,17 @@ body.person-select-open .global-status-bar {
     transition: opacity 0.3s var(--ease-smooth);
 }
 
+/* Hızlı işlem overlay — arka plan blur (mobil + masaüstü) */
+body.quick-overlay-open #mainAppContainer {
+    filter: blur(5px);
+    transition: filter 0.3s var(--ease-smooth);
+}
+
+body.quick-overlay-open .quick-overlay-backdrop {
+    background: rgba(8, 12, 22, 0.22);
+    transition: background-color 0.3s var(--ease-smooth);
+}
+
 .container.theme-white-glow { --light-color: #FFFFFF; --light-shadow: var(--white-50); }
 .container.theme-blue-glow { --light-color: #42A5F5; --light-shadow: rgba(66, 165, 245, 0.6); }
 .container.theme-lila-glow { --light-color: #9575CD; --light-shadow: rgba(149, 117, 205, 0.6); }
@@ -1383,19 +1394,63 @@ button.delete-notif-btn {
     display: none !important;
 }
 
-/* Masaüstü: liste ekran ortasında, daha yüksek */
+/* Masaüstü: ortada, hızlı işlem / sık kullanılanlar kutusu tarzı grid */
 @media screen and (min-width: 769px) {
     .person-select-menu.person-select-menu--centered {
         top: 50%;
         left: 50%;
         right: auto;
         transform: translate(-50%, -50%);
-        width: min(92vw, 420px);
-        max-width: 420px;
+        width: min(92vw, 480px);
+        max-width: 480px;
     }
 
     .person-select-menu.person-select-menu--centered .person-select-options {
-        max-height: min(62vh, 520px);
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 6px;
+        max-height: min(70vh, 560px);
+        padding-right: 0;
+    }
+
+    .person-select-menu.person-select-menu--centered .person-select-option,
+    .person-select-menu.person-select-menu--centered .person-select-empty {
+        min-height: 0;
+        padding: 6px 4px;
+        font-size: 0.8em;
+        font-weight: 600;
+        text-align: center;
+        justify-content: center;
+        align-items: center;
+        background: rgba(15, 20, 30, 0.35);
+        border: 1px solid var(--gray-40);
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.45);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .person-select-menu.person-select-menu--centered .person-select-option:hover,
+    .person-select-menu.person-select-menu--centered .person-select-option.is-active {
+        background: rgba(66, 165, 245, 0.22);
+        border-color: rgba(66, 165, 245, 0.45);
+        transform: scale(1.04);
+    }
+
+    .person-select-menu.person-select-menu--centered .person-select-option.is-selected {
+        background: rgba(46, 125, 50, 0.35);
+        border-color: rgba(102, 187, 106, 0.55);
+        color: #e8f5e9;
+    }
+
+    .person-select-menu.person-select-menu--centered .person-select-empty {
+        grid-column: 1 / -1;
+        font-size: 0.85em;
+        padding: 10px;
+        background: transparent;
+        border: none;
+        box-shadow: none;
     }
 }
 
@@ -4057,10 +4112,43 @@ select option {
     margin: 0;
     display: flex;
     flex-direction: column;
+    gap: 8px;
     pointer-events: auto !important;
     backdrop-filter: none;
     position: relative;
     z-index: 11;
+}
+
+@media screen and (min-width: 769px) {
+    .quick-person-list {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 6px;
+        padding: 5px 10px;
+        max-height: min(65vh, 520px);
+        align-items: stretch;
+    }
+
+    .quick-person-list .person-item {
+        margin-bottom: 0;
+        min-height: 0;
+        padding: 8px 6px;
+        font-size: 0.8em;
+        font-weight: 600;
+        border-radius: 8px;
+        background: rgba(15, 20, 30, 0.35);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.45);
+        text-align: center;
+        justify-content: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .quick-person-list .quick-add-person-btn {
+        font-size: 18px !important;
+        min-height: 36px;
+    }
 }
 
 .person-item {

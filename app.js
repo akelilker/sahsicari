@@ -1587,6 +1587,7 @@ function renderCustomPersonSelectOptions(filterText = '') {
 function openCustomPersonSelect() {
     if (!DOM.personSelectShell || !DOM.personSelectMenu || !DOM.personSelectTrigger) return;
     closeSettingsAndNotificationMenus();
+    closeQuickTransactionOverlay();
     DOM.personSelectShell.classList.add('open');
     DOM.personSelectMenu.hidden = false;
     DOM.personSelectTrigger.setAttribute('aria-expanded', 'true');
@@ -4622,10 +4623,12 @@ function importSystemFromJSON(event) {
 }
 
 function showQuickTransactionOverlay() {
-    
+    closeCustomPersonSelect();
+
     const quickOverlayContainer = document.getElementById('quickOverlayContainer'); 
     if (quickOverlayContainer) quickOverlayContainer.classList.remove('u-hidden');
     
+    document.body.classList.add('quick-overlay-open');
     DOM.mainAppContainer?.classList.add('disable-events');
     document.body.classList.add("disable-events"); 
     
@@ -4644,6 +4647,7 @@ function closeQuickTransactionOverlay() {
     const quickOverlayContainer = document.getElementById('quickOverlayContainer'); 
     if (quickOverlayContainer) quickOverlayContainer.classList.add('u-hidden');
     
+    document.body.classList.remove('quick-overlay-open');
     document.body.classList.remove("disable-events"); 
 
     if (!document.querySelector('.modal.show') && !checkAnyMenuOpen()) {
