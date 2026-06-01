@@ -1394,7 +1394,7 @@ button.delete-notif-btn {
     display: none !important;
 }
 
-/* Masaüstü: hızlı kişi grid formatı — 3 sütun, container içinde */
+/* Masaüstü: hızlı kişi grid — dış kapsayıcı yok, 3 sütun */
 @media screen and (min-width: 769px) {
     .person-select-menu.person-select-menu--centered {
         top: 50%;
@@ -1404,6 +1404,12 @@ button.delete-notif-btn {
         width: min(calc(450px - 24px), calc(100vw - 32px));
         max-width: calc(450px - 24px);
         box-sizing: border-box;
+        padding: 0;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
     }
 
     .person-select-menu.person-select-menu--centered .person-select-options {

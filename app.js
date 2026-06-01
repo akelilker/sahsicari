@@ -1544,19 +1544,6 @@ function renderCustomPersonSelectOptions(filterText = '') {
     const options = Array.from(DOM.personSelect.options || []).slice(1);
     const matchingOptions = options.filter(option => option.value.toLocaleLowerCase('tr-TR').includes(normalizedFilter));
 
-    const placeholderBtn = document.createElement('button');
-    placeholderBtn.type = 'button';
-    placeholderBtn.className = 'person-select-option';
-    if (!DOM.personSelect.value) placeholderBtn.classList.add('is-selected');
-    placeholderBtn.textContent = 'Kişi Seçiniz...';
-    placeholderBtn.addEventListener('click', function() {
-        if (DOM.personSelect) DOM.personSelect.value = '';
-        syncCustomPersonSelectUI();
-        closeCustomPersonSelect();
-        DOM.personSelectTrigger?.focus();
-    });
-    fragment.appendChild(placeholderBtn);
-
     if (!matchingOptions.length) {
         const emptyState = document.createElement('div');
         emptyState.className = 'person-select-empty';
