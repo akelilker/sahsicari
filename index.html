@@ -16,7 +16,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon.ico">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=78.44">
+<link rel="stylesheet" href="style.css?v=78.46">
 
 <title>ŞAHSİ HESAP TAKİBİ</title>
 </head>
@@ -60,8 +60,11 @@
     <div id="personSelectBackdrop" class="person-select-backdrop" role="button" tabindex="0" aria-label="Kişi listesini kapat" hidden></div>
 
     <div id="personSelectMenu" class="person-select-menu" hidden>
-        <div class="person-select-search-wrap">
-            <input type="text" id="personSelectSearch" class="person-select-search" placeholder="Kişiyi Ara" autocomplete="off" aria-label="Kişiyi Ara">
+        <div class="person-select-search-wrap quick-search-wrapper">
+            <div class="search-box">
+                <span class="search-icon" aria-hidden="true">🔍 </span>
+                <input type="text" id="personSelectSearch" class="person-select-search" placeholder="Kişiyi Ara" autocomplete="off" aria-label="Kişiyi Ara">
+            </div>
         </div>
         <div id="personSelectOptions" class="person-select-options" role="listbox" aria-label="Kişi listesi"></div>
     </div>
