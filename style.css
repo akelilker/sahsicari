@@ -1394,7 +1394,7 @@ button.delete-notif-btn {
     display: none !important;
 }
 
-/* Masaüstü: container içinde ortada, 3 sütun, kutular çerçevesiz */
+/* Masaüstü: hızlı kişi grid formatı — 3 sütun, container içinde */
 @media screen and (min-width: 769px) {
     .person-select-menu.person-select-menu--centered {
         top: 50%;
@@ -1409,49 +1409,55 @@ button.delete-notif-btn {
     .person-select-menu.person-select-menu--centered .person-select-options {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 4px 8px;
-        max-height: min(70vh, 560px);
-        padding-right: 0;
+        gap: 6px;
+        max-height: min(65vh, 520px);
+        padding: 5px 0;
     }
 
-    .person-select-menu.person-select-menu--centered .person-select-option,
-    .person-select-menu.person-select-menu--centered .person-select-empty {
+    .person-select-menu.person-select-menu--centered .person-select-option {
         min-height: 0;
-        padding: 6px 4px;
-        font-size: 0.82em;
+        margin-bottom: 0;
+        padding: 8px 6px;
+        font-size: 0.8em;
         font-weight: 600;
         text-align: center;
         justify-content: center;
         align-items: center;
-        background: transparent;
-        border: none;
-        border-radius: 0;
-        box-shadow: none;
+        color: #eceff1;
+        background: rgba(15, 20, 30, 0.35);
+        border: 1px solid var(--gray-40);
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.45);
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        transition: all 0.2s ease;
     }
 
     .person-select-menu.person-select-menu--centered .person-select-option:hover,
     .person-select-menu.person-select-menu--centered .person-select-option.is-active {
-        background: transparent;
-        border: none;
-        box-shadow: none;
-        color: #8bd3ff;
-        transform: none;
+        background: rgba(14, 21, 37, 0.98);
+        border-color: #8fb3ff;
+        color: #ffffff;
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.35);
+        transform: scale(1.02);
     }
 
     .person-select-menu.person-select-menu--centered .person-select-option.is-selected {
-        background: transparent;
-        border: none;
-        box-shadow: none;
-        color: #66bb6a;
+        background: rgba(14, 21, 37, 0.98);
+        border-color: rgba(102, 187, 106, 0.55);
+        color: #e8f5e9;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
     }
 
     .person-select-menu.person-select-menu--centered .person-select-empty {
         grid-column: 1 / -1;
         font-size: 0.85em;
         padding: 10px;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        text-align: center;
     }
 }
 
