@@ -6457,7 +6457,6 @@ input[type="date"]::-webkit-datetime-edit-year-field {
 
   .notification-icon-btn,
   .delete-notif-btn,
-  .quick-action-main-btn,
   .add-person-btn,
   .btn,
   .dropdown-menu .btn,
@@ -6486,7 +6485,8 @@ input[type="date"]::-webkit-datetime-edit-year-field {
   .transparent-date-input,
   #editDateInput,
   .rd-date-input,
-  .date-picker-simple {
+  .date-picker-simple,
+  .quick-action-main-btn {
     transition: transform 0.2s ease, filter 0.2s ease;
     transform-origin: left center;
   }
