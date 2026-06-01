@@ -742,11 +742,24 @@ body.ios-pwa .debt-controls select {
     top: 0;
     left: 0; right: 0; bottom: 0;
     background: transparent;
-    z-index: 1999;
+    /* Başlık/ikonların üstünde, açılır menülerin (9999) altında */
+    z-index: 9800;
     pointer-events: auto !important;
     touch-action: auto !important;
+    transition: backdrop-filter 0.3s var(--ease-smooth), -webkit-backdrop-filter 0.3s var(--ease-smooth), background-color 0.3s var(--ease-smooth);
 }
-.menu-backdrop-overlay.active { display: block; }
+.menu-backdrop-overlay.active {
+    display: block;
+    background: rgba(8, 12, 22, 0.4);
+    backdrop-filter: blur(7px);
+    -webkit-backdrop-filter: blur(7px);
+}
+
+/* Footer header katmanının üstünde; menü açıkken hafif bulanık */
+body.menu-dropdown-backdrop .global-status-bar {
+    filter: blur(6px);
+    transition: filter 0.3s var(--ease-smooth);
+}
 
 .container.theme-white-glow { --light-color: #FFFFFF; --light-shadow: var(--white-50); }
 .container.theme-blue-glow { --light-color: #42A5F5; --light-shadow: rgba(66, 165, 245, 0.6); }
@@ -5917,9 +5930,9 @@ label[for="editDateInput"] {
 
 @media (max-width: 768px) {
 
-    /* Mobil menü boyutları */
+    /* Mobil menü boyutları — blur katmanı (9800) üstünde kalmalı */
     #settingsMenu {
-        z-index: 2010;
+        z-index: 10000;
     }
 
     /* iOS PWA: ayarlar açılır menüsü ekran genişliğinin %50’si */
@@ -5930,7 +5943,7 @@ label[for="editDateInput"] {
     }
 
     #notificationMenu {
-        z-index: 2010;
+        z-index: 10000;
         width: 88%;
         max-width: calc(100vw - 20px);
     }

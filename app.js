@@ -1,5 +1,8 @@
 /* formatDateTR → js/utils.js */
+/** Önbellek / service worker — asset ?v= güncellerken bunu artır */
 const APP_VERSION = '78.34';
+/** Footer’da görünen sürüm — yalnızca kullanıcıya yansıyan sürüm değişince güncelle */
+const FOOTER_VERSION = '78.34';
 
 /* -----------------------------------------------------------------------------
    Dosya düzeni: yardımcılar & DOM önbelleği → olay bağlama → veri/sunucu
@@ -294,6 +297,7 @@ function setMenuBackdropActive(active) {
     const backdrop = document.getElementById('menuBackdrop');
     if (!backdrop) return;
     backdrop.classList.toggle('active', !!active);
+    document.body.classList.toggle('menu-dropdown-backdrop', !!active);
 }
 
 function anchorDropdownToIcon(menuEl, iconId, opts) {
@@ -5025,7 +5029,7 @@ function updateVersionDisplay() {
     const versionElement = document.querySelector('.version');
     if (!versionElement) return;
 
-    const currentVersion = APP_VERSION;
+    const currentVersion = FOOTER_VERSION;
     
     const userAgent = navigator.userAgent || navigator.vendor || window.opera;
     const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
