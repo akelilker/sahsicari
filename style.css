@@ -764,6 +764,41 @@ body.menu-dropdown-backdrop .global-status-bar {
     transition: opacity 0.3s var(--ease-smooth);
 }
 
+/* Kişi seçim listesi — ayarlar/bildirim ile aynı arka plan efekti */
+.person-select-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1500;
+    background: transparent;
+    pointer-events: auto !important;
+    touch-action: auto !important;
+    transition: background-color 0.3s var(--ease-smooth);
+}
+.person-select-backdrop:not([hidden]) {
+    display: block;
+    background: rgba(8, 12, 22, 0.22);
+}
+
+body.person-select-open .content-scroll-wrapper {
+    filter: blur(5px);
+    pointer-events: none;
+    transition: filter 0.3s var(--ease-smooth);
+}
+
+body.person-select-open .person-select-shell {
+    pointer-events: auto !important;
+    touch-action: auto !important;
+}
+
+body.person-select-open .global-status-bar {
+    opacity: 0.72;
+    transition: opacity 0.3s var(--ease-smooth);
+}
+
 .container.theme-white-glow { --light-color: #FFFFFF; --light-shadow: var(--white-50); }
 .container.theme-blue-glow { --light-color: #42A5F5; --light-shadow: rgba(66, 165, 245, 0.6); }
 .container.theme-lila-glow { --light-color: #9575CD; --light-shadow: rgba(149, 117, 205, 0.6); }
@@ -1324,11 +1359,8 @@ button.delete-notif-btn {
 }
 
 .person-select-menu {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: calc(100% + 8px);
-    z-index: 2205;
+    position: fixed;
+    z-index: 10000;
     padding: 10px;
     border-radius: 12px;
     border: 1px solid rgba(255, 255, 255, 0.34);
@@ -1338,6 +1370,33 @@ button.delete-notif-btn {
     box-shadow: 0 22px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.05);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
+    pointer-events: auto !important;
+    touch-action: auto !important;
+    top: var(--person-menu-top, auto);
+    left: var(--person-menu-left, 12px);
+    width: var(--person-menu-width, calc(100vw - 24px));
+    max-width: var(--person-menu-width, calc(100vw - 24px));
+    box-sizing: border-box;
+}
+
+.person-select-menu[hidden] {
+    display: none !important;
+}
+
+/* Masaüstü: liste ekran ortasında, daha yüksek */
+@media screen and (min-width: 769px) {
+    .person-select-menu.person-select-menu--centered {
+        top: 50%;
+        left: 50%;
+        right: auto;
+        transform: translate(-50%, -50%);
+        width: min(92vw, 420px);
+        max-width: 420px;
+    }
+
+    .person-select-menu.person-select-menu--centered .person-select-options {
+        max-height: min(62vh, 520px);
+    }
 }
 
 .person-select-search-wrap {
@@ -1366,7 +1425,7 @@ button.delete-notif-btn {
 }
 
 .person-select-options {
-    max-height: 240px;
+    max-height: min(50vh, 320px);
     overflow-y: auto;
     display: flex;
     flex-direction: column;

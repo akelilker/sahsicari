@@ -300,6 +300,38 @@ function setMenuBackdropActive(active) {
     document.body.classList.toggle('menu-dropdown-backdrop', !!active);
 }
 
+function setPersonSelectBackdropActive(active) {
+    const backdrop = document.getElementById('personSelectBackdrop');
+    if (!backdrop) return;
+    backdrop.hidden = !active;
+    document.body.classList.toggle('person-select-open', !!active);
+}
+
+function positionPersonSelectMenu() {
+    const menu = DOM.personSelectMenu;
+    const shell = DOM.personSelectShell;
+    const trigger = DOM.personSelectTrigger;
+    if (!menu || !trigger) return;
+
+    const isDesktop = window.innerWidth >= 769;
+    menu.classList.toggle('person-select-menu--centered', isDesktop);
+
+    if (isDesktop) {
+        menu.style.removeProperty('--person-menu-top');
+        menu.style.removeProperty('--person-menu-left');
+        menu.style.removeProperty('--person-menu-width');
+        return;
+    }
+
+    const shellRect = shell?.getBoundingClientRect();
+    const triggerRect = trigger.getBoundingClientRect();
+    const left = shellRect ? shellRect.left : triggerRect.left;
+    const width = shellRect ? shellRect.width : triggerRect.width;
+    menu.style.setProperty('--person-menu-top', Math.round(triggerRect.bottom + 8) + 'px');
+    menu.style.setProperty('--person-menu-left', Math.round(left) + 'px');
+    menu.style.setProperty('--person-menu-width', Math.round(width) + 'px');
+}
+
 function anchorDropdownToIcon(menuEl, iconId, opts) {
     const icon = document.getElementById(iconId);
     if (!menuEl || !icon) return false;
@@ -450,10 +482,25 @@ function bindPageEvents() {
     const systemImportFile = document.getElementById('systemImportFile');
     if (systemImportFile) systemImportFile.addEventListener('change', importSystemFromJSON);
 
+    const personSelectBackdrop = document.getElementById('personSelectBackdrop');
+    if (personSelectBackdrop) {
+        personSelectBackdrop.addEventListener('click', closeCustomPersonSelect);
+        personSelectBackdrop.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); closeCustomPersonSelect(); }
+        });
+    }
+
     document.addEventListener('click', function(e) {
-        if (!DOM.personSelectShell || DOM.personSelectMenu?.hidden) return;
-        if (!DOM.personSelectShell.contains(e.target)) {
-            closeCustomPersonSelect();
+        if (!DOM.personSelectMenu || DOM.personSelectMenu.hidden) return;
+        if (DOM.personSelectShell?.contains(e.target)) return;
+        if (DOM.personSelectMenu.contains(e.target)) return;
+        if (e.target === personSelectBackdrop) return;
+        closeCustomPersonSelect();
+    });
+
+    window.addEventListener('resize', function() {
+        if (DOM.personSelectMenu && !DOM.personSelectMenu.hidden) {
+            positionPersonSelectMenu();
         }
     });
 
@@ -1486,6 +1533,7 @@ function closeCustomPersonSelect() {
     DOM.personSelectMenu.hidden = true;
     DOM.personSelectTrigger.setAttribute('aria-expanded', 'false');
     if (DOM.personSelectSearch) DOM.personSelectSearch.value = '';
+    setPersonSelectBackdropActive(false);
 }
 
 function renderCustomPersonSelectOptions(filterText = '') {
@@ -1538,9 +1586,12 @@ function renderCustomPersonSelectOptions(filterText = '') {
 
 function openCustomPersonSelect() {
     if (!DOM.personSelectShell || !DOM.personSelectMenu || !DOM.personSelectTrigger) return;
+    closeSettingsAndNotificationMenus();
     DOM.personSelectShell.classList.add('open');
     DOM.personSelectMenu.hidden = false;
     DOM.personSelectTrigger.setAttribute('aria-expanded', 'true');
+    positionPersonSelectMenu();
+    setPersonSelectBackdropActive(true);
     renderCustomPersonSelectOptions(DOM.personSelectSearch?.value || '');
     if (DOM.personSelectSearch) {
         DOM.personSelectSearch.focus();
@@ -2825,6 +2876,7 @@ function checkAnyMenuOpen() {
 
 function toggleSettingsMenu() {
     closeColorSelectionMenuFromUI();
+    closeCustomPersonSelect();
     if (DOM.notificationMenu) DOM.notificationMenu.classList.remove(MENU_DROPDOWN_OPEN_CLASS);
 
     const m = DOM.settingsMenu;
@@ -2849,6 +2901,7 @@ function toggleSettingsMenu() {
 function closeAllMenus() {
     closeSettingsAndNotificationMenus();
     closeColorSelectionMenuFromUI();
+    closeCustomPersonSelect();
 
     closeQuickTransactionOverlay();
     closeMemoryOverlay();
@@ -2911,6 +2964,7 @@ async function loadGlowTheme() {
 function toggleNotificationMenu() {
     if (DOM.settingsMenu) DOM.settingsMenu.classList.remove(MENU_DROPDOWN_OPEN_CLASS);
     closeColorSelectionMenuFromUI();
+    closeCustomPersonSelect();
 
     const menu = DOM.notificationMenu;
     if (!menu) return;
