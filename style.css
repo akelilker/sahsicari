@@ -1394,21 +1394,22 @@ button.delete-notif-btn {
     display: none !important;
 }
 
-/* Masaüstü: ortada, hızlı işlem / sık kullanılanlar kutusu tarzı grid */
+/* Masaüstü: container içinde ortada, 3 sütun, kutular çerçevesiz */
 @media screen and (min-width: 769px) {
     .person-select-menu.person-select-menu--centered {
         top: 50%;
         left: 50%;
         right: auto;
         transform: translate(-50%, -50%);
-        width: min(92vw, 480px);
-        max-width: 480px;
+        width: min(calc(450px - 24px), calc(100vw - 32px));
+        max-width: calc(450px - 24px);
+        box-sizing: border-box;
     }
 
     .person-select-menu.person-select-menu--centered .person-select-options {
         display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 6px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 4px 8px;
         max-height: min(70vh, 560px);
         padding-right: 0;
     }
@@ -1417,15 +1418,15 @@ button.delete-notif-btn {
     .person-select-menu.person-select-menu--centered .person-select-empty {
         min-height: 0;
         padding: 6px 4px;
-        font-size: 0.8em;
+        font-size: 0.82em;
         font-weight: 600;
         text-align: center;
         justify-content: center;
         align-items: center;
-        background: rgba(15, 20, 30, 0.35);
-        border: 1px solid var(--gray-40);
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.45);
+        background: transparent;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -1433,24 +1434,24 @@ button.delete-notif-btn {
 
     .person-select-menu.person-select-menu--centered .person-select-option:hover,
     .person-select-menu.person-select-menu--centered .person-select-option.is-active {
-        background: rgba(66, 165, 245, 0.22);
-        border-color: rgba(66, 165, 245, 0.45);
-        transform: scale(1.04);
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        color: #8bd3ff;
+        transform: none;
     }
 
     .person-select-menu.person-select-menu--centered .person-select-option.is-selected {
-        background: rgba(46, 125, 50, 0.35);
-        border-color: rgba(102, 187, 106, 0.55);
-        color: #e8f5e9;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        color: #66bb6a;
     }
 
     .person-select-menu.person-select-menu--centered .person-select-empty {
         grid-column: 1 / -1;
         font-size: 0.85em;
         padding: 10px;
-        background: transparent;
-        border: none;
-        box-shadow: none;
     }
 }
 
@@ -4112,43 +4113,10 @@ select option {
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 8px;
     pointer-events: auto !important;
     backdrop-filter: none;
     position: relative;
     z-index: 11;
-}
-
-@media screen and (min-width: 769px) {
-    .quick-person-list {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 6px;
-        padding: 5px 10px;
-        max-height: min(65vh, 520px);
-        align-items: stretch;
-    }
-
-    .quick-person-list .person-item {
-        margin-bottom: 0;
-        min-height: 0;
-        padding: 8px 6px;
-        font-size: 0.8em;
-        font-weight: 600;
-        border-radius: 8px;
-        background: rgba(15, 20, 30, 0.35);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.45);
-        text-align: center;
-        justify-content: center;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .quick-person-list .quick-add-person-btn {
-        font-size: 18px !important;
-        min-height: 36px;
-    }
 }
 
 .person-item {
