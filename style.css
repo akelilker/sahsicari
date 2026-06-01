@@ -742,23 +742,26 @@ body.ios-pwa .debt-controls select {
     top: 0;
     left: 0; right: 0; bottom: 0;
     background: transparent;
-    /* Başlık/ikonların üstünde, açılır menülerin (9999) altında */
-    z-index: 9800;
+    /* Header (2001) ve menülerin altında; içerik alanının üstünde */
+    z-index: 1500;
     pointer-events: auto !important;
     touch-action: auto !important;
-    transition: backdrop-filter 0.3s var(--ease-smooth), -webkit-backdrop-filter 0.3s var(--ease-smooth), background-color 0.3s var(--ease-smooth);
+    transition: background-color 0.3s var(--ease-smooth);
 }
 .menu-backdrop-overlay.active {
     display: block;
-    background: rgba(8, 12, 22, 0.4);
-    backdrop-filter: blur(7px);
-    -webkit-backdrop-filter: blur(7px);
+    background: rgba(8, 12, 22, 0.22);
 }
 
-/* Footer header katmanının üstünde; menü açıkken hafif bulanık */
-body.menu-dropdown-backdrop .global-status-bar {
-    filter: blur(6px);
+/* Blur yalnızca kaydırılabilir içerikte — kutular net kalır */
+body.menu-dropdown-backdrop .content-scroll-wrapper {
+    filter: blur(5px);
     transition: filter 0.3s var(--ease-smooth);
+}
+
+body.menu-dropdown-backdrop .global-status-bar {
+    opacity: 0.72;
+    transition: opacity 0.3s var(--ease-smooth);
 }
 
 .container.theme-white-glow { --light-color: #FFFFFF; --light-shadow: var(--white-50); }
