@@ -1,5 +1,5 @@
 ---
-deployment:
+deployment: 
   tasks:
     - export DEPLOYPATH=/home/karmotor/public_html/sahsicari
     - /bin/mkdir -p $DEPLOYPATH
