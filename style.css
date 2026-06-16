@@ -2174,7 +2174,7 @@ overflow: hidden;
     max-height: 90vh;
     display: flex;
     flex-direction: column;
-    border: 1px solid var(--white-25);
+    border: 1px solid var(--frame-gray);
     z-index: 1001;
     overflow: hidden;
     box-shadow: 0 0 30px rgba(0,0,0,0.8);
@@ -2189,14 +2189,7 @@ overflow: hidden;
 
 #personModal .modal-content {
     width: 100%;
-    max-width: 450px;
-    height: 90vh;
-    max-height: 90vh;
-    margin: 0 auto;
     position: relative;
-
-    border: 1px solid var(--frame-gray);
-    box-shadow: 0 0 30px rgba(0,0,0,0.8);
 }
 
 /* Kişi sayfasında kaydırma çubukları gizli */
@@ -2321,8 +2314,6 @@ overflow: hidden;
 #categoryDetailModal .modal-header .back-modal-btn {
     justify-self: start;
     font-size: 1.3em;
-    position: relative;
-    top: 16px;
 }
 
 #categoryDetailModal .modal-header .close-modal-btn {
@@ -2484,12 +2475,7 @@ overflow: hidden;
 #categoryDetailModal .modal-content,
 #monthlySummaryModal .modal-content,
 #editTransactionModal .modal-content {
-    height: 90vh;
-    max-height: 90vh;
     width: 100%;
-    max-width: 450px;
-    margin: 0 auto;
-    border-radius: 15px;
 }
 
 .modal-footer {
