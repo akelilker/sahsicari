@@ -1,8 +1,8 @@
 /* formatDateTR → js/utils.js */
 /** Önbellek / service worker — asset ?v= güncellerken bunu artır */
-const APP_VERSION = '78.34';
+const APP_VERSION = '78.50';
 /** Footer’da görünen sürüm — yalnızca kullanıcıya yansıyan sürüm değişince güncelle */
-const FOOTER_VERSION = '78.34';
+const FOOTER_VERSION = '78.50';
 
 /* -----------------------------------------------------------------------------
    Dosya düzeni: yardımcılar & DOM önbelleği → olay bağlama → veri/sunucu
@@ -1799,9 +1799,8 @@ function openPersonModal(person) {
     document.getElementById('modalPersonName').textContent = ` 👤  ${person.toUpperCase()}`;
     
     updatePersonTotalInfo(person);
-    populateCategorySelect(DOM.category, person);
+    clearTransactionForm();
     updateTransactionHistory();
-    setCurrentDate();
     
     const shareOpt = document.getElementById('shareOptions');
     if(shareOpt) shareOpt.classList.remove('share-options--visible');
@@ -1814,7 +1813,6 @@ function openPersonModal(person) {
     if (firstTab) firstTab.click();
 
     openModal('personModal');
-    updateGelenAllocateButtonVisibility();
 }
 
 function updatePersonTotalInfo(person) {
@@ -2733,7 +2731,8 @@ async function processSingleTransaction() {
         isProcessing = false;
         if(DOM.addTransactionBtn) { 
             DOM.addTransactionBtn.disabled = false; 
-            DOM.addTransactionBtn.textContent = 'Kaydet'; 
+            DOM.addTransactionBtn.textContent = 'Kaydet';
+            DOM.addTransactionBtn.blur();
         }
     }
 }
@@ -2870,9 +2869,8 @@ function clearTransactionForm() {
     if(DOM.amount) DOM.amount.value = '';
     if(DOM.description) DOM.description.value = '';
     if(DOM.category) DOM.category.value = '';
-    setTransactionType('');
+    setTransactionType('giden');
     setCurrentDate();
-    updateGelenAllocateButtonVisibility();
 }
 
 function checkAnyMenuOpen() {

@@ -346,10 +346,6 @@
     margin-right: 0;
     cursor: pointer;
 }
-.share-btn-full {
-    width: 100%;
-    margin-top: 12px;
-}
 .share-link-excel {
     cursor: pointer;
     color: #66bb6a;
@@ -548,18 +544,19 @@ body.ios-pwa .container {
     max-height: 100dvh;
 }
 body.ios-pwa .global-status-bar {
-    position: fixed;
-    left: 0;
-    right: 0;
+    position: relative;
+    bottom: auto;
+    flex-shrink: 0;
+    left: auto;
+    right: auto;
     margin-left: auto;
     margin-right: auto;
     width: 100%;
     max-width: 450px;
     box-sizing: border-box;
-    bottom: 0;
 }
 
-/* Android PWA / genel standalone: footer her zaman viewport altında görünsün */
+/* Android PWA / genel standalone: container yüksekliği */
 @media (display-mode: standalone) {
     .container {
         min-height: 100vh;
@@ -567,6 +564,10 @@ body.ios-pwa .global-status-bar {
         max-height: 100vh;
         max-height: 100dvh;
     }
+}
+
+/* Masaüstü standalone: footer viewport altında sabit */
+@media (display-mode: standalone) and (min-width: 769px) {
     .global-status-bar {
         position: fixed;
         left: 0;
@@ -578,10 +579,6 @@ body.ios-pwa .global-status-bar {
         box-sizing: border-box;
         bottom: 0;
     }
-}
-
-/* Sadece masaüstü PWA: Veriler ile footer arası boşluk az */
-@media (display-mode: standalone) and (min-width: 769px) {
     .content-scroll-wrapper {
         padding-bottom: calc(var(--footer-h) + 1em + env(safe-area-inset-bottom));
     }
@@ -1095,26 +1092,24 @@ body.quick-overlay-open .quick-overlay-backdrop {
     white-space: normal;
 }
 
-.delete-notif-btn {
+.delete-notif-btn,
+button.delete-notif-btn {
     color: var(--expense-red);
     cursor: pointer;
     font-weight: 900;
     font-size: 1.1em;
+    font-family: inherit;
     padding: 5px 10px;
     margin-left: 0;
-    opacity: 0.8;
-    transition: transform 0.2s, color 0.2s, opacity 0.2s;
-    text-shadow: 0 0 5px var(--red-30);
+    opacity: 1;
+    transition: transform 0.2s, color 0.2s;
     flex-shrink: 0;
     white-space: nowrap;
     display: flex;
     align-items: center;
     justify-content: center;
-}
-button.delete-notif-btn {
     background: transparent;
     border: none;
-    font: inherit;
     line-height: 1;
 }
 
@@ -2806,6 +2801,19 @@ height: 100%;
     transition: transform 0.2s ease, border-width 0.2s ease, font-size 0.2s ease, background-color 0.2s ease, color 0.2s ease;
 }
 
+@media (hover: hover) and (pointer: fine) {
+    #personModal #addTransactionBtn:hover {
+        background: rgba(0, 255, 0, 0.12);
+        color: #00FF00;
+        border-width: 1.6px;
+        border-color: #00FF00;
+        font-size: 0.82em;
+        transform: scale(1.02);
+        text-shadow: 0 0 8px rgba(0, 255, 0, 0.5);
+        box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
+    }
+}
+
 .modal-body label {
     color: #e0e0e0;
     text-shadow: 0 1px 1px rgba(0,0,0,0.55);
@@ -3131,6 +3139,15 @@ select option {
     justify-content: center;
     align-items: center;
     text-shadow: 0 0 8px rgba(0, 255, 0, 0.4);
+}
+
+#categoryBalanceSection .share-btn {
+    width: auto;
+    min-width: 44px;
+    min-height: 44px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 11px;
 }
 
 #showZeroBalanceToggle {
@@ -4682,14 +4699,16 @@ label[for="editDateInput"] {
         min-height: 100dvh;
         max-height: 100vh;
         max-height: 100dvh;
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
     }
 
     .content-scroll-wrapper {
+        flex: 0 0 auto;
         justify-content: flex-start;
-        padding-bottom: calc(var(--footer-h) + env(safe-area-inset-bottom));
-        overflow: hidden !important;
+        padding-bottom: 20px;
+        overflow: visible;
         gap: 6px;
-        height: 100%;
         display: flex;
         flex-direction: column;
     }
@@ -4724,7 +4743,7 @@ label[for="editDateInput"] {
     .container::before,
     .container::after {
         top: 55px;
-        bottom: 8px;
+        bottom: calc(var(--footer-h) + env(safe-area-inset-bottom) + 20px);
         background: linear-gradient(to top,
             var(--light-color) 0%,
             var(--light-color) 65%,
@@ -4820,6 +4839,7 @@ label[for="editDateInput"] {
 
     .control-panel {
         padding: 12px 8px 10px 8px;
+        margin-bottom: 0;
         display: grid;
         grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
         gap: 5px;
@@ -4892,11 +4912,13 @@ label[for="editDateInput"] {
         margin-bottom: 3px;
     }
 
-    /* Footer her zaman görünür: viewport altına sabit (mobil + iOS/Android PWA), container ile hizalı */
+    /* Footer: normal flex akışı, viewport'a sabitlenmez */
     .global-status-bar {
-        position: fixed;
-        left: 0;
-        right: 0;
+        position: relative;
+        bottom: auto;
+        flex-shrink: 0;
+        left: auto;
+        right: auto;
         margin-left: auto;
         margin-right: auto;
         width: 100%;
@@ -4904,7 +4926,6 @@ label[for="editDateInput"] {
         box-sizing: border-box;
         height: auto;
         min-height: 36px;
-        bottom: 0;
         padding-top: 6px;
         padding-bottom: calc(6px + env(safe-area-inset-bottom));
         padding-left: max(12px, env(safe-area-inset-left));
@@ -5927,30 +5948,6 @@ label[for="editDateInput"] {
     width: 100%;
     margin-top: 8px;
 }
-#personModal #addTransactionBtn {
-    background: transparent;
-    font-size: 0.78em;
-    border: 1px solid rgba(0, 255, 0, 0.6);
-    color: #00FF00;
-    box-shadow: none;
-    padding: 10px 32px;
-    margin-top: 5px;
-    font-weight: 300;
-    text-shadow: 0 0 7px rgba(0, 255, 0, 0.35);
-    transition: transform 0.2s ease, border-width 0.2s ease, font-size 0.2s ease, background-color 0.2s ease, color 0.2s ease;
-}
-
-#personModal #addTransactionBtn:hover {
-    background: rgba(0, 255, 0, 0.12);
-    color: #00FF00;
-    border-width: 1.6px;
-    border-color: #00FF00;
-    font-size: 0.82em;
-    transform: scale(1.02);
-    text-shadow: 0 0 8px rgba(0, 255, 0, 0.5);
-    box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
-}
-
 .rd-btn {
     flex: 1;
     padding: 0;
@@ -6157,6 +6154,10 @@ label[for="editDateInput"] {
     #notificationMenu .btn {
         text-align: right;
         justify-content: flex-end;
+    }
+
+    #settingsMenu .btn {
+        font-size: 15px;
     }
 
     .rd-toggles {
