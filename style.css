@@ -545,17 +545,6 @@ body.ios-pwa .container {
     max-height: 100vh;
     max-height: 100dvh;
 }
-body.ios-pwa .global-status-bar {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    margin-left: auto;
-    margin-right: auto;
-    width: 100%;
-    max-width: 450px;
-    box-sizing: border-box;
-}
 
 /* Masaüstü standalone: container yüksekliği + footer viewport altında sabit */
 @media (display-mode: standalone) and (min-width: 769px) {
@@ -567,13 +556,6 @@ body.ios-pwa .global-status-bar {
     }
     .global-status-bar {
         position: fixed;
-        left: 0;
-        right: 0;
-        margin-left: auto;
-        margin-right: auto;
-        width: 100%;
-        max-width: 450px;
-        box-sizing: border-box;
         bottom: 0;
     }
     .content-scroll-wrapper {
@@ -2029,8 +2011,12 @@ button.delete-notif-btn {
     left: 0;
     right: 0;
     width: 100%;
-    max-width: 100%;
+    max-width: 450px;
+    margin-left: auto;
+    margin-right: auto;
     box-sizing: border-box;
+    flex-shrink: 0;
+    min-height: 0;
     height: calc(var(--footer-h) + var(--sa-bot));
     background: rgba(8, 12, 22, 0.97);
     color: #eceff1;
@@ -2050,21 +2036,10 @@ body.modal-open-ios .global-status-bar {
     position: fixed !important;
     bottom: 0 !important;
     top: auto !important;
-    left: 0;
-    right: 0;
-    margin-left: auto;
-    margin-right: auto;
-    width: 100%;
-    max-width: 450px;
-    box-sizing: border-box;
     pointer-events: auto !important;
 }
 
-/* Modal açıkken footer hep görünsün; tema ışığı korunsun, taşma azaltılsın */
-body:has(.modal.show) .global-status-bar {
-    box-shadow: 0 -2px 4px rgba(0,0,0,0.2), 0 -12px 18px -6px var(--light-shadow);
-}
-
+/* Modal açıkken footer çerçeve ışığı */
 body:has(.modal.show) .global-status-bar::before {
     border-top: 2px solid var(--light-shadow);
     border-left: 1px solid var(--light-shadow);
@@ -4959,24 +4934,6 @@ label[for="editDateInput"] {
         margin-bottom: 3px;
     }
 
-    /* Footer: mobilde de viewport alt alanının sahibi */
-    .global-status-bar {
-        position: absolute;
-        bottom: 0;
-        flex-shrink: 0;
-        left: 0;
-        right: 0;
-        margin-left: auto;
-        margin-right: auto;
-        width: 100%;
-        max-width: 450px;
-        box-sizing: border-box;
-        height: calc(var(--footer-h) + var(--sa-bot));
-        min-height: 0;
-        padding: 5px 12px;
-        padding-bottom: var(--sa-bot);
-    }
-
     .quick-access-section {
         padding: 0 10px;
         margin-top: 4px;
@@ -5693,11 +5650,7 @@ label[for="editDateInput"] {
         margin-top: 4px;
         margin-bottom: 6px;
     }
-    /* Footer sağ/soldan 1px daraltma + çerçeve */
-    .global-status-bar {
-        left: 0 !important;
-        right: 0 !important;
-    }
+    /* Footer çerçeve (masaüstü) */
     .global-status-bar::before {
         content: '';
         position: absolute;
