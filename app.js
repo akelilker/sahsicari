@@ -307,6 +307,23 @@ function setPersonSelectBackdropActive(active) {
     document.body.classList.toggle('person-select-open', !!active);
 }
 
+function setCategorySelectBackdropActive(active) {
+    document.body.classList.toggle('category-select-open', !!active);
+    const personModal = document.getElementById('personModal');
+    if (personModal) personModal.classList.toggle('category-select-active', !!active);
+}
+
+function bindCategorySelectBackdrop(selectEl) {
+    if (!selectEl || selectEl.dataset.categoryBackdropBound) return;
+    selectEl.dataset.categoryBackdropBound = '1';
+    function activate() { setCategorySelectBackdropActive(true); }
+    function deactivate() { setCategorySelectBackdropActive(false); }
+    selectEl.addEventListener('focus', activate);
+    selectEl.addEventListener('blur', deactivate);
+    selectEl.addEventListener('mousedown', activate);
+    selectEl.addEventListener('touchstart', activate, { passive: true });
+}
+
 function positionPersonSelectMenu() {
     const menu = DOM.personSelectMenu;
     const trigger = DOM.personSelectTrigger;
@@ -649,6 +666,7 @@ function bindModalEvents() {
     if (addTransactionBtn) addTransactionBtn.addEventListener('click', processSingleTransaction);
     const categorySelect = document.getElementById('category');
     if (categorySelect) {
+        bindCategorySelectBackdrop(categorySelect);
         categorySelect.addEventListener('change', function() {
             if (this.value === '__add_new_category__') {
                 this.value = '';
@@ -1438,7 +1456,7 @@ function populateCategorySelect(selectElement, person) {
                            document.getElementById('editTransactionType')?.value ||
                            document.getElementById('quickTransactionType')?.value;
     
-    let html = '<option value="">Kategori Seçin</option>';
+    let html = '<option value="">Seç</option>';
     
     cats.filter(c => {
         if (c === 'BEN' || c === 'Elden') return false;
@@ -1919,6 +1937,7 @@ function closeCurrentModal(el) {
         }
     }
     if(modal && modal.id === 'personModal') {
+        setCategorySelectBackdropActive(false);
         if(DOM.personSelect) DOM.personSelect.value = '';
     }
 }
@@ -1937,6 +1956,8 @@ function closeAllModals() {
     closeMemoryOverlay();
 
     closeAllocationOverlay();
+
+    setCategorySelectBackdropActive(false);
 
     DOM.mainAppContainer?.classList.remove('disable-events');
     document.body.classList.remove("disable-events"); 
