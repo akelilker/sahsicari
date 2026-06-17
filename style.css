@@ -537,6 +537,12 @@ body.ios-pwa {
     overscroll-behavior-y: none;
     -webkit-overflow-scrolling: auto;
 }
+body.ios-pwa .container {
+    min-height: 100vh;
+    min-height: 100dvh;
+    max-height: 100vh;
+    max-height: 100dvh;
+}
 body.ios-pwa .global-status-bar {
     position: absolute;
     bottom: 0;
@@ -4691,10 +4697,12 @@ label[for="editDateInput"] {
     }
 
 
-    /* Mobil: viewport sahibi container; içerik footer üstünde kalır */
+    /* Mobil / PWA: viewport sahibi container; içerik footer üstünde kalır */
     .container {
         height: 100%;
         min-height: 100vh;
+        min-height: 100dvh;
+        max-height: 100vh;
         max-height: 100dvh;
         overflow: hidden !important;
     }
