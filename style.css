@@ -4962,14 +4962,14 @@ label[for="editDateInput"] {
         gap: 10px;
     }
 
-    /* Kişi modali: alt çerçeve ile footer arasında net boşluk */
+    /* Kişi modali: alt çerçeve ile footer arası 10px */
     #personModal {
-        padding-bottom: calc(var(--footer-h) + env(safe-area-inset-bottom) + 24px);
+        padding-bottom: calc(var(--footer-h) + env(safe-area-inset-bottom) + 10px);
     }
 
     #personModal .modal-content {
         height: auto;
-        max-height: calc(100dvh - var(--sa-top) - var(--footer-h) - env(safe-area-inset-bottom) - 34px);
+        max-height: calc(100dvh - var(--sa-top) - var(--footer-h) - env(safe-area-inset-bottom) - 20px);
     }
 
     /* Mobil - İşlem Geçmişi SCROLL DÜZELTME */

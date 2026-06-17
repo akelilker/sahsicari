@@ -2,7 +2,7 @@
 /** Önbellek / service worker — asset ?v= güncellerken bunu artır */
 const APP_VERSION = '78.53';
 /** Footer’da görünen sürüm — yalnızca kullanıcıya yansıyan sürüm değişince güncelle */
-const FOOTER_VERSION = '78.53';
+const FOOTER_VERSION = '78.34';
 
 /* -----------------------------------------------------------------------------
    Dosya düzeni: yardımcılar & DOM önbelleği → olay bağlama → veri/sunucu
