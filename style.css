@@ -538,11 +538,10 @@ body.ios-pwa {
     -webkit-overflow-scrolling: auto;
 }
 body.ios-pwa .global-status-bar {
-    position: relative;
-    bottom: auto;
-    flex-shrink: 0;
-    left: auto;
-    right: auto;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
     margin-left: auto;
     margin-right: auto;
     width: 100%;
@@ -4692,20 +4691,20 @@ label[for="editDateInput"] {
     }
 
 
-    /* Mobil: içerik kadar yükseklik, uzun içerikte container scroll owner */
+    /* Mobil: viewport sahibi container; içerik footer üstünde kalır */
     .container {
-        height: auto;
-        min-height: 0;
+        height: 100%;
+        min-height: 100vh;
         max-height: 100dvh;
-        overflow-x: hidden !important;
-        overflow-y: auto !important;
+        overflow: hidden !important;
     }
 
     .content-scroll-wrapper {
-        flex: 0 0 auto;
+        flex: 1 1 auto;
+        min-height: 0;
         justify-content: flex-start;
-        padding-bottom: 20px;
-        overflow: visible !important;
+        padding-bottom: calc(var(--footer-h) + env(safe-area-inset-bottom));
+        overflow: hidden !important;
         gap: 6px;
         display: flex;
         flex-direction: column;
@@ -4910,24 +4909,22 @@ label[for="editDateInput"] {
         margin-bottom: 3px;
     }
 
-    /* Footer: normal flex akışı, viewport'a sabitlenmez */
+    /* Footer: mobilde de viewport alt alanının sahibi */
     .global-status-bar {
-        position: relative;
-        bottom: auto;
+        position: absolute;
+        bottom: 0;
         flex-shrink: 0;
-        left: auto;
-        right: auto;
+        left: 0;
+        right: 0;
         margin-left: auto;
         margin-right: auto;
         width: 100%;
         max-width: 450px;
         box-sizing: border-box;
-        height: auto;
-        min-height: 36px;
-        padding-top: 6px;
-        padding-bottom: calc(6px + env(safe-area-inset-bottom));
-        padding-left: max(12px, env(safe-area-inset-left));
-        padding-right: max(12px, env(safe-area-inset-right));
+        height: calc(var(--footer-h) + env(safe-area-inset-bottom));
+        min-height: 0;
+        padding: 5px 12px;
+        padding-bottom: env(safe-area-inset-bottom);
     }
 
     .quick-access-section {
@@ -5008,7 +5005,7 @@ label[for="editDateInput"] {
     }
 
     #personModal #reportPreviewList {
-        padding-bottom: 70px;
+        padding-bottom: 12px;
     }
 
     #yeniIslem {
@@ -5128,24 +5125,24 @@ label[for="editDateInput"] {
     }
 
     #categoryDetailContent {
-        padding-bottom: 70px;
+        padding-bottom: 12px;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
     }
 
     #categoryDetailModal {
-        padding-bottom: calc(var(--footer-h) + env(safe-area-inset-bottom) + 24px);
+        padding-bottom: calc(var(--footer-h) + env(safe-area-inset-bottom) + 12px);
     }
 
     #categoryDetailModal .modal-content {
-        margin-bottom: 10px;
-        max-height: calc(100dvh - var(--sa-top) - var(--footer-h) - env(safe-area-inset-bottom) - 24px);
+        margin-bottom: 0;
+        max-height: calc(100dvh - var(--sa-top) - var(--footer-h) - env(safe-area-inset-bottom) - 22px);
     }
 
     #categoryDetailModal .modal-body {
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
-        padding-bottom: calc(var(--footer-h) + env(safe-area-inset-bottom) + 24px);
+        padding-bottom: 12px;
     }
 
     #categoryDetailContent .detail-table tbody td:last-child {
