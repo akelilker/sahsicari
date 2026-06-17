@@ -1,8 +1,8 @@
 /* formatDateTR → js/utils.js */
 /** Önbellek / service worker — asset ?v= güncellerken bunu artır */
-const APP_VERSION = '78.50';
+const APP_VERSION = '78.51';
 /** Footer’da görünen sürüm — yalnızca kullanıcıya yansıyan sürüm değişince güncelle */
-const FOOTER_VERSION = '78.50';
+const FOOTER_VERSION = '78.51';
 
 /* -----------------------------------------------------------------------------
    Dosya düzeni: yardımcılar & DOM önbelleği → olay bağlama → veri/sunucu
