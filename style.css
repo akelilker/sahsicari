@@ -513,6 +513,19 @@
   --green-panel-rgb: 9, 138, 20;
 }
 
+/* Ana panel çerçevesi — border-color tek kaynak (mobil, iOS PWA, masaüstü) */
+.header h1,
+.summary-card,
+.debt-status-section,
+.debt-status-section h3,
+.control-panel,
+.control-panel h3,
+.control-panel .btn,
+.control-panel .file-upload-btn,
+.debt-controls select {
+    border-color: var(--frame-gray);
+}
+
 html, body {
     width: 100%;
     height: 100%;
@@ -661,19 +674,6 @@ body.ios-pwa .tab-btn.active::after {
 }
 body.ios-pwa .category-item {
     border-color: rgba(98, 0, 234, 0.85);
-}
-
-/* Mobil + iOS PWA: çerçeve renkleri net gri (kirli görünümü giderme) */
-body.ios-pwa .header h1,
-body.ios-pwa .summary-card,
-body.ios-pwa .debt-status-section,
-body.ios-pwa .debt-status-section h3,
-body.ios-pwa .control-panel,
-body.ios-pwa .control-panel h3,
-body.ios-pwa .control-panel .btn,
-body.ios-pwa .control-panel .file-upload-btn,
-body.ios-pwa .debt-controls select {
-    border-color: var(--frame-gray);
 }
 
 /* 2. ANA MİMARİ */
@@ -2039,26 +2039,23 @@ button.delete-notif-btn {
     align-items: center;
 }
 
+.global-status-bar::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-top: 2px solid var(--light-shadow);
+    border-left: 1px solid var(--light-shadow);
+    border-right: 1px solid var(--light-shadow);
+    pointer-events: none;
+    border-radius: 0;
+}
+
 body.modal-open-ios .global-status-bar {
     z-index: 9999;
     position: fixed !important;
     bottom: 0 !important;
     top: auto !important;
     pointer-events: auto !important;
-}
-
-/* Modal açıkken footer çerçeve ışığı */
-body:has(.modal.show) .global-status-bar::before {
-    border-top: 2px solid var(--light-shadow);
-    border-left: 1px solid var(--light-shadow);
-    border-right: 1px solid var(--light-shadow);
-}
-
-/* Modal açıkken sadece sağ-sol lazer çizgilerini gizle */
-body:has(.modal.show) .container::before,
-body:has(.modal.show) .container::after {
-    display: block !important;
-    opacity: 0.95 !important;
 }
 
 .status-bar-inner {
@@ -2197,13 +2194,10 @@ overflow: hidden;
 }
 
 #personModal .modal-content {
-    width: 100%;
-    max-width: 450px;
     flex: 1 1 auto;
     min-height: 0;
     height: auto;
     max-height: none;
-    margin: 0 auto;
     position: relative;
 }
 
@@ -2484,6 +2478,7 @@ overflow: hidden;
     margin-top: 12px;
 }
 
+#personModal .modal-content,
 #addPersonModal .modal-content,
 #personManagementModal .modal-content,
 #categoryManagementModal .modal-content,
@@ -2493,6 +2488,7 @@ overflow: hidden;
 #monthlySummaryModal .modal-content,
 #editTransactionModal .modal-content {
     width: 100%;
+    max-width: 450px;
 }
 
 .modal-footer {
@@ -4692,18 +4688,6 @@ label[for="editDateInput"] {
 }
 
 @media screen and (max-width: 768px) {
-    .header h1,
-    .summary-card,
-    .debt-status-section,
-    .debt-status-section h3,
-    .control-panel,
-    .control-panel h3,
-    .control-panel .btn,
-    .control-panel .file-upload-btn,
-    .debt-controls select {
-        border-color: var(--frame-gray);
-    }
-
     .debt-status-section,
     .control-panel {
         border-color: var(--panel-chrome-border);
@@ -5634,16 +5618,6 @@ label[for="editDateInput"] {
     body {
         background: #0c1628;
     }
-    .header h1,
-    .summary-card,
-    .debt-status-section,
-    .debt-status-section h3,
-    .control-panel,
-    .control-panel h3,
-    .control-panel .btn,
-    .control-panel .file-upload-btn {
-        border-color: var(--frame-gray);
-    }
     .header h1 {
         box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 4px 14px rgba(0, 0, 0, 0.28);
     }
@@ -5681,17 +5655,6 @@ label[for="editDateInput"] {
     .quick-transaction-area {
         margin-top: 4px;
         margin-bottom: 6px;
-    }
-    /* Footer çerçeve (masaüstü) */
-    .global-status-bar::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        border-top: 2px solid var(--light-shadow);
-        border-left: 1px solid var(--light-shadow);
-        border-right: 1px solid var(--light-shadow);
-        pointer-events: none;
-        border-radius: 0;
     }
     /* Kişi modalı masaüstü boşluk düzenlemeleri */
     #personModal .modal-header .header-top-row {
