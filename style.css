@@ -4748,7 +4748,7 @@ label[for="editDateInput"] {
     .container::before,
     .container::after {
         top: 55px;
-        bottom: calc(var(--footer-h) + env(safe-area-inset-bottom) + 20px);
+        bottom: calc(var(--footer-h) + env(safe-area-inset-bottom));
         background: linear-gradient(to top,
             var(--light-color) 0%,
             var(--light-color) 65%,
