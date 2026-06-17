@@ -460,8 +460,8 @@
 
   --header-h: 60px;
   --footer-h: 40px;
-  --modal-footer-gap: 10px;
-  --modal-viewport-bottom: calc(var(--modal-footer-gap) + var(--footer-h) + env(safe-area-inset-bottom));
+  --modal-footer-gap: 14px;
+  --modal-viewport-bottom: calc(var(--modal-footer-gap) + var(--footer-h) + var(--sa-bot));
   --vh: 1vh;
 
   --shadow-small: 0 2px 8px var(--black-30);
@@ -577,7 +577,7 @@ body.ios-pwa .global-status-bar {
         bottom: 0;
     }
     .content-scroll-wrapper {
-        padding-bottom: calc(var(--footer-h) + 1em + env(safe-area-inset-bottom));
+        padding-bottom: calc(var(--footer-h) + 1em + var(--sa-bot));
     }
 }
 
@@ -668,12 +668,6 @@ body.ios-pwa .tab-btn.active::after {
     transform: translateX(-50%);
     background: var(--tab-purple);
     box-shadow: 0 0 10px var(--tab-purple);
-}
-body.ios-pwa #yeniIslem .form-group:nth-last-child(2) {
-    margin-bottom: 8px;
-}
-body.ios-pwa #yeniIslem .form-group:last-of-type {
-    margin-bottom: 2px;
 }
 body.ios-pwa .category-item {
     border-color: rgba(98, 0, 234, 0.85);
@@ -865,7 +859,7 @@ body.quick-overlay-open .quick-overlay-backdrop {
     content: '';
     position: absolute;
     top: 48px;
-    bottom: calc(var(--footer-h) + env(safe-area-inset-bottom));
+    bottom: calc(var(--footer-h) + var(--sa-bot));
     width: 1.6px;
     z-index: 2002;
     pointer-events: none;
@@ -894,12 +888,12 @@ body.quick-overlay-open .quick-overlay-backdrop {
     justify-content: flex-start;
     gap: 0px;
     padding: 1px 12px 0 12px;
-    padding-bottom: calc(var(--footer-h) + env(safe-area-inset-bottom));
+    padding-bottom: calc(var(--footer-h) + var(--sa-bot));
 }
 
 @media screen and (min-width: 769px) {
     .content-scroll-wrapper {
-        padding-bottom: calc(var(--footer-h) + 5em + env(safe-area-inset-bottom));
+        padding-bottom: calc(var(--footer-h) + 5em + var(--sa-bot));
     }
     .control-panel {
         margin-bottom: 0;
@@ -2037,7 +2031,7 @@ button.delete-notif-btn {
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
-    height: calc(var(--footer-h) + env(safe-area-inset-bottom));
+    height: calc(var(--footer-h) + var(--sa-bot));
     background: rgba(8, 12, 22, 0.97);
     color: #eceff1;
     font-size: 0.75em;
@@ -2045,7 +2039,7 @@ button.delete-notif-btn {
     z-index: 4200;
     box-shadow: 0 -2px 4px rgba(0,0,0,0.2), 0 -12px 18px -6px var(--light-shadow);
     padding: 5px 12px;
-    padding-bottom: env(safe-area-inset-bottom);
+    padding-bottom: var(--sa-bot);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -2197,7 +2191,7 @@ overflow: hidden;
     justify-content: center;
     align-items: center;
     padding-top: calc(var(--sa-top) + 20px);
-    padding-bottom: calc(var(--footer-h) + env(safe-area-inset-bottom));
+    padding-bottom: calc(var(--footer-h) + var(--sa-bot));
 }
 
 .modal.show { display: flex !important; }
@@ -2217,14 +2211,6 @@ overflow: hidden;
     z-index: 1001;
     overflow: hidden;
     box-shadow: 0 0 30px rgba(0,0,0,0.8);
-}
-
-#personModal {
-    justify-content: flex-start;
-    align-items: center;
-    padding-top: calc(var(--sa-top) + 10px);
-    padding-bottom: var(--modal-viewport-bottom);
-    box-sizing: border-box;
 }
 
 #personModal .modal-content {
@@ -2326,6 +2312,7 @@ overflow: hidden;
     transition: transform 0.2s;
 }
 
+#personModal,
 #addPersonModal,
 #personManagementModal,
 #categoryManagementModal,
@@ -2338,10 +2325,11 @@ overflow: hidden;
     align-items: center;
     padding-top: calc(var(--sa-top) + 10px);
     padding-bottom: var(--modal-viewport-bottom);
+    box-sizing: border-box;
 }
 
 #categoryDetailModal {
-    padding-bottom: calc(var(--footer-h) + env(safe-area-inset-bottom) + 22px);
+    padding-bottom: calc(var(--footer-h) + var(--sa-bot) + 22px);
 }
 
 #categoryDetailModal .modal-header .header-top-row {
@@ -2655,7 +2643,7 @@ overflow: hidden;
 }
 
 .modal-body {
-    padding: 5px 12px 10px 12px;
+    padding: 5px 12px 20px 12px;
     position: relative;
     color: #e0e0e0;
     background: transparent;
@@ -2664,7 +2652,6 @@ overflow: hidden;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     min-height: 0;
-    padding-bottom: 20px;
     overscroll-behavior: contain;
     overscroll-behavior-y: contain;
     -webkit-overscroll-behavior: contain;
@@ -2822,12 +2809,12 @@ height: 100%;
 }
 
 #yeniIslem .form-group:nth-last-child(2) {
-    margin-bottom: 1.5px;
+    margin-bottom: 10px;
 }
 
 #yeniIslem .form-group:last-of-type {
-    margin-top: 0px;
-    margin-bottom: -2px;
+    margin-top: 0;
+    margin-bottom: 0;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -3838,20 +3825,20 @@ select option {
 @media screen and (orientation: landscape) and (max-width: 932px) {
     #categoryDetailModal {
         padding-top: calc(var(--sa-top) + 4px);
-        padding-bottom: calc(var(--footer-h) + env(safe-area-inset-bottom) + 12px);
+        padding-bottom: calc(var(--footer-h) + var(--sa-bot) + 12px);
     }
 
     #categoryDetailModal .modal-content {
         width: min(92vw, 780px);
         max-width: calc(100vw - 28px);
-        height: calc(100dvh - var(--sa-top) - var(--footer-h) - env(safe-area-inset-bottom) - 16px);
-        max-height: calc(100dvh - var(--sa-top) - var(--footer-h) - env(safe-area-inset-bottom) - 16px);
+        height: calc(100dvh - var(--sa-top) - var(--footer-h) - var(--sa-bot) - 16px);
+        max-height: calc(100dvh - var(--sa-top) - var(--footer-h) - var(--sa-bot) - 16px);
     }
 
     #categoryDetailModal .modal-body {
         padding-left: 14px;
         padding-right: 14px;
-        padding-bottom: calc(var(--footer-h) + env(safe-area-inset-bottom) + 14px);
+        padding-bottom: calc(var(--footer-h) + var(--sa-bot) + 14px);
     }
 
     #categoryDetailModal .category-detail-toolbar {
@@ -4766,7 +4753,7 @@ label[for="editDateInput"] {
         flex: 1 1 auto;
         min-height: 0;
         justify-content: flex-start;
-        padding-bottom: calc(var(--footer-h) + env(safe-area-inset-bottom));
+        padding-bottom: calc(var(--footer-h) + var(--sa-bot));
         overflow: hidden !important;
         gap: 6px;
         display: flex;
@@ -4803,7 +4790,7 @@ label[for="editDateInput"] {
     .container::before,
     .container::after {
         top: 55px;
-        bottom: calc(var(--footer-h) + env(safe-area-inset-bottom));
+        bottom: calc(var(--footer-h) + var(--sa-bot));
         background: linear-gradient(to top,
             var(--light-color) 0%,
             var(--light-color) 65%,
@@ -4984,10 +4971,10 @@ label[for="editDateInput"] {
         width: 100%;
         max-width: 450px;
         box-sizing: border-box;
-        height: calc(var(--footer-h) + env(safe-area-inset-bottom));
+        height: calc(var(--footer-h) + var(--sa-bot));
         min-height: 0;
         padding: 5px 12px;
-        padding-bottom: env(safe-area-inset-bottom);
+        padding-bottom: var(--sa-bot);
     }
 
     .quick-access-section {
@@ -5190,12 +5177,12 @@ label[for="editDateInput"] {
     }
 
     #categoryDetailModal {
-        padding-bottom: calc(var(--footer-h) + env(safe-area-inset-bottom) + 12px);
+        padding-bottom: calc(var(--footer-h) + var(--sa-bot) + 12px);
     }
 
     #categoryDetailModal .modal-content {
         margin-bottom: 0;
-        max-height: calc(100dvh - var(--sa-top) - var(--footer-h) - env(safe-area-inset-bottom) - 22px);
+        max-height: calc(100dvh - var(--sa-top) - var(--footer-h) - var(--sa-bot) - 22px);
     }
 
     #categoryDetailModal .modal-body {
