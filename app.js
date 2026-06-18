@@ -275,8 +275,8 @@ function queueSave() {
         allData.metadata.lastUpdate = new Date().toISOString();
         try {
             if (hasPersistedPeopleData(allData) && navigator.onLine) {
-                await saveDataToServer(allData, false);
                 allData.metadata.unsynced = false;
+                await saveDataToServer(allData, false);
                 await advancedStorage.removeItem('sahsiHesapTakibiData');
             } else {
                 allData.metadata.unsynced = true;
@@ -1110,11 +1110,15 @@ async function loadData() {
                 hasLoadedServerData = false;
                 updateServerStatus('', 'Yerel degisiklikler korunuyor, sunucuya gonderiliyor...');
                 try {
-                    await saveDataToServer(localData, false);
                     allData.metadata.unsynced = false;
+                    await saveDataToServer(allData, false);
                     await advancedStorage.removeItem('sahsiHesapTakibiData');
                     updateServerStatus('success', 'Yerel veri sunucuya gonderildi');
                 } catch (pushErr) {
+                    allData.metadata.unsynced = true;
+                    try {
+                        await advancedStorage.setItem('sahsiHesapTakibiData', JSON.stringify(allData));
+                    } catch (_) {}
                     updateServerStatus('error', 'Yerel veri sunucuya gonderilemedi');
                 }
                 const hasPD = hasPersistedPeopleData(allData);
@@ -2593,7 +2597,7 @@ function initiateAllocation() {
             : '';
         
         itemsHtml += `
-        <div class="allocation-item" data-category="${cat}" data-max-debt="${debtAmount}">
+        <div class="allocation-item" data-category="${safeCategoryAttr}" data-max-debt="${debtAmount}">
             <div class="allocation-item-header">
                 <span class="category-name">${sanitizeHTML(cat)}</span>
                 <span class="debt-amount">${formatAmount(debtAmount)}</span>
@@ -2864,8 +2868,12 @@ async function processSingleTransaction() {
     const amount = deformatCurrency(DOM.amount?.value || '0');
     let category = DOM.category?.value || '';
     const transType = DOM.transactionType?.value || '';
+    const dateStr = DOM.dateInput?.value || '';
     if (!isValidPositiveAmount(amount)) return showNotification(VALIDATION_MSG.validAmount, 'error');
     if (!transType) return showNotification(VALIDATION_MSG.selectTransType, 'error');
+    if (dateStr && !isValidOptionalIsoDate(dateStr)) {
+        return showNotification(VALIDATION_MSG.validDate, 'error');
+    }
 
     if (transType === 'gelen') {
         const debts = getDebtorCategoriesForPerson(currentPerson);
@@ -2877,11 +2885,6 @@ async function processSingleTransaction() {
     }
 
     if (!category) return showNotification(VALIDATION_MSG.selectCategory, 'error');
-
-    const dateStr = DOM.dateInput?.value || '';
-    if (dateStr && !isValidOptionalIsoDate(dateStr)) {
-        return showNotification(VALIDATION_MSG.validDate, 'error');
-    }
 
     let desc = DOM.description?.value?.trim() || '';
     desc = formatTitleCase(desc); 
