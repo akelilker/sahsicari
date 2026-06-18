@@ -1285,10 +1285,10 @@ button.delete-notif-btn {
     padding: 6px;
     margin: -7px -12px 6px -12px;
     border-radius: 12px 12px 0 0;
-    border-top: none;
+    border-top: 1px solid var(--green-panel-border);
     border-left: none;
     border-right: none;
-    border-bottom: 1px solid var(--green-panel-border);
+    border-bottom: none;
     color: #eceff1;
     opacity: 1;
     text-align: center;
@@ -1728,10 +1728,10 @@ button.delete-notif-btn {
     padding: 6px;
     margin: -10px -8px 6px -8px;
     border-radius: 12px 12px 0 0;
-    border-top: none;
+    border-top: 1px solid var(--green-panel-border);
     border-left: none;
     border-right: none;
-    border-bottom: 1px solid var(--green-panel-border);
+    border-bottom: none;
     color: #eceff1;
     opacity: 1;
     text-align: center;
@@ -4703,7 +4703,11 @@ label[for="editDateInput"] {
 
     .debt-status-section h3,
     .control-panel h3 {
-        border-bottom-color: var(--green-panel-border);
+        border-top-color: var(--green-panel-border);
+    }
+
+    .control-panel h3 {
+        border-top: none;
     }
 
     #colorBubbles {
@@ -5752,7 +5756,7 @@ label[for="editDateInput"] {
     }
     .debt-status-section h3,
     .control-panel h3 {
-        border-bottom-color: var(--green-panel-border);
+        border-top-color: var(--green-panel-border);
     }
     .control-panel .btn,
     .control-panel .file-upload-btn {
