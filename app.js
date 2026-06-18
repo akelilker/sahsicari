@@ -87,6 +87,11 @@ const DOM = {
     personSelectMenu: null,
     personSelectSearch: null,
     personSelectOptions: null,
+    categorySelectShell: null,
+    categorySelectTrigger: null,
+    categorySelectLabel: null,
+    categorySelectMenu: null,
+    categorySelectOptions: null,
     transactionType: null,
     amount: null,
     category: null,
@@ -133,6 +138,11 @@ function initDOMCache() {
     DOM.personSelectMenu = document.getElementById('personSelectMenu');
     DOM.personSelectSearch = document.getElementById('personSelectSearch');
     DOM.personSelectOptions = document.getElementById('personSelectOptions');
+    DOM.categorySelectShell = document.getElementById('categorySelectShell');
+    DOM.categorySelectTrigger = document.getElementById('categorySelectTrigger');
+    DOM.categorySelectLabel = document.getElementById('categorySelectLabel');
+    DOM.categorySelectMenu = document.getElementById('categorySelectMenu');
+    DOM.categorySelectOptions = document.getElementById('categorySelectOptions');
     DOM.transactionType = document.getElementById('transactionType');
     DOM.amount = document.getElementById('amount');
     DOM.category = document.getElementById('category');
@@ -324,6 +334,121 @@ function bindCategorySelectBackdrop(selectEl) {
     selectEl.addEventListener('touchstart', activate, { passive: true });
 }
 
+function shouldUseCustomCategorySelect() {
+    return window.innerWidth <= 768;
+}
+
+function syncCustomCategorySelectLabel() {
+    if (!DOM.category || !DOM.categorySelectLabel) return;
+    const selectedOption = DOM.category.options[DOM.category.selectedIndex];
+    const labelText = selectedOption ? selectedOption.textContent.trim() : 'Seç';
+    const isPlaceholder = !DOM.category.value;
+    DOM.categorySelectLabel.textContent = labelText || 'Seç';
+    DOM.categorySelectLabel.classList.toggle('category-select-label--placeholder', isPlaceholder);
+}
+
+function positionCategorySelectMenu() {
+    const menu = DOM.categorySelectMenu;
+    const trigger = DOM.categorySelectTrigger;
+    if (!menu || !trigger) return;
+
+    const vv = window.visualViewport;
+    const viewH = vv ? vv.height : window.innerHeight;
+    const offsetTop = vv ? vv.offsetTop : 0;
+    const rect = trigger.getBoundingClientRect();
+    const side = 18;
+    const gap = 8;
+    const footerGap = 72;
+    const availableBelow = viewH - (rect.bottom - offsetTop) - footerGap;
+    const availableAbove = rect.top - offsetTop - side;
+    const preferredMax = Math.min(360, Math.max(220, Math.round(viewH * 0.42)));
+    const openAbove = availableBelow < 220 && availableAbove > availableBelow;
+    const maxHeight = Math.max(180, Math.min(preferredMax, openAbove ? availableAbove - gap : availableBelow - gap));
+    const top = openAbove
+        ? Math.max(offsetTop + side, rect.top - gap - maxHeight)
+        : Math.min(rect.bottom + gap, offsetTop + viewH - footerGap - maxHeight);
+    const width = Math.min(window.innerWidth - side * 2, Math.max(260, rect.width));
+    const left = Math.max(side, Math.min(rect.right - width, window.innerWidth - side - width));
+
+    menu.style.setProperty('--category-menu-top', Math.round(top) + 'px');
+    menu.style.setProperty('--category-menu-left', Math.round(left) + 'px');
+    menu.style.setProperty('--category-menu-width', Math.round(width) + 'px');
+    menu.style.setProperty('--category-menu-max-height', Math.round(maxHeight) + 'px');
+}
+
+function closeCustomCategorySelect() {
+    if (!DOM.categorySelectShell || !DOM.categorySelectMenu || !DOM.categorySelectTrigger) return;
+    DOM.categorySelectShell.classList.remove('open');
+    DOM.categorySelectMenu.hidden = true;
+    DOM.categorySelectTrigger.setAttribute('aria-expanded', 'false');
+    setCategorySelectBackdropActive(false);
+}
+
+function renderCustomCategorySelectOptions() {
+    if (!DOM.category || !DOM.categorySelectOptions) return;
+    const fragment = document.createDocumentFragment();
+    const options = Array.from(DOM.category.options || []);
+
+    options.forEach(option => {
+        const item = document.createElement('button');
+        item.type = 'button';
+        item.className = 'category-select-option';
+        item.textContent = option.textContent.trim();
+        item.setAttribute('role', 'option');
+        item.dataset.value = option.value;
+        if (option.value === DOM.category.value) item.classList.add('is-selected');
+        item.addEventListener('click', function() {
+            DOM.category.value = option.value;
+            DOM.category.dispatchEvent(new Event('change', { bubbles: true }));
+            syncCustomCategorySelectUI();
+            closeCustomCategorySelect();
+        });
+        fragment.appendChild(item);
+    });
+
+    DOM.categorySelectOptions.innerHTML = '';
+    DOM.categorySelectOptions.appendChild(fragment);
+}
+
+function openCustomCategorySelect() {
+    if (!shouldUseCustomCategorySelect()) {
+        DOM.category?.focus();
+        return;
+    }
+    if (!DOM.categorySelectShell || !DOM.categorySelectMenu || !DOM.categorySelectTrigger) return;
+    closeSettingsAndNotificationMenus();
+    closeCustomPersonSelect();
+    DOM.categorySelectShell.classList.add('open');
+    DOM.categorySelectMenu.hidden = false;
+    DOM.categorySelectTrigger.setAttribute('aria-expanded', 'true');
+    setCategorySelectBackdropActive(true);
+    syncCustomCategorySelectLabel();
+    renderCustomCategorySelectOptions();
+    positionCategorySelectMenu();
+}
+
+function toggleCustomCategorySelect() {
+    if (!DOM.categorySelectMenu || DOM.categorySelectMenu.hidden) {
+        openCustomCategorySelect();
+    } else {
+        closeCustomCategorySelect();
+    }
+}
+
+function syncCustomCategorySelectUI() {
+    syncCustomCategorySelectLabel();
+    if (DOM.categorySelectShell?.classList.contains('open')) {
+        renderCustomCategorySelectOptions();
+        positionCategorySelectMenu();
+    }
+}
+
+function onCategorySelectViewportChange() {
+    if (DOM.categorySelectMenu && !DOM.categorySelectMenu.hidden) {
+        positionCategorySelectMenu();
+    }
+}
+
 function positionPersonSelectMenu() {
     const menu = DOM.personSelectMenu;
     const trigger = DOM.personSelectTrigger;
@@ -510,6 +635,18 @@ function bindPageEvents() {
             }
         });
     }
+    if (DOM.categorySelectTrigger) {
+        DOM.categorySelectTrigger.addEventListener('click', function(e) {
+            e.preventDefault();
+            toggleCustomCategorySelect();
+        });
+        DOM.categorySelectTrigger.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                closeCustomCategorySelect();
+            }
+        });
+    }
     const addPersonBtn = document.getElementById('addPersonBtn');
     if (addPersonBtn) addPersonBtn.addEventListener('click', showAddPersonModal);
     const quickActionMainBtn = document.getElementById('quickActionMainBtn');
@@ -537,10 +674,20 @@ function bindPageEvents() {
         closeCustomPersonSelect();
     });
 
+    document.addEventListener('click', function(e) {
+        if (!DOM.categorySelectMenu || DOM.categorySelectMenu.hidden) return;
+        if (DOM.categorySelectShell?.contains(e.target)) return;
+        if (DOM.categorySelectMenu.contains(e.target)) return;
+        closeCustomCategorySelect();
+    });
+
     window.addEventListener('resize', onPersonSelectViewportChange);
+    window.addEventListener('resize', onCategorySelectViewportChange);
     if (window.visualViewport) {
         window.visualViewport.addEventListener('resize', onPersonSelectViewportChange);
         window.visualViewport.addEventListener('scroll', onPersonSelectViewportChange);
+        window.visualViewport.addEventListener('resize', onCategorySelectViewportChange);
+        window.visualViewport.addEventListener('scroll', onCategorySelectViewportChange);
     }
 
     const quickOverlayBackdrop = document.getElementById('quickOverlayBackdrop');
@@ -670,10 +817,13 @@ function bindModalEvents() {
         categorySelect.addEventListener('change', function() {
             if (this.value === '__add_new_category__') {
                 this.value = '';
+                syncCustomCategorySelectUI();
                 showCategoryManagementModal(
                     currentPerson && allData[currentPerson] ? { person: currentPerson } : undefined
                 );
+                return;
             }
+            syncCustomCategorySelectUI();
         });
     }
     const showZeroBalanceToggle = document.getElementById('showZeroBalanceToggle');
@@ -1477,6 +1627,9 @@ function populateCategorySelect(selectElement, person) {
         html += '<option value="__add_new_category__">+ Kategori yönetimi</option>';
     }
     selectElement.innerHTML = html;
+    if (selectElement.id === 'category') {
+        syncCustomCategorySelectUI();
+    }
 }
 
 function setTransactionTypeUnified(type, typeInputId, gidenBtnId, gelenBtnId) {

@@ -815,6 +815,12 @@ body.category-select-open #personModal #yeniIslem .form-group:has(#category) * {
     touch-action: auto !important;
 }
 
+body.category-select-open #personModal #categorySelectMenu,
+body.category-select-open #personModal #categorySelectMenu * {
+    pointer-events: auto !important;
+    touch-action: auto !important;
+}
+
 /* Hızlı işlem overlay — arka plan blur (mobil + masaüstü) */
 body.quick-overlay-open #mainAppContainer {
     filter: blur(5px);
@@ -2816,6 +2822,16 @@ height: 100%;
 #yeniIslem .form-group select {
     color: rgba(236, 239, 241, 0.82);
     -webkit-text-fill-color: rgba(236, 239, 241, 0.82);
+}
+
+.category-select-shell {
+    position: relative;
+    width: 100%;
+}
+
+.category-select-trigger,
+.category-select-menu {
+    display: none;
 }
 
 #personModal #yeniIslem .form-actions-inline #addTransactionBtn {
@@ -5045,6 +5061,132 @@ label[for="editDateInput"] {
     #personModal #yeniIslem .form-group select {
         height: 38px;
         line-height: normal;
+    }
+
+    #personModal #yeniIslem #categorySelectShell #category {
+        position: absolute !important;
+        inset: 0 !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
+
+    #personModal #yeniIslem .category-select-trigger {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        min-height: 38px;
+        padding: 3px 34px 3px 10px;
+        border: 1px solid var(--tab-purple);
+        border-radius: 10px;
+        background-color: rgba(255, 255, 255, 0.12);
+        color: #e0e0e0;
+        font-size: 14px;
+        font-weight: 500;
+        text-align: left;
+        text-shadow: 0 1px 1px rgba(0,0,0,0.55);
+        box-sizing: border-box;
+    }
+
+    #personModal #yeniIslem .category-select-shell.open .category-select-trigger {
+        border-color: #42a5f5;
+    }
+
+    #categorySelectLabel {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .category-select-label--placeholder {
+        color: rgba(224, 224, 224, 0.7);
+    }
+
+    .category-select-chevron {
+        position: absolute;
+        right: 13px;
+        top: 50%;
+        width: 10px;
+        height: 10px;
+        border-right: 2px solid #42a5f5;
+        border-bottom: 2px solid #42a5f5;
+        transform: translateY(-65%) rotate(45deg);
+        pointer-events: none;
+    }
+
+    .category-select-shell.open .category-select-chevron {
+        transform: translateY(-35%) rotate(-135deg);
+    }
+
+    #personModal #yeniIslem .category-select-menu {
+        display: block;
+        position: fixed;
+        z-index: 10020;
+        top: var(--category-menu-top, 50%);
+        left: var(--category-menu-left, 18px);
+        width: var(--category-menu-width, calc(100vw - 36px));
+        max-width: calc(100vw - 36px);
+        padding: 10px;
+        border: 1px solid rgba(149, 117, 205, 0.45);
+        border-radius: 22px;
+        background:
+            linear-gradient(to bottom, rgba(255,255,255,0.08), rgba(255,255,255,0.01) 20%, rgba(255,255,255,0) 26%),
+            rgba(14, 21, 37, 0.98);
+        box-shadow: 0 18px 48px rgba(0, 0, 0, 0.54), inset 0 1px 0 rgba(255,255,255,0.06);
+        box-sizing: border-box;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+    }
+
+    #personModal #yeniIslem .category-select-menu[hidden] {
+        display: none !important;
+    }
+
+    .category-select-options {
+        max-height: var(--category-menu-max-height, 320px);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        padding: 2px 0;
+    }
+
+    .category-select-option {
+        width: 100%;
+        min-height: 42px;
+        padding: 9px 14px 9px 40px;
+        border: 1px solid transparent;
+        border-radius: 12px;
+        background: transparent;
+        color: #f3f5f8;
+        font-size: 16px;
+        font-weight: 500;
+        line-height: 1.25;
+        text-align: right;
+        cursor: pointer;
+        position: relative;
+        white-space: normal;
+        overflow-wrap: anywhere;
+        box-sizing: border-box;
+    }
+
+    .category-select-option.is-selected {
+        color: #ffffff;
+        background: rgba(66, 165, 245, 0.12);
+        border-color: rgba(66, 165, 245, 0.22);
+    }
+
+    .category-select-option.is-selected::before {
+        content: '✓';
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #ffffff;
+        font-size: 18px;
+        font-weight: 700;
     }
 
     #personManagementModal .modal-body > .btn.btn-success {

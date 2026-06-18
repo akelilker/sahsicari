@@ -16,7 +16,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon.ico">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=78.59">
+<link rel="stylesheet" href="style.css?v=78.60">
 
 <title>ŞAHSİ HESAP TAKİBİ</title>
 </head>
@@ -259,7 +259,16 @@
                 
                 <div class="form-group">
                     <label for="category">Kategori</label>
-                    <select id="category" class="form-select-full-width"><option value="">Seç</option></select>
+                    <div class="category-select-shell" id="categorySelectShell">
+                        <select id="category" class="form-select-full-width"><option value="">Seç</option></select>
+                        <button type="button" id="categorySelectTrigger" class="category-select-trigger" aria-haspopup="listbox" aria-expanded="false" aria-controls="categorySelectMenu">
+                            <span id="categorySelectLabel">Seç</span>
+                            <span class="category-select-chevron" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                    <div id="categorySelectMenu" class="category-select-menu" hidden>
+                        <div id="categorySelectOptions" class="category-select-options" role="listbox" aria-label="Kategori listesi"></div>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="description">Açıklama</label>
@@ -588,6 +597,6 @@
 <script src="js/xlsx.bundle.min.js" defer></script>
 <script src="storage.js?v=1.0" defer></script>
 <script src="js/utils.js?v=78.34" defer></script>
-<script src="app.js?v=78.56" defer></script>
+<script src="app.js?v=78.57" defer></script>
 </body>
 </html>
