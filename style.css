@@ -4703,6 +4703,11 @@ label[for="editDateInput"] {
 }
 
 @media screen and (max-width: 768px) {
+    .global-status-bar::before {
+        border-left: none;
+        border-right: none;
+    }
+
     .debt-status-section,
     .control-panel {
         border-color: var(--panel-chrome-border);
