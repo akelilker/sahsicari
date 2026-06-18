@@ -1,8 +1,9 @@
 /* formatDateTR → js/utils.js */
 /** Önbellek / service worker — asset ?v= güncellerken bunu artır */
-const APP_VERSION = '78.53';
+const APP_VERSION = '78.62';
 /** Footer’da görünen sürüm — yalnızca kullanıcıya yansıyan sürüm değişince güncelle */
 const FOOTER_VERSION = '78.34';
+const APP_DEBUG = false;
 
 /* -----------------------------------------------------------------------------
    Dosya düzeni: yardımcılar & DOM önbelleği → olay bağlama → veri/sunucu
@@ -49,6 +50,17 @@ function fetchWithTimeout(url, options, timeoutMs) {
     var opts = Object.assign({}, options || {});
     opts.signal = controller.signal;
     return fetch(url, opts).finally(function () { clearTimeout(id); });
+}
+
+function calculateExcelColumnWidth(text, isNumber = false, isBold = false, options = {}) {
+    const emptyWidth = options.emptyWidth ?? 10;
+    const adjustment = options.adjustment ?? 2;
+    if (!text && text !== 0) return emptyWidth;
+    const strText = String(text);
+    let baseWidth = strText.length;
+    if (isNumber) baseWidth *= 1.2;
+    if (isBold) baseWidth *= 1.15;
+    return Math.max(10, Math.ceil(baseWidth) + adjustment);
 }
 
 let allData = {};
@@ -182,16 +194,12 @@ function initDOMCache() {
     DOM.categoryDetailExcelBtn = document.getElementById('categoryDetailExcelBtn');
 
     if (DOM.amount) {
-        DOM.amount.addEventListener('input', function() {
-            updateGelenAllocateButtonVisibility();
-        });
         DOM.amount.addEventListener('keydown', function(e) {
             if (e.key === 'Enter' || e.key === 'Tab') {
                 setTimeout(maybeTriggerMainAutoAllocation, 40);
             }
         });
         DOM.amount.addEventListener('blur', function() {
-            updateGelenAllocateButtonVisibility();
             setTimeout(maybeTriggerMainAutoAllocation, 80);
         });
     }
@@ -1646,17 +1654,9 @@ function setTransactionTypeUnified(type, typeInputId, gidenBtnId, gelenBtnId) {
             populateCategorySelect(categorySelect, currentPerson);
         }
     }
-    updateGelenAllocateButtonVisibility();
     if (typeInputId === 'transactionType') {
         maybeTriggerMainAutoAllocation();
     }
-}
-
-function updateGelenAllocateButtonVisibility() {
-    const btn = document.getElementById('gelenAllocateBtn');
-    if (!btn) return;
-    // Manual allocation button is deprecated; keep hidden for backward compatibility.
-    btn.classList.add('u-hidden');
 }
 
 function getDebtorCategoriesForPerson(person) {
@@ -3635,15 +3635,6 @@ function exportToExcel() {
         summaryHeader: { fill: { fgColor: { rgb: "444444" } }, font: { bold: true, color: { rgb: "FFFFFF" } }, border: borderStyle, alignment: { horizontal: 'center' } }
     };
 
-    function calculateColumnWidth(text, isNumber = false, isBold = false) {
-        if (!text && text !== 0) return 10;
-        const strText = String(text);
-        let baseWidth = strText.length;
-        if (isNumber) baseWidth *= 1.2; 
-        if (isBold) baseWidth *= 1.15; 
-        return Math.max(10, Math.ceil(baseWidth) + 2); 
-    }
-
     try {
         const { allTransactions, periodTransactions } = getFilteredTransactions();
         
@@ -3705,9 +3696,9 @@ function exportToExcel() {
 
             let rowStyleBase = tx.type === 'giden' ? styles.rowGiden : styles.rowGelen;
 
-            if (tx.type === 'gelen') colWidths[1] = Math.max(colWidths[1], calculateColumnWidth(amountNum, true));
-            if (tx.type === 'giden') colWidths[2] = Math.max(colWidths[2], calculateColumnWidth(amountNum, true));
-            colWidths[3] = Math.max(colWidths[3], calculateColumnWidth(currentBalDisplay, true));
+            if (tx.type === 'gelen') colWidths[1] = Math.max(colWidths[1], calculateExcelColumnWidth(amountNum, true));
+            if (tx.type === 'giden') colWidths[2] = Math.max(colWidths[2], calculateExcelColumnWidth(amountNum, true));
+            colWidths[3] = Math.max(colWidths[3], calculateExcelColumnWidth(currentBalDisplay, true));
 
             const row = [
                 { v: dateStr, s: { ...rowStyleBase, alignment: { horizontal: 'left', vertical: 'top' } } },
@@ -3755,11 +3746,11 @@ function exportToExcel() {
                 const numStyle = { ...cellStyle, ...styles.cellNumber, alignment: { horizontal: 'right' } };
                 const boldNumStyle = { ...numStyle, font: { bold: true } };
 
-                sumColWidths[0] = Math.max(sumColWidths[0], calculateColumnWidth(rowData[0]));
-                sumColWidths[1] = Math.max(sumColWidths[1], calculateColumnWidth(rowData[1], true));
-                sumColWidths[2] = Math.max(sumColWidths[2], calculateColumnWidth(rowData[2], true));
-                sumColWidths[3] = Math.max(sumColWidths[3], calculateColumnWidth(rowData[3], true));
-                sumColWidths[4] = Math.max(sumColWidths[4], calculateColumnWidth(rowData[4], true));
+                sumColWidths[0] = Math.max(sumColWidths[0], calculateExcelColumnWidth(rowData[0]));
+                sumColWidths[1] = Math.max(sumColWidths[1], calculateExcelColumnWidth(rowData[1], true));
+                sumColWidths[2] = Math.max(sumColWidths[2], calculateExcelColumnWidth(rowData[2], true));
+                sumColWidths[3] = Math.max(sumColWidths[3], calculateExcelColumnWidth(rowData[3], true));
+                sumColWidths[4] = Math.max(sumColWidths[4], calculateExcelColumnWidth(rowData[4], true));
 
                 wsDataSummary.push([
                     { v: rowData[0], s: { ...cellStyle, font: { bold: true }, alignment: { horizontal: 'left' } } }, 
@@ -4106,15 +4097,6 @@ async function exportStyledCategoryDetailToExcel(person, categoryName, transacti
         cellNumber: { numFmt: "#,##0.00" } 
     };
 
-    function calculateColumnWidth(text, isNumber = false, isBold = false) {
-        if (!text && text !== 0) return 8;
-        const strText = String(text);
-        let baseWidth = strText.length;
-        if (isNumber) baseWidth *= 1.2; 
-        if (isBold) baseWidth *= 1.15; 
-        return Math.max(10, Math.ceil(baseWidth) - 1); 
-    }
-
     let safeCatName = categoryName.toLocaleUpperCase('tr-TR');
     let titleSuffix = (safeCatName.includes('HESAP') || safeCatName.endsWith(' H.') || safeCatName.endsWith(' H')) ? '' : ' HESABI';
     const titleText = `${person.toLocaleUpperCase('tr-TR')} - ${safeCatName}${titleSuffix} HAREKETLERİ`;
@@ -4132,10 +4114,10 @@ async function exportStyledCategoryDetailToExcel(person, categoryName, transacti
     ];
 
     let colWidths = [
-        calculateColumnWidth("Tarih", false, true),       
-        calculateColumnWidth("Gelen TL", false, true),    
-        calculateColumnWidth("Giden TL", false, true),    
-        calculateColumnWidth("Bakiye", false, true),      
+        calculateExcelColumnWidth("Tarih", false, true, { emptyWidth: 8, adjustment: -1 }),
+        calculateExcelColumnWidth("Gelen TL", false, true, { emptyWidth: 8, adjustment: -1 }),
+        calculateExcelColumnWidth("Giden TL", false, true, { emptyWidth: 8, adjustment: -1 }),
+        calculateExcelColumnWidth("Bakiye", false, true, { emptyWidth: 8, adjustment: -1 }),
         50 
     ];
 
@@ -4162,20 +4144,20 @@ async function exportStyledCategoryDetailToExcel(person, categoryName, transacti
             maximumFractionDigits: 2 
         }).format(Math.abs(runningBalance));
 
-        const dateWidth = calculateColumnWidth(dateStr, false, false);
+        const dateWidth = calculateExcelColumnWidth(dateStr, false, false, { emptyWidth: 8, adjustment: -1 });
         if (dateWidth > colWidths[0]) colWidths[0] = dateWidth;
 
         if (tx.type === 'gelen') {
-            const gelenWidth = calculateColumnWidth(amountStr, true, false);
+            const gelenWidth = calculateExcelColumnWidth(amountStr, true, false, { emptyWidth: 8, adjustment: -1 });
             if (gelenWidth > colWidths[1]) colWidths[1] = gelenWidth;
         }
 
         if (tx.type === 'giden') {
-            const gidenWidth = calculateColumnWidth(amountStr, true, false);
+            const gidenWidth = calculateExcelColumnWidth(amountStr, true, false, { emptyWidth: 8, adjustment: -1 });
             if (gidenWidth > colWidths[2]) colWidths[2] = gidenWidth;
         }
 
-        const bakiyeWidth = calculateColumnWidth(balanceStr, true, false);
+        const bakiyeWidth = calculateExcelColumnWidth(balanceStr, true, false, { emptyWidth: 8, adjustment: -1 });
         if (bakiyeWidth > colWidths[3]) colWidths[3] = bakiyeWidth;
 
         let rowStyleBase = tx.type === 'giden' ? styles.rowGiden : styles.rowGelen;
@@ -4432,7 +4414,7 @@ function hidePWAInstallBanner() {
 
 // Listen for successful installation
 window.addEventListener('appinstalled', () => {
-    console.log('PWA successfully installed');
+    APP_DEBUG && console.log('PWA successfully installed');
     hidePWAInstallBanner();
     showNotification('Uygulama başarıyla yüklendi!', 'success');
 });
@@ -4450,7 +4432,7 @@ window.addEventListener('online', async () => {
         try {
             const registration = await navigator.serviceWorker.ready;
             await registration.sync.register('sync-data');
-            console.log('Background sync registered');
+            APP_DEBUG && console.log('Background sync registered');
         } catch (error) {
             console.error('Background sync registration failed:', error);
             // Fallback: manual sync
@@ -4475,7 +4457,7 @@ async function manualSync() {
         const syncQueue = await getSyncQueue(db);
 
         if (syncQueue.length > 0) {
-            console.log('Manual sync: processing', syncQueue.length, 'items');
+            APP_DEBUG && console.log('Manual sync: processing', syncQueue.length, 'items');
 
             for (const item of syncQueue) {
                 try {
@@ -4487,7 +4469,7 @@ async function manualSync() {
 
                     if (response.ok) {
                         await removeSyncQueueItem(db, item.id);
-                        console.log('Synced item:', item.id);
+                        APP_DEBUG && console.log('Synced item:', item.id);
                     }
                 } catch (error) {
                     console.error('Sync failed for item:', item.id, error);
@@ -4554,7 +4536,7 @@ function removeSyncQueueItem(db, itemId) {
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.addEventListener('message', async (event) => {
         if (event.data.type === 'SYNC_COMPLETE') {
-            console.log('Background sync completed:', event.data.syncedCount, 'items');
+            APP_DEBUG && console.log('Background sync completed:', event.data.syncedCount, 'items');
             await showNotification(`${event.data.syncedCount} değişiklik senkronize edildi`, 'success');
             // Reload data to show synced changes
             const loadResult = await loadData();
