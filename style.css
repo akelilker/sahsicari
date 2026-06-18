@@ -5759,7 +5759,7 @@ label[for="editDateInput"] {
     }
     .control-panel .btn,
     .control-panel .file-upload-btn {
-        border-color: rgba(255, 255, 255, 0.38);
+        border-color: rgba(255, 255, 255, 0.56);
         box-shadow: none;
     }
     .container {
@@ -5825,7 +5825,7 @@ label[for="editDateInput"] {
         justify-content: center;
         height: 32px;
         min-height: 32px;
-        margin: -7px -8px 10px -8px;
+        margin: -3px -8px 6px -8px;
         padding: 0;
         line-height: 1;
     }
