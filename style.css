@@ -1264,10 +1264,9 @@ button.delete-notif-btn {
     padding: 7px 12px;
     border-radius: 12px;
     margin-bottom: 1px;
-    border: 1px solid rgba(255, 255, 255, 0.38);
+    border: 1px solid rgba(255, 255, 255, 0.52);
     flex-shrink: 0;
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.10), 0 3px 10px rgba(0,0,0,0.18);
-    background-clip: padding-box;
     overflow: visible !important;
 }
 
@@ -1283,7 +1282,7 @@ button.delete-notif-btn {
     padding: 6px;
     margin: -7px -12px 6px -12px;
     border-radius: 12px 12px 0 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.38);
+    border-top: 1px solid rgba(255, 255, 255, 0.52);
     border-left: none;
     border-right: none;
     border-bottom: none;
@@ -1329,7 +1328,7 @@ button.delete-notif-btn {
     background:
         linear-gradient(to bottom, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.01)),
         #0e1525;
-    border: 1px solid rgba(255, 255, 255, 0.38);
+    border: 1px solid rgba(255, 255, 255, 0.52);
     border-radius: 8px;
     color: #d7e6ef;
     font-size: 13px;
@@ -1642,7 +1641,7 @@ button.delete-notif-btn {
     min-width: 0;
     padding: 4px 8px;
     background: #0e1525;
-    border: 1px solid rgba(255, 255, 255, 0.38);
+    border: 1px solid rgba(255, 255, 255, 0.52);
     border-radius: 8px;
     color: #b0bec5;
     font-size: 13px;
@@ -1695,8 +1694,7 @@ button.delete-notif-btn {
 
 .control-panel,
 .quick-access-section {
-    background: rgba(10, 16, 30, 0.85);
-    border: 1px solid rgba(255, 255, 255, 0.38);
+    border: 1px solid rgba(255, 255, 255, 0.52);
     border-radius: 12px;
     padding: 10px 8px;
     margin-bottom: -2px;
@@ -1704,6 +1702,7 @@ button.delete-notif-btn {
     overflow: hidden !important;
 }
 .quick-access-section {
+    background: rgba(10, 16, 30, 0.85);
     box-shadow: 0 4px 15px rgba(0,0,0,0.4);
 }
 
@@ -1712,7 +1711,6 @@ button.delete-notif-btn {
     padding: 5px 8px 10px 8px;
     background: var(--green-panel-bg);
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.10), 0 3px 10px rgba(0,0,0,0.18);
-    background-clip: padding-box;
 }
 
 .quick-access-section {
@@ -1727,7 +1725,7 @@ button.delete-notif-btn {
     padding: 6px;
     margin: -10px -8px 6px -8px;
     border-radius: 12px 12px 0 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.38);
+    border-top: 1px solid rgba(255, 255, 255, 0.52);
     border-left: none;
     border-right: none;
     border-bottom: none;
@@ -1755,7 +1753,7 @@ button.delete-notif-btn {
 /* Veriler bölümü butonları: yeşil panel üzerinde net beyaz çizgi (gri solukluk yok) */
 .control-panel .btn,
 .control-panel .file-upload-btn {
-    border: 1px solid rgba(255, 255, 255, 0.38);
+    border: 1px solid rgba(255, 255, 255, 0.52);
     background: rgba(12, 18, 32, 0.94);
     box-shadow: none;
 }
@@ -5755,7 +5753,7 @@ label[for="editDateInput"] {
     }
     .debt-status-section h3,
     .control-panel h3 {
-        border-top-color: rgba(255, 255, 255, 0.38);
+        border-top-color: rgba(255, 255, 255, 0.52);
     }
     .control-panel .btn,
     .control-panel .file-upload-btn {
@@ -5813,11 +5811,9 @@ label[for="editDateInput"] {
     #categoryDetailContent .detail-table td:nth-child(2) {
         padding-left: 3px;
     }
-    /* Veriler kutusu: aynı temiz panel zemini, masaüstü tekrarını tek çizgide tut */
+    /* Veriler kutusu: masaüstü padding */
     .control-panel {
         padding-top: 7px;
-        background: var(--green-panel-bg);
-        background-clip: padding-box;
     }
     .control-panel h3 {
         display: flex;
