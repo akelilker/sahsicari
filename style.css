@@ -5823,9 +5823,10 @@ label[for="editDateInput"] {
         display: flex;
         align-items: center;
         justify-content: center;
+        height: 32px;
         min-height: 32px;
         margin: -7px -8px 10px -8px;
-        padding: 0 0 1px 0;
+        padding: 0;
         line-height: 1;
     }
     .quick-item {
