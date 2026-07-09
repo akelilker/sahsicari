@@ -473,24 +473,24 @@ function positionPersonSelectMenu() {
         return;
     }
 
-    /* Mobil: header altından başla, klavye açılınca görünür alana sığdır */
+    /* Mobil: tetikleyicinin altında normal liste paneli */
+    const shellRect = DOM.personSelectShell?.getBoundingClientRect();
+    const triggerRect = trigger.getBoundingClientRect();
+    const left = shellRect ? shellRect.left : triggerRect.left;
+    const width = shellRect ? shellRect.width : triggerRect.width;
     const vv = window.visualViewport;
     const viewH = vv ? vv.height : window.innerHeight;
     const offsetTop = vv ? vv.offsetTop : 0;
-    const side = 12;
-    const searchBlock = 76;
     const gap = 8;
-    let top = offsetTop + gap;
-    const headerEl = document.querySelector('#mainAppContainer .header') || document.querySelector('.header');
-    if (headerEl) {
-        top = Math.max(top, headerEl.getBoundingClientRect().bottom + gap);
-    }
+    const side = 12;
+    const searchBlock = 52;
+    const top = triggerRect.bottom + gap;
     const topInView = top - offsetTop;
     const listMax = Math.max(160, viewH - topInView - side - searchBlock);
 
     menu.style.setProperty('--person-menu-top', Math.round(top) + 'px');
-    menu.style.setProperty('--person-menu-left', side + 'px');
-    menu.style.setProperty('--person-menu-width', Math.round(window.innerWidth - side * 2) + 'px');
+    menu.style.setProperty('--person-menu-left', Math.round(left) + 'px');
+    menu.style.setProperty('--person-menu-width', Math.round(width) + 'px');
     menu.style.setProperty('--person-menu-max-height', Math.round(listMax) + 'px');
 }
 
@@ -681,6 +681,8 @@ function bindPageEvents() {
         if (e.target === personSelectBackdrop) return;
         closeCustomPersonSelect();
     });
+
+    document.addEventListener('keydown', handlePersonSelectOpenKeydown);
 
     document.addEventListener('click', function(e) {
         if (!DOM.categorySelectMenu || DOM.categorySelectMenu.hidden) return;
@@ -1731,6 +1733,36 @@ function syncCustomPersonSelectLabel() {
     const isPlaceholder = !DOM.personSelect.value;
     DOM.personSelectLabel.textContent = labelText;
     DOM.personSelectLabel.classList.toggle('person-select-label--placeholder', isPlaceholder);
+}
+
+function handlePersonSelectOpenKeydown(e) {
+    if (!DOM.personSelectMenu || DOM.personSelectMenu.hidden) return;
+    if (e.target === DOM.personSelectSearch) return;
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+    if (e.key === 'Escape') {
+        e.preventDefault();
+        closeCustomPersonSelect();
+        DOM.personSelectTrigger?.focus();
+        return;
+    }
+
+    if (e.key === 'Backspace') {
+        e.preventDefault();
+        if (!DOM.personSelectSearch) return;
+        DOM.personSelectSearch.focus();
+        DOM.personSelectSearch.value = DOM.personSelectSearch.value.slice(0, -1);
+        renderCustomPersonSelectOptions(DOM.personSelectSearch.value);
+        return;
+    }
+
+    if (e.key.length === 1 && /[^\s]/.test(e.key)) {
+        e.preventDefault();
+        if (!DOM.personSelectSearch) return;
+        DOM.personSelectSearch.focus();
+        DOM.personSelectSearch.value += e.key;
+        renderCustomPersonSelectOptions(DOM.personSelectSearch.value);
+    }
 }
 
 function closeCustomPersonSelect() {

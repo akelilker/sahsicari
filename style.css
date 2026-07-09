@@ -1421,6 +1421,21 @@ button.delete-notif-btn {
         -webkit-backdrop-filter: none;
     }
 
+    .person-select-menu.person-select-menu--centered .person-select-search-wrap {
+        width: 100%;
+        margin-bottom: 10px;
+        padding: 0 2px;
+        box-sizing: border-box;
+    }
+
+    .person-select-menu.person-select-menu--centered .search-box {
+        width: 100%;
+    }
+
+    .person-select-menu.person-select-menu--centered .person-select-search {
+        text-align: left;
+    }
+
     .person-select-menu.person-select-menu--centered .person-select-options {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1502,12 +1517,13 @@ button.delete-notif-btn {
 }
 
 .person-select-options {
-    max-height: min(50vh, 320px);
+    max-height: min(50vh, var(--person-menu-max-height, 320px));
     overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 4px;
     padding-right: 2px;
+    -webkit-overflow-scrolling: touch;
 }
 
 .person-select-option,
@@ -1544,91 +1560,6 @@ button.delete-notif-btn {
     color: rgba(224, 224, 224, 0.7);
     cursor: default;
     background: rgba(255, 255, 255, 0.03);
-}
-
-/* Mobil: kişi listesi = hızlı işlem kişi listesi mantığı */
-@media screen and (max-width: 768px) {
-    .person-select-menu:not(.person-select-menu--centered) {
-        padding: 0;
-        background: transparent;
-        border: none;
-        box-shadow: none;
-        backdrop-filter: none;
-        -webkit-backdrop-filter: none;
-    }
-
-    .person-select-menu:not(.person-select-menu--centered) .person-select-search-wrap {
-        margin-bottom: 12px;
-        padding: 0 20px;
-    }
-
-    .person-select-menu .search-box .person-select-search {
-        background: transparent;
-        border: none;
-        color: #fff;
-        font-size: 15px;
-        font-weight: 600;
-        width: 100%;
-        height: 100%;
-        outline: none;
-        text-align: right;
-        text-shadow: 0 1px 1px rgba(0, 0, 0, 0.55);
-        box-shadow: none;
-    }
-
-    .person-select-menu .search-box .person-select-search::placeholder {
-        color: #90a4ae;
-        font-weight: 500;
-    }
-
-    .person-select-menu:not(.person-select-menu--centered) .person-select-options {
-        align-items: flex-end;
-        padding: 5px 10px 5px 30px;
-        gap: 0;
-        max-height: min(50vh, var(--person-menu-max-height, 320px));
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .person-select-menu:not(.person-select-menu--centered) .person-select-option,
-    .person-select-menu:not(.person-select-menu--centered) .person-select-empty {
-        width: auto;
-        min-width: 200px;
-        margin-left: auto;
-        margin-bottom: 8px;
-        padding: 12px 15px;
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        text-align: right;
-        font-size: 15px;
-        font-weight: 700;
-        color: #eceff1;
-        background: rgba(14, 21, 37, 0.98);
-        border: 1px solid var(--gray-40);
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-    }
-
-    .person-select-menu:not(.person-select-menu--centered) .person-select-option:last-child,
-    .person-select-menu:not(.person-select-menu--centered) .person-select-empty:last-child {
-        margin-bottom: 0;
-    }
-
-    .person-select-menu:not(.person-select-menu--centered) .person-select-option:hover,
-    .person-select-menu:not(.person-select-menu--centered) .person-select-option.is-active {
-        background: rgba(14, 21, 37, 0.98);
-        border-color: #8fb3ff;
-        color: #ffffff;
-        text-shadow: 0 0 10px rgba(255, 255, 255, 0.35);
-        transform: scale(1.02);
-    }
-
-    .person-select-menu:not(.person-select-menu--centered) .person-select-option.is-selected {
-        background: rgba(14, 21, 37, 0.98);
-        border-color: #8fb3ff;
-        color: #ffffff;
-    }
 }
 
 /* Native <select> katmanları: üst toolbar (.debt-controls) | genel modal form (.form-group) | kategori yönetimi (#categoryManagementModal) | kişi modalı yeni işlem (#yeniIslem yükseklik) */
