@@ -4077,6 +4077,15 @@ select option {
     animation: quickPopup 0.18s ease-out;
 }
 
+/* Şeffaf alanlara tıklanınca backdrop kapanabilsin (mobil) */
+#quickOverlayContainer .quick-panel-content {
+    pointer-events: none;
+}
+
+#quickOverlayContainer .quick-panel-content > * {
+    pointer-events: auto;
+}
+
 .quick-panel-content.filled-mode {
     background: #0e1525;
     border: 1px solid rgba(176, 190, 197, 0.85);

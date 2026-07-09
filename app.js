@@ -705,6 +705,15 @@ function bindPageEvents() {
             if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); closeQuickTransactionOverlay(); }
         });
     }
+
+    document.addEventListener('click', function(e) {
+        const quickOverlayContainer = document.getElementById('quickOverlayContainer');
+        if (!quickOverlayContainer || quickOverlayContainer.classList.contains('u-hidden')) return;
+        const panelContent = quickOverlayContainer.querySelector('.quick-panel-content');
+        if (panelContent?.contains(e.target)) return;
+        if (quickActionMainBtn?.contains(e.target)) return;
+        closeQuickTransactionOverlay();
+    });
     const quickOverlayCloseBtn = document.getElementById('quickOverlayCloseBtn');
     if (quickOverlayCloseBtn) quickOverlayCloseBtn.addEventListener('click', closeQuickTransactionOverlay);
     const quickSearchInput = document.getElementById('quickSearchInput');
