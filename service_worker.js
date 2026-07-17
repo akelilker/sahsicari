@@ -1,6 +1,6 @@
-// Service Worker with Smart Caching - v78.70
+// Service Worker with Smart Caching - v78.71
 const DEBUG = false; // Set to true for development
-const SW_VERSION = '78.70';
+const SW_VERSION = '78.71';
 const CACHE_PREFIX = 'sahsi-hesap-v';
 const CACHE_NAME = `${CACHE_PREFIX}${SW_VERSION}`;
 const APP_SCOPE_URL = self.registration.scope;
