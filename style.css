@@ -3970,6 +3970,7 @@ select option {
     left: 0;
     width: 100%;
     height: 100%;
+    box-sizing: border-box;
     z-index: 4000;
     display: flex;
     justify-content: center;
@@ -3978,6 +3979,12 @@ select option {
     padding-bottom: 80px;
     background: transparent;
     backdrop-filter: none;
+}
+
+#quickOverlayContainer {
+    bottom: calc(var(--footer-h) + var(--sa-bot));
+    height: auto;
+    padding-bottom: 20px;
 }
 
 #allocationOverlay {
@@ -4171,6 +4178,7 @@ select option {
 
 .quick-person-list {
     max-height: 50vh;
+    max-height: min(50dvh, calc(100dvh - var(--footer-h) - var(--sa-bot) - 180px));
     overflow-y: auto;
     background: transparent;
     padding: 5px 20px;
