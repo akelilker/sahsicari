@@ -1,45 +1,46 @@
-// Service Worker with Smart Caching - v78.68
+// Service Worker with Smart Caching - v78.70
 const DEBUG = false; // Set to true for development
-const SW_VERSION = '78.68';
-const CACHE_NAME = `sahsi-hesap-v${SW_VERSION}`;
-const API_BYPASS_PATHS = new Set(['/load.php', '/get_data.php', '/save.php', '/write_data.php', '/api_save.php', '/kd_load.php', '/kd_save.php']);
+const SW_VERSION = '78.70';
+const CACHE_PREFIX = 'sahsi-hesap-v';
+const CACHE_NAME = `${CACHE_PREFIX}${SW_VERSION}`;
+const APP_SCOPE_URL = self.registration.scope;
+const scopedUrl = (relativePath) => new URL(relativePath, APP_SCOPE_URL).toString();
+const APP_SHELL_URL = scopedUrl('index.html');
+const OFFLINE_URL = scopedUrl('offline.html');
+const API_BYPASS_FILES = new Set(['load.php', 'get_data.php', 'save.php', 'write_data.php', 'api_save.php', 'kd_load.php', 'kd_save.php']);
 const urlsToCache = [
-    '/',
-    '/index.html',
-    '/kasa.html',
-    '/offline.html',
-    '/storage.js?v=1.0',
-    '/js/utils.js?v=78.34',
-    '/style.css?v=78.68',
-    '/app.js?v=78.63',
-    '/kasa.css?v=1.11',
-    '/kasa.js?v=1.11',
-    '/manifest.json',
-    '/favicon.ico',
-    '/apple-touch-icon.png',
+    './',
+    'index.html',
+    'kasa.html',
+    'offline.html',
+    'storage.js?v=1.0',
+    'js/utils.js?v=78.34',
+    'js/FileSaver.min.js',
+    'js/xlsx.bundle.min.js',
+    'style.css?v=78.68',
+    'app.js?v=78.70',
+    'kasa.css?v=1.11',
+    'kasa.js?v=1.11',
+    'manifest.json?v=20260119',
+    'manifest.json',
+    'favicon.ico',
+    'apple-touch-icon.png',
     // PWA Icons (referenced in manifest.json)
-    '/icons/android-chrome-192x192.png',
-    '/icons/android-chrome-512x512.png',
-    '/icons/maskable-512x512.png',
-    '/icons/favicon-16x16.png',
-    '/icons/favicon-32x32.png'
-];
+    'icons/android-chrome-192x192.png',
+    'icons/android-chrome-512x512.png',
+    'icons/maskable-512x512.png',
+    'icons/favicon-16x16.png',
+    'icons/favicon-32x32.png'
+].map(scopedUrl);
 
-// Install Event: Pre-cache critical assets (tek bir URL hatası tüm install'ı bozmasın)
+// Install Event: çekirdek dosyalar eksikse yeni worker aktive edilmez; sağlam eski cache korunur.
 self.addEventListener('install', (event) => {
     DEBUG && console.log('[SW] Installing... v' + SW_VERSION);
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then((cache) => {
-                DEBUG && console.log('[SW] Pre-caching assets');
-                return Promise.allSettled(
-                    urlsToCache.map((url) =>
-                        cache.add(url).catch((err) => {
-                            if (DEBUG) console.warn('[SW] Cache skip:', url, err);
-                            return null;
-                        })
-                    )
-                );
+                DEBUG && console.log('[SW] Pre-caching scoped app assets');
+                return cache.addAll(urlsToCache);
             })
             .then(() => self.skipWaiting())
     );
@@ -52,7 +53,7 @@ self.addEventListener('activate', (event) => {
         caches.keys().then((cacheNames) => {
             return Promise.all(
                 cacheNames.map((cacheName) => {
-                    if (cacheName !== CACHE_NAME) {
+                    if (cacheName.startsWith(CACHE_PREFIX) && cacheName !== CACHE_NAME) {
                         DEBUG && console.log('[SW] Deleting old cache:', cacheName);
                         return caches.delete(cacheName);
                     }
@@ -66,6 +67,7 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
     const { request } = event;
     const url = new URL(request.url);
+    const requestedFile = url.pathname.split('/').pop() || '';
 
     // Skip external CDN requests (always fetch fresh)
     if (url.origin !== location.origin) {
@@ -74,7 +76,7 @@ self.addEventListener('fetch', (event) => {
     }
 
     // Never cache write requests or backend API endpoints
-    if (request.method !== 'GET' || API_BYPASS_PATHS.has(url.pathname) || url.pathname.endsWith('.php')) {
+    if (request.method !== 'GET' || API_BYPASS_FILES.has(requestedFile) || url.pathname.endsWith('.php')) {
         event.respondWith(fetch(request));
         return;
     }
@@ -84,22 +86,24 @@ self.addEventListener('fetch', (event) => {
         event.respondWith(
             fetch(request)
                 .then((response) => {
-                    // Update cache with fresh HTML
-                    const responseClone = response.clone();
-                    caches.open(CACHE_NAME).then((cache) => {
-                        cache.put(request, responseClone);
-                    });
+                    if (response && response.ok) {
+                        const responseClone = response.clone();
+                        caches.open(CACHE_NAME).then((cache) => {
+                            cache.put(request, responseClone);
+                        });
+                    }
                     return response;
                 })
                 .catch(() => {
-                    // Offline: serve from cache
-                    return caches.match(request)
-                        .then((cachedResponse) => {
-                            // If page is cached, serve it
-                            if (cachedResponse) return cachedResponse;
-                            // Otherwise, serve offline fallback page
-                            return caches.match('/offline.html');
-                        });
+                    return caches.open(CACHE_NAME).then(async (cache) => {
+                        const cachedResponse = await cache.match(request, { ignoreSearch: true });
+                        if (cachedResponse) return cachedResponse;
+
+                        const appShell = await cache.match(APP_SHELL_URL);
+                        if (appShell) return appShell;
+
+                        return cache.match(OFFLINE_URL);
+                    });
                 })
         );
         return;
@@ -107,15 +111,13 @@ self.addEventListener('fetch', (event) => {
 
     // Static assets (CSS, JS, images): Cache-first
     event.respondWith(
-        caches.match(request)
+        caches.open(CACHE_NAME).then((cache) => cache.match(request)
             .then((cachedResponse) => {
                 if (cachedResponse) {
                     // Serve from cache, update in background
                     fetch(request).then((response) => {
                         if (!response || response.status !== 200) return;
-                        caches.open(CACHE_NAME).then((cache) => {
-                            cache.put(request, response.clone());
-                        });
+                        cache.put(request, response.clone());
                     }).catch(() => {}); // Ignore fetch errors in background
                     return cachedResponse;
                 }
@@ -125,13 +127,11 @@ self.addEventListener('fetch', (event) => {
                     // Only cache successful responses
                     if (response && response.status === 200) {
                         const responseClone = response.clone();
-                        caches.open(CACHE_NAME).then((cache) => {
-                            cache.put(request, responseClone);
-                        });
+                        cache.put(request, responseClone);
                     }
                     return response;
                 });
-            })
+            }))
     );
 });
 
@@ -142,11 +142,11 @@ self.addEventListener('message', (event) => {
     }
     if (event.data === 'clearCache') {
         event.waitUntil(
-            caches.keys().then((cacheNames) => {
-                return Promise.all(
-                    cacheNames.map((cacheName) => caches.delete(cacheName))
-                );
-            })
+            caches.keys().then((cacheNames) => Promise.all(
+                cacheNames
+                    .filter((cacheName) => cacheName.startsWith(CACHE_PREFIX))
+                    .map((cacheName) => caches.delete(cacheName))
+            ))
         );
     }
 });

@@ -306,6 +306,7 @@ async function migrateFromLocalStorage() {
 
         const keysToMigrate = [
             'sahsiHesapTakibiData',
+            'sahsiHesapTakibiLastSyncedData',
             'sahsiHesapTakibiNotifications'
         ];
 

@@ -118,7 +118,7 @@
 
         <div class="cached-notice">
             💡 <strong>İpucu:</strong> Bazı sayfalar önbellekte mevcut olabilir.
-            Ana sayfaya dönmek için <a href="/index.html" style="color: white; text-decoration: underline;">buraya tıklayın</a>.
+            Ana sayfaya dönmek için <a href="index.html" style="color: white; text-decoration: underline;">buraya tıklayın</a>.
         </div>
     </div>
 
@@ -139,7 +139,7 @@
         setInterval(() => {
             if (navigator.onLine) {
                 document.getElementById('statusText').textContent = '🔄 Bağlantı test ediliyor...';
-                fetch('/index.html', { method: 'HEAD', cache: 'no-cache' })
+                fetch('index.html', { method: 'HEAD', cache: 'no-cache' })
                     .then(() => {
                         document.getElementById('statusText').textContent = '✅ Bağlantı kuruldu!';
                         setTimeout(() => location.reload(), 500);
