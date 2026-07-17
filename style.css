@@ -1403,7 +1403,7 @@ button.delete-notif-btn {
     display: none !important;
 }
 
-/* Masaüstü: hızlı kişi grid — dış kapsayıcı yok, 3 sütun */
+/* Masaüstü: hızlı kişi grid — dış kapsayıcı yok, 2 sütun */
 @media screen and (min-width: 769px) {
     .person-select-menu.person-select-menu--centered {
         top: 50%;
@@ -1433,12 +1433,25 @@ button.delete-notif-btn {
     }
 
     .person-select-menu.person-select-menu--centered .person-select-search {
+        flex: 1;
+        min-width: 0;
+        height: 100%;
+        padding: 0;
+        border: none;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
         text-align: left;
+    }
+
+    .person-select-menu.person-select-menu--centered .person-select-search:focus {
+        border: none;
+        box-shadow: none;
     }
 
     .person-select-menu.person-select-menu--centered .person-select-options {
         display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 6px;
         max-height: min(65vh, 520px);
         padding: 5px 0;
@@ -1446,10 +1459,12 @@ button.delete-notif-btn {
 
     .person-select-menu.person-select-menu--centered .person-select-option {
         min-height: 0;
+        width: 100%;
         margin-bottom: 0;
         padding: 8px 6px;
         font-size: 0.8em;
         font-weight: 600;
+        justify-self: center;
         text-align: center;
         justify-content: center;
         align-items: center;
