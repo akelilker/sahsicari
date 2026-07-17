@@ -780,6 +780,12 @@ body.person-select-open .content-scroll-wrapper {
     transition: filter 0.3s var(--ease-smooth);
 }
 
+/* iOS: kişi seçimi açıkken klavye kaynaklı viewport kaymasını sınırla */
+body.person-select-open {
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: auto;
+}
+
 body.person-select-open .person-select-shell {
     pointer-events: auto !important;
     touch-action: auto !important;
@@ -1519,6 +1525,9 @@ button.delete-notif-btn {
     background: rgba(8, 15, 29, 0.88);
     color: #e6f4ff;
     font-size: 13px;
+    /* iOS Safari focus'ta scrollIntoView zıplamasını yumuşat */
+    scroll-margin: 0;
+    scroll-padding: 0;
 }
 
 .person-select-search:focus {

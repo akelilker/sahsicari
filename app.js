@@ -1,8 +1,8 @@
 /* formatDateTR → js/utils.js */
 /** Önbellek / service worker — asset ?v= güncellerken bunu artır */
-const APP_VERSION = '78.70';
+const APP_VERSION = '78.71';
 /** Footer’da görünen sürüm — yalnızca kullanıcıya yansıyan sürüm değişince güncelle */
-const FOOTER_VERSION = '78.34';
+const FOOTER_VERSION = '78.36';
 const APP_DEBUG = false;
 const LOCAL_PENDING_DATA_KEY = 'sahsiHesapTakibiData';
 const LAST_SYNCED_DATA_KEY = 'sahsiHesapTakibiLastSyncedData';
@@ -497,6 +497,22 @@ function onCategorySelectViewportChange() {
     }
 }
 
+function isCoarsePointerUi() {
+    return window.innerWidth <= 768
+        || window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+}
+
+function resetPersonSelectViewportJump() {
+    /* iOS PWA: klavye açılınca visualViewport kayar; layout'u tekrar sabitle */
+    if (window.scrollY || window.scrollX) {
+        window.scrollTo(0, 0);
+    }
+    if (document.documentElement.scrollTop || document.body.scrollTop) {
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+    }
+}
+
 function positionPersonSelectMenu() {
     const menu = DOM.personSelectMenu;
     const trigger = DOM.personSelectTrigger;
@@ -513,20 +529,29 @@ function positionPersonSelectMenu() {
         return;
     }
 
-    /* Mobil: tetikleyicinin altında normal liste paneli */
+    /*
+     * Mobil: getBoundingClientRect + position:fixed aynı visualViewport uzayında.
+     * offsetTop çıkarmak max-height'i şişirip klavye altında taşmaya → iOS kaydırma döngüsüne yol açıyordu.
+     */
+    resetPersonSelectViewportJump();
     const shellRect = DOM.personSelectShell?.getBoundingClientRect();
     const triggerRect = trigger.getBoundingClientRect();
     const left = shellRect ? shellRect.left : triggerRect.left;
     const width = shellRect ? shellRect.width : triggerRect.width;
     const vv = window.visualViewport;
     const viewH = vv ? vv.height : window.innerHeight;
-    const offsetTop = vv ? vv.offsetTop : 0;
     const gap = 8;
     const side = 12;
     const searchBlock = 52;
-    const top = triggerRect.bottom + gap;
-    const topInView = top - offsetTop;
-    const listMax = Math.max(160, viewH - topInView - side - searchBlock);
+    let top = triggerRect.bottom + gap;
+
+    /* Tetikleyici klavye yüzünden görünür alan dışına kaydıysa menüyü görünür alana sabitle */
+    if (triggerRect.bottom < side) {
+        top = side;
+    }
+
+    const availableBelow = viewH - top - side;
+    const listMax = Math.max(120, availableBelow - searchBlock);
 
     menu.style.setProperty('--person-menu-top', Math.round(top) + 'px');
     menu.style.setProperty('--person-menu-left', Math.round(left) + 'px');
@@ -534,10 +559,14 @@ function positionPersonSelectMenu() {
     menu.style.setProperty('--person-menu-max-height', Math.round(listMax) + 'px');
 }
 
+let personSelectViewportRaf = 0;
 function onPersonSelectViewportChange() {
-    if (DOM.personSelectMenu && !DOM.personSelectMenu.hidden) {
+    if (!DOM.personSelectMenu || DOM.personSelectMenu.hidden) return;
+    if (personSelectViewportRaf) cancelAnimationFrame(personSelectViewportRaf);
+    personSelectViewportRaf = requestAnimationFrame(function() {
+        personSelectViewportRaf = 0;
         positionPersonSelectMenu();
-    }
+    });
 }
 
 function anchorDropdownToIcon(menuEl, iconId, opts) {
@@ -673,13 +702,26 @@ function bindPageEvents() {
             renderCustomPersonSelectOptions(this.value);
         });
         DOM.personSelectSearch.addEventListener('focus', function() {
-            setTimeout(onPersonSelectViewportChange, 80);
-            setTimeout(onPersonSelectViewportChange, 320);
+            /* preventScroll desteklenmeyen iOS: focus sonrası kaymayı geri al, menüyü klavye üstüne sığdır */
+            resetPersonSelectViewportJump();
+            onPersonSelectViewportChange();
+            setTimeout(function() {
+                resetPersonSelectViewportJump();
+                onPersonSelectViewportChange();
+            }, 300);
+        });
+        DOM.personSelectSearch.addEventListener('blur', function() {
+            setTimeout(function() {
+                resetPersonSelectViewportJump();
+                if (DOM.personSelectMenu && !DOM.personSelectMenu.hidden) {
+                    onPersonSelectViewportChange();
+                }
+            }, 280);
         });
         DOM.personSelectSearch.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closeCustomPersonSelect();
-                DOM.personSelectTrigger?.focus();
+                if (!isCoarsePointerUi()) DOM.personSelectTrigger?.focus({ preventScroll: true });
             }
         });
     }
@@ -1807,14 +1849,14 @@ function handlePersonSelectOpenKeydown(e) {
     if (e.key === 'Escape') {
         e.preventDefault();
         closeCustomPersonSelect();
-        DOM.personSelectTrigger?.focus();
+        if (!isCoarsePointerUi()) DOM.personSelectTrigger?.focus({ preventScroll: true });
         return;
     }
 
     if (e.key === 'Backspace') {
         e.preventDefault();
         if (!DOM.personSelectSearch) return;
-        DOM.personSelectSearch.focus();
+        DOM.personSelectSearch.focus({ preventScroll: true });
         DOM.personSelectSearch.value = DOM.personSelectSearch.value.slice(0, -1);
         renderCustomPersonSelectOptions(DOM.personSelectSearch.value);
         return;
@@ -1823,7 +1865,7 @@ function handlePersonSelectOpenKeydown(e) {
     if (e.key.length === 1 && /[^\s]/.test(e.key)) {
         e.preventDefault();
         if (!DOM.personSelectSearch) return;
-        DOM.personSelectSearch.focus();
+        DOM.personSelectSearch.focus({ preventScroll: true });
         DOM.personSelectSearch.value += e.key;
         renderCustomPersonSelectOptions(DOM.personSelectSearch.value);
     }
@@ -1831,11 +1873,15 @@ function handlePersonSelectOpenKeydown(e) {
 
 function closeCustomPersonSelect() {
     if (!DOM.personSelectShell || !DOM.personSelectMenu || !DOM.personSelectTrigger) return;
+    if (DOM.personSelectSearch) {
+        DOM.personSelectSearch.blur();
+        DOM.personSelectSearch.value = '';
+    }
     DOM.personSelectShell.classList.remove('open');
     DOM.personSelectMenu.hidden = true;
     DOM.personSelectTrigger.setAttribute('aria-expanded', 'false');
-    if (DOM.personSelectSearch) DOM.personSelectSearch.value = '';
     setPersonSelectBackdropActive(false);
+    resetPersonSelectViewportJump();
 }
 
 function renderCustomPersonSelectOptions(filterText = '') {
@@ -1877,14 +1923,19 @@ function openCustomPersonSelect() {
     if (!DOM.personSelectShell || !DOM.personSelectMenu || !DOM.personSelectTrigger) return;
     closeSettingsAndNotificationMenus();
     closeQuickTransactionOverlay();
+    resetPersonSelectViewportJump();
     DOM.personSelectShell.classList.add('open');
     DOM.personSelectMenu.hidden = false;
     DOM.personSelectTrigger.setAttribute('aria-expanded', 'true');
     positionPersonSelectMenu();
     setPersonSelectBackdropActive(true);
     renderCustomPersonSelectOptions(DOM.personSelectSearch?.value || '');
-    if (DOM.personSelectSearch) {
-        DOM.personSelectSearch.focus();
+    /*
+     * Mobilde arama input'una otomatik focus klavyeyi açıp visualViewport'u yukarı
+     * kaydırıyordu (ekran zıplaması). Masaüstünde klavye araması için focus kalsın.
+     */
+    if (DOM.personSelectSearch && !isCoarsePointerUi()) {
+        DOM.personSelectSearch.focus({ preventScroll: true });
         DOM.personSelectSearch.select();
     }
 }

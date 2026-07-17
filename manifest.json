@@ -4,7 +4,7 @@
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#0e1525",
+  "background_color": "#f8f9fb",
   "theme_color": "#0e1525",
   "description": "Şahsi Hesap Takibi Uygulaması - Offline çalışır, güvenli ve hızlı",
   "orientation": "portrait-primary",
