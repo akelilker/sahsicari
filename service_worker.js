@@ -7,7 +7,7 @@ const APP_SCOPE_URL = self.registration.scope;
 const scopedUrl = (relativePath) => new URL(relativePath, APP_SCOPE_URL).toString();
 const APP_SHELL_URL = scopedUrl('index.html');
 const OFFLINE_URL = scopedUrl('offline.html');
-const API_BYPASS_FILES = new Set(['load.php', 'get_data.php', 'save.php', 'write_data.php', 'api_save.php', 'kd_load.php', 'kd_save.php']);
+const API_BYPASS_FILES = new Set(['load.php', 'get_data.php', 'save.php', 'write_data.php', 'kd_load.php', 'kd_save.php']);
 const urlsToCache = [
     './',
     'index.html',

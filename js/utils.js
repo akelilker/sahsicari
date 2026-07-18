@@ -1,7 +1,7 @@
 /**
  * Şahsi Cari – XSS/render yardımcıları (app.js tarafından kullanılır).
  * Kullanıcı/veri katmanından gelen metin innerHTML veya attribute'a yazılmadan önce
- * sanitizeHTML (HTML) veya safeAttr (attribute) ile kaçışlanmalı; sadece metin için setText.
+ * sanitizeHTML (HTML) veya safeAttr (attribute) ile kaçışlanmalı.
  */
 (function (global) {
     'use strict';
@@ -25,15 +25,6 @@
             .replace(/'/g, "&#39;")
             .replace(/</g, "&lt;")
             .replace(/>/g, "&gt;");
-    }
-
-    function setText(el, text) {
-        if (el) el.textContent = text == null ? '' : String(text);
-    }
-
-    function clearElement(el) {
-        if (!el) return;
-        while (el.firstChild) el.removeChild(el.firstChild);
     }
 
     function renderEmptyState(message) {
@@ -154,8 +145,6 @@
 
     global.sanitizeHTML = sanitizeHTML;
     global.safeAttr = safeAttr;
-    global.setText = setText;
-    global.clearElement = clearElement;
     global.renderEmptyState = renderEmptyState;
     global.formatDateTR = formatDateTR;
     global.getLocalTimeISO = getLocalTimeISO;
