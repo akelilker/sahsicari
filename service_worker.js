@@ -1,6 +1,6 @@
-// Service Worker with Smart Caching - v78.78
+// Service Worker with Smart Caching - v78.79
 const DEBUG = false; // Set to true for development
-const SW_VERSION = '78.78';
+const SW_VERSION = '78.79';
 const CACHE_PREFIX = 'sahsi-hesap-v';
 const CACHE_NAME = `${CACHE_PREFIX}${SW_VERSION}`;
 const APP_SCOPE_URL = self.registration.scope;
@@ -18,18 +18,20 @@ const urlsToCache = [
     'js/FileSaver.min.js',
     'js/xlsx.bundle.min.js',
     'style.css?v=78.75',
-    'app.js?v=78.75',
+    'app.js?v=78.79',
     'kasa.css?v=1.11',
     'kasa.js?v=1.11',
-    'manifest.json?v=20260718b',
+    'manifest.json?v=20260718c',
     'manifest.json',
-    'favicon.ico',
-    'apple-touch-icon.png',
+    'favicon.ico?v=20260718c',
+    'apple-touch-icon.png?v=20260718c',
+    'og-image.png?v=20260718c',
     // PWA Icons (referenced in manifest.json)
     'icons/android-chrome-192x192.png',
     'icons/android-chrome-512x512.png',
     'icons/maskable-512x512.png',
-    'icons/favicon-32x32.png'
+    'icons/favicon-32x32.png',
+    'icons/favicon-16x16.png'
 ].map(scopedUrl);
 
 // Install Event: çekirdek dosyalar eksikse yeni worker aktive edilmez; sağlam eski cache korunur.
