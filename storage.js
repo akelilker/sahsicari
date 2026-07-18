@@ -1,8 +1,8 @@
 // Advanced Storage System: IndexedDB + localStorage fallback
 // Version: 1.0
 //
-// Sözleşme: getItem/setItem/removeItem/clear/getAllKeys her zaman aynı imzayı kullanır;
-// hata durumunda getItem/getAllKeys null/[] döner, yazma işlemleri sessizce başarısız olabilir.
+// Sözleşme: getItem/setItem/removeItem/clear her zaman aynı imzayı kullanır;
+// hata durumunda getItem null döner, yazma işlemleri sessizce başarısız olabilir.
 // syncQueue: arka plan senkronizasyonu için kullanılır; şema aşağıda belgelenmiştir.
 
 const DEBUG = false; // Set to false in production
@@ -155,27 +155,6 @@ class IndexedDBStorage {
         }
     }
 
-    async getAllKeys() {
-        try {
-            await this.initPromise;
-            return new Promise((resolve, reject) => {
-                const transaction = this.db.transaction([this.storeName], 'readonly');
-                const store = transaction.objectStore(this.storeName);
-                const request = store.getAllKeys();
-
-                request.onsuccess = () => {
-                    resolve(request.result);
-                };
-
-                request.onerror = () => {
-                    reject(request.error);
-                };
-            });
-        } catch (error) {
-            logger.error('getAllKeys error:', error);
-            return [];
-        }
-    }
 }
 
 // Hybrid Storage: IndexedDB with localStorage fallback.
@@ -242,14 +221,6 @@ class HybridStorage {
                 } catch (e) {
                     logger.error('localStorage clear failed:', e);
                 }
-            },
-            async getAllKeys() {
-                try {
-                    return Object.keys(localStorage);
-                } catch (e) {
-                    logger.error('localStorage getAllKeys failed:', e);
-                    return [];
-                }
             }
         };
     }
@@ -282,10 +253,6 @@ class HybridStorage {
         return this.storage.clear();
     }
 
-    async getAllKeys() {
-        await this.waitForReady();
-        return this.storage.getAllKeys();
-    }
 }
 
 // Migration: localStorage → IndexedDB
