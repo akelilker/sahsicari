@@ -5,7 +5,7 @@ Diğer siteler/klasörler etkilenmez.
 
 ## Canlı Erişim Adresi
 
-- Ana adres: `https://zelda.veridyen.com/sahsicari/`
+- Ana adres: `https://karmotors.com.tr/sahsicari/`
 
 ## Kurulum (cPanel)
 
@@ -48,7 +48,7 @@ Hedef path:
 
 ## Hızlı Kontrol Listesi
 
-1. `https://zelda.veridyen.com/sahsicari/` açılıyor mu?
+1. `https://karmotors.com.tr/sahsicari/` açılıyor mu?
 2. Yeni kayıt ekleniyor mu?
 3. Sunucuda `backups/` içinde yeni `veriler_YYYY-MM-DD_HH-MM-SS.json` oluşuyor mu?
 4. Sağ alttaki durum metni hata veriyorsa log/cPanel error log kontrol edildi mi?
