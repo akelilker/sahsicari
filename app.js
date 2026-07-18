@@ -1,6 +1,6 @@
 /* formatDateTR → js/utils.js */
 /** Önbellek / service worker — asset ?v= güncellerken bunu artır */
-const APP_VERSION = '78.74';
+const APP_VERSION = '78.75';
 /** Footer’da görünen sürüm — yalnızca kullanıcıya yansıyan sürüm değişince güncelle */
 const FOOTER_VERSION = '78.34';
 const APP_DEBUG = false;
@@ -476,8 +476,8 @@ function positionPersonSelectMenu() {
     }
 
     /*
-     * Mobil: header altı ↔ footer üstü (klavye açıksa visualViewport altı).
-     * Neredeyse tam ekran, ama başlık ve status bar’ın üzerine binmez.
+     * Mobil: header altında panel.
+     * Klavye yokken liste ~8 kişi yüksekliğinde; klavye varken kalan alana sığar.
      */
     const vv = window.visualViewport;
     const viewTop = vv ? vv.offsetTop : 0;
@@ -486,26 +486,46 @@ function positionPersonSelectMenu() {
     const offsetLeft = vv ? vv.offsetLeft : 0;
     const side = 10;
     const gap = 6;
+    const visibleRows = 8;
+    const rowGap = 4;
+    const keyboardOpen = !!(vv && (window.innerHeight - vv.height) > 120);
 
     const headerEl = document.querySelector('.header');
     const footerEl = document.querySelector('.global-status-bar');
     const headerBottom = headerEl ? headerEl.getBoundingClientRect().bottom : viewTop;
     const footerTop = footerEl ? footerEl.getBoundingClientRect().top : viewBottom;
 
-    let top = Math.max(viewTop + gap, headerBottom + gap);
-    let bottom = Math.min(viewBottom - gap, footerTop - gap);
-    if (bottom - top < 160) {
-        top = viewTop + gap;
-        bottom = viewBottom - gap;
-    }
-
-    const menuHeight = Math.max(160, Math.floor(bottom - top));
     const searchWrap = menu.querySelector('.person-select-search-wrap');
     const searchChrome = searchWrap
-        ? Math.ceil(searchWrap.getBoundingClientRect().height + 8)
-        : 56;
+        ? Math.ceil(searchWrap.getBoundingClientRect().height + 6)
+        : 52;
     const menuPadY = 16;
-    const listMax = Math.max(100, menuHeight - searchChrome - menuPadY);
+    const sampleOpt = menu.querySelector('.person-select-option');
+    const rowH = sampleOpt ? Math.max(32, sampleOpt.getBoundingClientRect().height) : 36;
+    const eightListH = Math.ceil(visibleRows * rowH + (visibleRows - 1) * rowGap);
+
+    let top = Math.max(viewTop + gap, headerBottom + gap);
+    let listMax;
+    let menuHeight;
+
+    if (keyboardOpen) {
+        let bottom = Math.min(viewBottom - gap, footerTop - gap);
+        if (bottom - top < 140) {
+            top = viewTop + gap;
+            bottom = viewBottom - gap;
+        }
+        menuHeight = Math.max(140, Math.floor(bottom - top));
+        listMax = Math.max(80, menuHeight - searchChrome - menuPadY);
+    } else {
+        listMax = eightListH;
+        menuHeight = searchChrome + menuPadY + listMax;
+        const maxBottom = Math.min(viewBottom - gap, footerTop - gap);
+        if (top + menuHeight > maxBottom) {
+            menuHeight = Math.max(140, maxBottom - top);
+            listMax = Math.max(80, menuHeight - searchChrome - menuPadY);
+        }
+    }
+
     const width = Math.max(200, viewW - side * 2);
     const left = offsetLeft + side;
 

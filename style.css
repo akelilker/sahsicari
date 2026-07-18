@@ -1425,8 +1425,8 @@ button.delete-notif-btn {
 .person-select-menu.person-select-menu--viewport .person-select-options {
     flex: 1 1 auto;
     min-height: 0;
-    max-height: none;
-    height: auto;
+    max-height: var(--person-menu-max-height, 320px);
+    height: var(--person-menu-max-height, 320px);
 }
 
 .person-select-menu[hidden] {
