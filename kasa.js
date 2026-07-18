@@ -592,6 +592,14 @@ currentKasaCategory = null;
 function exportKasaCategoryExcel(kategoriAdi, transactions) {
 if (!transactions || transactions.length === 0) return showNotification('Dışa aktarılacak veri yok!', 'error');
 
+ensureExcelLibs().then(function() {
+exportKasaCategoryExcelInner(kategoriAdi, transactions);
+}).catch(function() {
+showNotification('Excel kütüphanesi yüklenemedi', 'error');
+});
+}
+
+function exportKasaCategoryExcelInner(kategoriAdi, transactions) {
 const data = [];
 
 data.push([
@@ -678,6 +686,14 @@ document.getElementById('raporBitis').value = end;
 function excelExport() {
 if (kasaData.islemler.length === 0) return showNotification('Dışa aktarılacak işlem yok!', 'error');
 
+ensureExcelLibs().then(function() {
+excelExportInner();
+}).catch(function() {
+showNotification('Excel kütüphanesi yüklenemedi', 'error');
+});
+}
+
+function excelExportInner() {
 const headerStyle = {
     font: { bold: true, color: { rgb: "FFFFFF" }, sz: 11 },
     fill: { fgColor: { rgb: "2E7D32" } },

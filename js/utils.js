@@ -127,7 +127,7 @@
         var dateStr = formatDateTR(new Date(t.date));
         var desc = t.description || '';
         var id = Number(t.id) || 0;
-        return '<div class="history-item">' +
+        return '<div class="history-item" data-tx-id="' + id + '">' +
             '<div class="history-left">' +
             '<div class="history-top-row">' +
             '<span class="history-type ' + typeClass + '">' + typeTxt + '</span>' +
@@ -143,6 +143,54 @@
             '</div></div>';
     }
 
+    /** Excel kütüphanelerini yalnızca export anında yükler (ilk açılışta ~415 KB tasarruf). */
+    var excelLibsPromise = null;
+    function ensureExcelLibs() {
+        if (typeof global.XLSX !== 'undefined') {
+            return Promise.resolve(global.XLSX);
+        }
+        if (excelLibsPromise) return excelLibsPromise;
+
+        function loadScript(src) {
+            return new Promise(function (resolve, reject) {
+                var existing = document.querySelector('script[data-excel-lib="' + src + '"]');
+                if (existing) {
+                    if (existing.getAttribute('data-loaded') === '1') {
+                        resolve();
+                        return;
+                    }
+                    existing.addEventListener('load', function () { resolve(); });
+                    existing.addEventListener('error', function () { reject(new Error('Failed: ' + src)); });
+                    return;
+                }
+                var s = document.createElement('script');
+                s.src = src;
+                s.async = true;
+                s.setAttribute('data-excel-lib', src);
+                s.onload = function () {
+                    s.setAttribute('data-loaded', '1');
+                    resolve();
+                };
+                s.onerror = function () { reject(new Error('Failed to load ' + src)); };
+                document.head.appendChild(s);
+            });
+        }
+
+        excelLibsPromise = loadScript('js/FileSaver.min.js')
+            .then(function () { return loadScript('js/xlsx.bundle.min.js'); })
+            .then(function () {
+                if (typeof global.XLSX === 'undefined') {
+                    throw new Error('XLSX yüklenemedi');
+                }
+                return global.XLSX;
+            })
+            .catch(function (err) {
+                excelLibsPromise = null;
+                throw err;
+            });
+        return excelLibsPromise;
+    }
+
     global.sanitizeHTML = sanitizeHTML;
     global.safeAttr = safeAttr;
     global.renderEmptyState = renderEmptyState;
@@ -156,4 +204,5 @@
     global.formatCurrency = formatCurrency;
     global.renderCategoryItem = renderCategoryItem;
     global.renderTransactionHistoryItem = renderTransactionHistoryItem;
+    global.ensureExcelLibs = ensureExcelLibs;
 })(typeof window !== 'undefined' ? window : this);

@@ -1,8 +1,8 @@
 /* formatDateTR → js/utils.js */
 /** Önbellek / service worker — asset ?v= güncellerken bunu artır */
-const APP_VERSION = '78.79';
+const APP_VERSION = '78.81';
 /** Footer’da görünen sürüm — yalnızca kullanıcıya yansıyan sürüm değişince güncelle */
-const FOOTER_VERSION = '78.34';
+const FOOTER_VERSION = '78.81';
 const APP_DEBUG = false;
 
 /* -----------------------------------------------------------------------------
@@ -1392,11 +1392,20 @@ function updateMainDisplay() {
     if(DOM.totalPayable) DOM.totalPayable.textContent = formatAmount(totalPay);
     if(DOM.totalPeople) DOM.totalPeople.textContent = people.length;
 
-    if (DOM.personSelect) populatePersonSelect(DOM.personSelect, people.sort((a, b) => a.localeCompare(b, 'tr-TR')));
+    people.sort((a, b) => a.localeCompare(b, 'tr-TR'));
+    const peopleKey = people.join('\0');
+    if (DOM.personSelect && peopleKey !== lastMainPeopleKey) {
+        lastMainPeopleKey = peopleKey;
+        populatePersonSelect(DOM.personSelect, people);
+    }
     updateQuickGrid();
 }
 
 let draggedIndex = null;
+let lastMainPeopleKey = '';
+let quickGridDelegated = false;
+let historyMenuDelegated = false;
+let lastHistoryTxById = Object.create(null);
 
 function safeDisplayName(name) {
     if (!name) return '';
@@ -1410,26 +1419,62 @@ function escapeHtmlAttr(s) {
         .replace(/</g, '&lt;');
 }
 
-function wireQuickAccessGridItems() {
+function ensureQuickGridDelegation() {
     const grid = DOM.quickAccessGrid;
-    if (!grid) return;
-    grid.querySelectorAll('.quick-item').forEach(function(item) {
+    if (!grid || quickGridDelegated) return;
+    quickGridDelegated = true;
+
+    grid.addEventListener('click', function(e) {
+        const item = e.target.closest('.quick-item');
+        if (!item || !grid.contains(item)) return;
         const person = item.getAttribute('data-person');
+        if (person == null || person === '') return;
+        handleQuickItemClick(e, person);
+    });
+
+    grid.addEventListener('dragstart', function(e) {
+        const item = e.target.closest('.quick-item');
+        if (!item || !grid.contains(item)) return;
         const index = parseInt(item.getAttribute('data-index'), 10);
-        if (person == null || person === '' || Number.isNaN(index)) return;
-        item.addEventListener('click', function(e) { handleQuickItemClick(e, person); });
-        item.addEventListener('dragstart', function(e) { handleDragStart(e, index); });
-        item.addEventListener('dragover', handleDragOver);
-        item.addEventListener('drop', function(e) { handleDrop(e, index); });
-        item.addEventListener('dragend', handleDragEnd);
-        item.addEventListener('touchstart', function(e) { handleTouchStart(e, index); });
-        item.addEventListener('touchmove', handleTouchMove);
-        item.addEventListener('touchend', function(e) { handleTouchEnd(e, index); });
+        if (Number.isNaN(index)) return;
+        handleDragStart(e, index, item);
+    });
+
+    grid.addEventListener('dragover', handleDragOver);
+
+    grid.addEventListener('drop', function(e) {
+        const item = e.target.closest('.quick-item');
+        if (!item || !grid.contains(item)) return;
+        const index = parseInt(item.getAttribute('data-index'), 10);
+        handleDrop(e, Number.isNaN(index) ? null : index);
+    });
+
+    grid.addEventListener('dragend', function(e) {
+        const item = e.target.closest('.quick-item');
+        handleDragEnd(e, item);
+    });
+
+    grid.addEventListener('touchstart', function(e) {
+        const item = e.target.closest('.quick-item');
+        if (!item || !grid.contains(item)) return;
+        const index = parseInt(item.getAttribute('data-index'), 10);
+        if (Number.isNaN(index)) return;
+        handleTouchStart(e, index);
+    }, { passive: true });
+
+    grid.addEventListener('touchmove', handleTouchMove, { passive: false });
+
+    grid.addEventListener('touchend', function(e) {
+        const item = e.target.closest('.quick-item');
+        if (!item || !grid.contains(item)) return;
+        const index = parseInt(item.getAttribute('data-index'), 10);
+        handleTouchEnd(e, Number.isNaN(index) ? null : index);
     });
 }
 
 function updateQuickGrid() {
     if (!DOM.quickAccessGrid) return;
+    ensureQuickGridDelegation();
     
     let html = '';
     const allPeople = Object.keys(allData).filter(p => p !== 'metadata').sort();
@@ -1474,7 +1519,6 @@ function updateQuickGrid() {
     });
 
     DOM.quickAccessGrid.innerHTML = html;
-    wireQuickAccessGridItems();
 }
 
 function handleQuickItemClick(event, person) {
@@ -1488,12 +1532,14 @@ function handleQuickItemClick(event, person) {
     }
 }
 
-function handleDragStart(event, index) {
+function handleDragStart(event, index, itemEl) {
     draggedIndex = index;
-    const el = event.currentTarget;
+    const el = itemEl || event.target.closest('.quick-item');
     if (el) el.classList.add('quick-item--dragging');
-    event.dataTransfer.effectAllowed = 'move';
-    event.dataTransfer.setData('text/html', el ? el.innerHTML : '');
+    if (event.dataTransfer) {
+        event.dataTransfer.effectAllowed = 'move';
+        event.dataTransfer.setData('text/html', el ? el.innerHTML : '');
+    }
 }
 
 function handleDragOver(event) {
@@ -1526,8 +1572,8 @@ function handleDrop(event, dropIndex) {
     return false;
 }
 
-function handleDragEnd(event) {
-    const el = event.currentTarget;
+function handleDragEnd(event, itemEl) {
+    const el = itemEl || event.target.closest('.quick-item');
     if (el) el.classList.remove('quick-item--dragging');
     if (draggedIndex !== null) {
         justDragged = true;
@@ -1981,8 +2027,14 @@ function copySummaryText() {
     doCopy(text);
 }
 
-function exportSummaryExcel() {
+async function exportSummaryExcel() {
     if (!currentPerson || !allData[currentPerson]) return;
+    try {
+        await ensureExcelLibs();
+    } catch (err) {
+        showNotification('❌ Excel kütüphanesi yüklenemedi', 'error');
+        return;
+    }
     
     const balances = allData[currentPerson].categoryBalances || {};
     const data = [];
@@ -2359,17 +2411,25 @@ function createNotificationMenuItemElement(notif, index) {
 
 function updateTransactionHistory() {
     if(!DOM.transactionHistory) return;
+    ensureHistoryMenuDelegation();
     
     let txs = getAllTransactionsForPerson(currentPerson);
-    txs.sort((a,b) => new Date(b.date) - new Date(a.date));
+    // ISO string karşılaştırması Date() oluşturmadan sıralar
+    txs.sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
     
     if(txs.length === 0) {
+         lastHistoryTxById = Object.create(null);
          DOM.transactionHistory.innerHTML = renderEmptyState('Henüz işlem yok');
          return;
     }
 
     const MAX_HISTORY_ITEMS = 200;
     const displayTxs = txs.length > MAX_HISTORY_ITEMS ? txs.slice(0, MAX_HISTORY_ITEMS) : txs;
+
+    lastHistoryTxById = Object.create(null);
+    displayTxs.forEach(function(t) {
+        lastHistoryTxById[Number(t.id)] = t;
+    });
 
     var html = renderTransactionHistoryHeaderHtml();
     displayTxs.forEach(function(t) { html += renderTransactionHistoryItem(t); });
@@ -2380,12 +2440,23 @@ function updateTransactionHistory() {
     }
     
     DOM.transactionHistory.innerHTML = html;
-    
-    const historyItems = DOM.transactionHistory.querySelectorAll('.history-item');
-    historyItems.forEach(function(item, index) {
-        const transaction = displayTxs[index];
-        if (transaction) {
-            attachThreeDotsMenu(item, transaction, currentPerson);
+}
+
+function ensureHistoryMenuDelegation() {
+    if (!DOM.transactionHistory || historyMenuDelegated) return;
+    historyMenuDelegated = true;
+    DOM.transactionHistory.addEventListener('click', function(e) {
+        if (e.target.closest('.edit-transaction-btn, .delete-transaction-btn')) return;
+        const item = e.target.closest('.history-item');
+        if (!item || !DOM.transactionHistory.contains(item)) return;
+        const rect = item.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        if (clickX <= rect.width - 50) return;
+        e.stopPropagation();
+        const txId = Number(item.getAttribute('data-tx-id'));
+        const transaction = lastHistoryTxById[txId];
+        if (transaction && currentPerson) {
+            showTransactionContextMenu(e, transaction, currentPerson, item);
         }
     });
 }
@@ -2627,9 +2698,13 @@ function exportCurrentCategoryDetailToExcel() {
     }
 
     showNotification('⚠️ Rapor hazırlanıyor...', 'warning');
-    setTimeout(() => {
-        exportStyledCategoryDetailToExcel(person, categoryName, transactions, currentCategoryDetailState.openingBalance);
-    }, 100);
+    ensureExcelLibs()
+        .then(function() {
+            exportStyledCategoryDetailToExcel(person, categoryName, transactions, currentCategoryDetailState.openingBalance);
+        })
+        .catch(function() {
+            showNotification('❌ Excel kütüphanesi yüklenemedi', 'error');
+        });
 }
 
 function initiateAllocation() {
@@ -3709,12 +3784,19 @@ function createCategorySummaryData(person, allTransactions, periodTransactions, 
     return { categoryData: data, activeCategories };
 }
 
-function exportToExcel() {
+async function exportToExcel() {
     if (exportInProgress) return showNotification("⚠️ Rapor hazırlanıyor...", "warning");
     const person = currentPerson;
     if (!person) return showNotification(VALIDATION_MSG.selectPerson, 'error');
     
     exportInProgress = true;
+
+    try {
+        await ensureExcelLibs();
+    } catch (err) {
+        exportInProgress = false;
+        return showNotification('❌ Excel kütüphanesi yüklenemedi', 'error');
+    }
     
     const borderStyle = { top: { style: 'thin' }, bottom: { style: 'thin' }, left: { style: 'thin' }, right: { style: 'thin' } };
     const styles = {
@@ -3914,6 +3996,14 @@ async function exportMonthlySummary() {
     exportInProgress = true;
     const btn = document.getElementById('generateReportBtn');
     if(btn) { btn.disabled = true; btn.textContent = 'Hazırlanıyor...'; }
+
+    try {
+        await ensureExcelLibs();
+    } catch (err) {
+        exportInProgress = false;
+        if(btn) { btn.disabled = false; btn.textContent = 'Rapor Oluştur'; }
+        return showNotification('❌ Excel kütüphanesi yüklenemedi', 'error');
+    }
 
     try {
         const monthName = months[monthIndex];
@@ -4153,7 +4243,13 @@ async function exportMonthlySummary() {
 async function exportStyledCategoryDetailToExcel(person, categoryName, transactions, openingBalance) {
     if (!transactions || transactions.length === 0) return showNotification('⚠️ Veri yok', 'warning');
 
-    const sortedTxs = [...transactions].sort((a, b) => new Date(a.date) - new Date(b.date));
+    try {
+        await ensureExcelLibs();
+    } catch (err) {
+        return showNotification('❌ Excel kütüphanesi yüklenemedi', 'error');
+    }
+
+    const sortedTxs = [...transactions].sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')));
     const initialBalance = Number(openingBalance) || 0;
     
     const startDate = formatDateTR(new Date(sortedTxs[0].date));
@@ -5103,19 +5199,6 @@ function showSyncHelp() {
 }
 
 let activeContextMenu = null;
-
-function attachThreeDotsMenu(historyItem, transaction, person) {
-    
-    historyItem.addEventListener('click', function(e) {
-        const rect = historyItem.getBoundingClientRect();
-        const clickX = e.clientX - rect.left;
-        
-        if (clickX > rect.width - 50) {
-            e.stopPropagation();
-            showTransactionContextMenu(e, transaction, person, historyItem);
-        }
-    });
-}
 
 function showTransactionContextMenu(event, transaction, person, historyItem) {
     if (activeContextMenu) {
