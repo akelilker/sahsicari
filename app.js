@@ -1,8 +1,8 @@
 /* formatDateTR → js/utils.js */
 /** Önbellek / service worker — asset ?v= güncellerken bunu artır */
-const APP_VERSION = '78.81';
+const APP_VERSION = '78.83';
 /** Footer’da görünen sürüm — yalnızca kullanıcıya yansıyan sürüm değişince güncelle */
-const FOOTER_VERSION = '78.81';
+const FOOTER_VERSION = '78.83';
 const APP_DEBUG = false;
 
 /* -----------------------------------------------------------------------------
@@ -233,6 +233,7 @@ function syncZeroBalanceToggleText() {
     label.textContent = toggle.checked ? 'Geri Dön' : 'Sıfır Bakiyeleri Göster';
 }
 let saveTimer = null;
+let dataSaveRevision = 0;
 let statusDotHideTimer = null;
 
 function getPersistedPeopleCount(data) {
@@ -247,12 +248,10 @@ function hasPersistedPeopleData(data) {
 async function queueServerSyncPayload(payload) {
     try {
         const db = await openIndexedDB();
-        const existing = await getSyncQueue(db);
-        for (const item of existing) {
-            if (item && typeof item.url === 'string' && (item.url.includes('save.php') || item.url.includes('write_data.php'))) {
-                await removeSyncQueueItem(db, item.id);
-            }
-        }
+        await clearQueuedServerSyncPayloads(db);
+        const serverPayload = JSON.parse(JSON.stringify(payload));
+        if (!serverPayload.metadata) serverPayload.metadata = {};
+        serverPayload.metadata.unsynced = false;
         await addToSyncQueue(db, {
             url: 'write_data.php',
             method: 'POST',
@@ -260,38 +259,67 @@ async function queueServerSyncPayload(payload) {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
             },
-            body: JSON.stringify(payload)
+            body: JSON.stringify(serverPayload)
         });
     } catch (error) {
         console.error('Sync queue add failed:', error);
     }
 }
 
+function isServerSyncQueueItem(item) {
+    return !!(item && typeof item.url === 'string' && (item.url.includes('save.php') || item.url.includes('write_data.php')));
+}
+
+async function clearQueuedServerSyncPayloads(existingDb) {
+    const db = existingDb || await openIndexedDB();
+    const existing = await getSyncQueue(db);
+    for (const item of existing) {
+        if (isServerSyncQueueItem(item)) await removeSyncQueueItem(db, item.id);
+    }
+}
+
+async function persistLocalDataSnapshot(data, unsynced) {
+    if (!data.metadata) data.metadata = {};
+    data.metadata.unsynced = unsynced === true;
+    await advancedStorage.setItem('sahsiHesapTakibiData', JSON.stringify(data));
+}
+
 function queueSave() {
     if (saveTimer) clearTimeout(saveTimer);
+    const revision = ++dataSaveRevision;
+    if (!allData.metadata) allData.metadata = {};
+    allData.metadata.lastUpdate = new Date().toISOString();
+    persistLocalDataSnapshot(allData, true).catch(error => {
+        console.error('Immediate local snapshot failed:', error);
+    });
 
-    saveTimer = setTimeout(async () => {
-        if (!allData.metadata) allData.metadata = {};
-        allData.metadata.lastUpdate = new Date().toISOString();
+    const timerId = setTimeout(async () => {
+        const payload = JSON.parse(JSON.stringify(allData));
         try {
-            if (hasPersistedPeopleData(allData) && navigator.onLine) {
-                allData.metadata.unsynced = false;
-                await saveDataToServer(allData, false);
-                await advancedStorage.removeItem('sahsiHesapTakibiData');
+            if (hasPersistedPeopleData(payload) && navigator.onLine) {
+                payload.metadata.unsynced = false;
+                await saveDataToServer(payload, false);
+                if (revision === dataSaveRevision) {
+                    allData.metadata.unsynced = false;
+                    await persistLocalDataSnapshot(allData, false);
+                    await clearQueuedServerSyncPayloads();
+                }
             } else {
-                allData.metadata.unsynced = true;
-                await advancedStorage.setItem('sahsiHesapTakibiData', JSON.stringify(allData));
-                await queueServerSyncPayload(allData);
+                if (revision === dataSaveRevision && hasPersistedPeopleData(payload)) {
+                    await queueServerSyncPayload(payload);
+                }
             }
             await advancedStorage.setItem('sahsiHesapTakibiNotifications', JSON.stringify(notificationHistory));
         } catch (error) {
             updateServerStatus('error', 'Sunucuya kaydedilemedi, yerelde bekliyor');
-            allData.metadata.unsynced = true;
-            await advancedStorage.setItem('sahsiHesapTakibiData', JSON.stringify(allData));
-            await queueServerSyncPayload(allData);
+            if (revision === dataSaveRevision) {
+                await persistLocalDataSnapshot(allData, true);
+                if (hasPersistedPeopleData(allData)) await queueServerSyncPayload(allData);
+            }
         }
-        saveTimer = null;
+        if (saveTimer === timerId) saveTimer = null;
     }, 1000);
+    saveTimer = timerId;
 }
 
 if (location.protocol !== 'file:') {
@@ -1153,33 +1181,48 @@ async function loadData() {
         localData = null;
     }
 
+    if (!navigator.onLine) {
+        if (localData) {
+            allData = localData;
+            hasLoadedServerData = false;
+            updateServerStatus('error', 'Çevrimdışı mod, cihazdaki veri yüklendi');
+            return { ok: true, hasPeopleData: true, source: 'offline-local' };
+        }
+        hasLoadedServerData = false;
+        updateServerStatus('error', 'Çevrimdışı mod, cihazda kayıtlı veri yok');
+        return { ok: false, hasPeopleData: false, source: 'offline-empty' };
+    }
+
     try {
         const serverResult = await loadDataFromServer();
         const serverData = serverResult && serverResult.data ? serverResult.data : {};
         const serverSource = serverResult && serverResult.source ? serverResult.source : '';
         const isMetadataOnlyServerData = (serverSource === 'main' || serverSource === 'backup') && !hasPersistedPeopleData(serverData);
-        if (hasPersistedPeopleData(serverData)) {
-            if (localData && localData.metadata && localData.metadata.unsynced === true) {
-                allData = localData;
-                hasLoadedServerData = false;
-                updateServerStatus('', 'Yerel degisiklikler korunuyor, sunucuya gonderiliyor...');
+        if (localData && localData.metadata && localData.metadata.unsynced === true) {
+            allData = localData;
+            hasLoadedServerData = false;
+            updateServerStatus('', 'Yerel degisiklikler korunuyor, sunucuya gonderiliyor...');
+            try {
+                allData.metadata.unsynced = false;
+                await saveDataToServer(allData, false);
+                await persistLocalDataSnapshot(allData, false);
+                await clearQueuedServerSyncPayloads();
+                updateServerStatus('success', 'Yerel veri sunucuya gonderildi');
+            } catch (pushErr) {
                 try {
-                    allData.metadata.unsynced = false;
-                    await saveDataToServer(allData, false);
-                    await advancedStorage.removeItem('sahsiHesapTakibiData');
-                    updateServerStatus('success', 'Yerel veri sunucuya gonderildi');
-                } catch (pushErr) {
-                    allData.metadata.unsynced = true;
-                    try {
-                        await advancedStorage.setItem('sahsiHesapTakibiData', JSON.stringify(allData));
-                    } catch (_) {}
-                    updateServerStatus('error', 'Yerel veri sunucuya gonderilemedi');
-                }
-                const hasPD = hasPersistedPeopleData(allData);
-                return { ok: hasPD, hasPeopleData: hasPD, source: 'local-unsynced-reconciled' };
+                    await persistLocalDataSnapshot(allData, true);
+                    await queueServerSyncPayload(allData);
+                } catch (_) {}
+                updateServerStatus('error', 'Yerel veri sunucuya gonderilemedi');
             }
+            const hasPD = hasPersistedPeopleData(allData);
+            return { ok: hasPD, hasPeopleData: hasPD, source: 'local-unsynced-reconciled' };
+        }
+        if (hasPersistedPeopleData(serverData)) {
             allData = serverData;
             hasLoadedServerData = true;
+            await persistLocalDataSnapshot(allData, false);
+            await clearQueuedServerSyncPayloads();
             updateServerStatus('success', serverSource === 'backup' ? 'Yedek veriden yuklendi' : 'Sunucudan yuklendi');
             return { ok: true, hasPeopleData: true, source: serverSource === 'backup' ? 'backup' : 'server' };
         }
@@ -4532,7 +4575,7 @@ async function attemptBackupAndClear() {
     }
 }
 
-function finalizeClear() {
+async function finalizeClear() {
     const overlay = document.getElementById('customMemoryOverlay');
     const btn = overlay?.querySelector('.btn-yes');
     const noBtn = overlay?.querySelector('.btn-no');
@@ -4542,8 +4585,15 @@ function finalizeClear() {
     const alertTitle = document.getElementById('memAlertTitle');
     const alertMessage = document.getElementById('memAlertMessage');
 
+    await advancedStorage.removeItem('sahsiHesapTakibiData');
+    await advancedStorage.removeItem('sahsiHesapTakibiNotifications');
     localStorage.removeItem('sahsiHesapTakibiData');
     localStorage.removeItem('sahsiHesapTakibiNotifications');
+    try {
+        await clearQueuedServerSyncPayloads();
+    } catch (error) {
+        console.error('Sync queue clear failed:', error);
+    }
 
     if (alertTitle) alertTitle.textContent = '✅ BAŞARILI';
     if (alertMessage) alertMessage.innerHTML = 'Bellek temizlendi. Sayfa yenileniyor...';

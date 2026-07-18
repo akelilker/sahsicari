@@ -1,6 +1,6 @@
-// Service Worker with Smart Caching - v78.81
+// Service Worker with Smart Caching - v78.83
 const DEBUG = false; // Set to true for development
-const SW_VERSION = '78.81';
+const SW_VERSION = '78.83';
 const CACHE_PREFIX = 'sahsi-hesap-v';
 const CACHE_NAME = `${CACHE_PREFIX}${SW_VERSION}`;
 const APP_SCOPE_URL = self.registration.scope;
@@ -17,7 +17,7 @@ const urlsToCache = [
     'js/utils.js?v=78.81',
     // XLSX/FileSaver: Excel tıklanınca lazy-load (ilk açılışta cache'e alma)
     'style.css?v=78.75',
-    'app.js?v=78.81',
+    'app.js?v=78.83',
     'kasa.css?v=1.11',
     'kasa.js?v=1.12',
     'manifest.json?v=20260718d',
@@ -204,7 +204,7 @@ async function syncPendingData() {
             client.postMessage({
                 type: 'SYNC_COMPLETE',
                 syncedCount: syncedCount,
-                pendingCount: syncQueue.length
+                pendingCount: syncQueue.length - syncedCount
             });
         });
 
