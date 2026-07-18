@@ -1,12 +1,9 @@
 /* formatDateTR → js/utils.js */
 /** Önbellek / service worker — asset ?v= güncellerken bunu artır */
-const APP_VERSION = '78.71';
+const APP_VERSION = '78.73';
 /** Footer’da görünen sürüm — yalnızca kullanıcıya yansıyan sürüm değişince güncelle */
-const FOOTER_VERSION = '78.36';
+const FOOTER_VERSION = '78.73';
 const APP_DEBUG = false;
-const LOCAL_PENDING_DATA_KEY = 'sahsiHesapTakibiData';
-const LAST_SYNCED_DATA_KEY = 'sahsiHesapTakibiLastSyncedData';
-const INITIAL_DATA_LOAD_TIMEOUT_MS = 8000;
 
 /* -----------------------------------------------------------------------------
    Dosya düzeni: yardımcılar & DOM önbelleği → olay bağlama → veri/sunucu
@@ -247,38 +244,6 @@ function hasPersistedPeopleData(data) {
     return getPersistedPeopleCount(data) > 0;
 }
 
-async function readPersistedPeopleData(storageKey) {
-    try {
-        const storedValue = await advancedStorage.getItem(storageKey);
-        if (!storedValue) return null;
-        const parsedValue = JSON.parse(storedValue);
-        return hasPersistedPeopleData(parsedValue) ? parsedValue : null;
-    } catch (_) {
-        return null;
-    }
-}
-
-async function persistLastSyncedData(data) {
-    if (!hasPersistedPeopleData(data)) return false;
-
-    try {
-        const snapshot = JSON.parse(JSON.stringify(data));
-        snapshot.metadata = snapshot.metadata && typeof snapshot.metadata === 'object'
-            ? snapshot.metadata
-            : {};
-        snapshot.metadata.unsynced = false;
-        snapshot.metadata.offlineSnapshotAt = new Date().toISOString();
-
-        const serializedSnapshot = JSON.stringify(snapshot);
-        await advancedStorage.setItem(LAST_SYNCED_DATA_KEY, serializedSnapshot);
-        const storedSnapshot = await advancedStorage.getItem(LAST_SYNCED_DATA_KEY);
-        return storedSnapshot === serializedSnapshot;
-    } catch (error) {
-        console.error('Son senkronlanan veri cihaza kaydedilemedi:', error);
-        return false;
-    }
-}
-
 async function queueServerSyncPayload(payload) {
     try {
         const db = await openIndexedDB();
@@ -312,22 +277,17 @@ function queueSave() {
             if (hasPersistedPeopleData(allData) && navigator.onLine) {
                 allData.metadata.unsynced = false;
                 await saveDataToServer(allData, false);
-                const snapshotSaved = await persistLastSyncedData(allData);
-                if (snapshotSaved) {
-                    await advancedStorage.removeItem(LOCAL_PENDING_DATA_KEY);
-                } else {
-                    await advancedStorage.setItem(LOCAL_PENDING_DATA_KEY, JSON.stringify(allData));
-                }
+                await advancedStorage.removeItem('sahsiHesapTakibiData');
             } else {
                 allData.metadata.unsynced = true;
-                await advancedStorage.setItem(LOCAL_PENDING_DATA_KEY, JSON.stringify(allData));
+                await advancedStorage.setItem('sahsiHesapTakibiData', JSON.stringify(allData));
                 await queueServerSyncPayload(allData);
             }
             await advancedStorage.setItem('sahsiHesapTakibiNotifications', JSON.stringify(notificationHistory));
         } catch (error) {
             updateServerStatus('error', 'Sunucuya kaydedilemedi, yerelde bekliyor');
             allData.metadata.unsynced = true;
-            await advancedStorage.setItem(LOCAL_PENDING_DATA_KEY, JSON.stringify(allData));
+            await advancedStorage.setItem('sahsiHesapTakibiData', JSON.stringify(allData));
             await queueServerSyncPayload(allData);
         }
         saveTimer = null;
@@ -497,22 +457,6 @@ function onCategorySelectViewportChange() {
     }
 }
 
-function isCoarsePointerUi() {
-    return window.innerWidth <= 768
-        || window.matchMedia('(hover: none) and (pointer: coarse)').matches;
-}
-
-function resetPersonSelectViewportJump() {
-    /* iOS PWA: klavye açılınca visualViewport kayar; layout'u tekrar sabitle */
-    if (window.scrollY || window.scrollX) {
-        window.scrollTo(0, 0);
-    }
-    if (document.documentElement.scrollTop || document.body.scrollTop) {
-        document.documentElement.scrollTop = 0;
-        document.body.scrollTop = 0;
-    }
-}
-
 function positionPersonSelectMenu() {
     const menu = DOM.personSelectMenu;
     const trigger = DOM.personSelectTrigger;
@@ -526,47 +470,45 @@ function positionPersonSelectMenu() {
         menu.style.removeProperty('--person-menu-left');
         menu.style.removeProperty('--person-menu-width');
         menu.style.removeProperty('--person-menu-max-height');
+        menu.classList.remove('person-select-menu--viewport');
         return;
     }
 
     /*
-     * Mobil: getBoundingClientRect + position:fixed aynı visualViewport uzayında.
-     * offsetTop çıkarmak max-height'i şişirip klavye altında taşmaya → iOS kaydırma döngüsüne yol açıyordu.
+     * Mobil: menüyü tetikleyicinin altına değil visualViewport içine yerleştir.
+     * Klavye açılınca arama kutusu üstte kalır, liste kalan yüksekliğe sığar.
      */
-    resetPersonSelectViewportJump();
-    const shellRect = DOM.personSelectShell?.getBoundingClientRect();
-    const triggerRect = trigger.getBoundingClientRect();
-    const left = shellRect ? shellRect.left : triggerRect.left;
-    const width = shellRect ? shellRect.width : triggerRect.width;
     const vv = window.visualViewport;
     const viewH = vv ? vv.height : window.innerHeight;
-    const gap = 8;
+    const viewW = vv ? vv.width : window.innerWidth;
+    const offsetTop = vv ? vv.offsetTop : 0;
+    const offsetLeft = vv ? vv.offsetLeft : 0;
     const side = 12;
-    const searchBlock = 52;
-    let top = triggerRect.bottom + gap;
+    const topPad = 10;
+    const bottomPad = 10;
+    const searchChrome = 72;
+    const shellRect = DOM.personSelectShell?.getBoundingClientRect();
+    const triggerRect = trigger.getBoundingClientRect();
+    const preferredWidth = shellRect ? shellRect.width : triggerRect.width;
+    const width = Math.min(Math.max(preferredWidth, viewW - side * 2), viewW - side * 2);
+    const left = Math.max(offsetLeft + side, Math.min(
+        (shellRect ? shellRect.left : triggerRect.left),
+        offsetLeft + viewW - width - side
+    ));
+    const top = offsetTop + topPad;
+    const listMax = Math.max(120, Math.floor(viewH - topPad - bottomPad - searchChrome));
 
-    /* Tetikleyici klavye yüzünden görünür alan dışına kaydıysa menüyü görünür alana sabitle */
-    if (triggerRect.bottom < side) {
-        top = side;
-    }
-
-    const availableBelow = viewH - top - side;
-    const listMax = Math.max(120, availableBelow - searchBlock);
-
+    menu.classList.add('person-select-menu--viewport');
     menu.style.setProperty('--person-menu-top', Math.round(top) + 'px');
     menu.style.setProperty('--person-menu-left', Math.round(left) + 'px');
     menu.style.setProperty('--person-menu-width', Math.round(width) + 'px');
     menu.style.setProperty('--person-menu-max-height', Math.round(listMax) + 'px');
 }
 
-let personSelectViewportRaf = 0;
 function onPersonSelectViewportChange() {
-    if (!DOM.personSelectMenu || DOM.personSelectMenu.hidden) return;
-    if (personSelectViewportRaf) cancelAnimationFrame(personSelectViewportRaf);
-    personSelectViewportRaf = requestAnimationFrame(function() {
-        personSelectViewportRaf = 0;
+    if (DOM.personSelectMenu && !DOM.personSelectMenu.hidden) {
         positionPersonSelectMenu();
-    });
+    }
 }
 
 function anchorDropdownToIcon(menuEl, iconId, opts) {
@@ -702,26 +644,13 @@ function bindPageEvents() {
             renderCustomPersonSelectOptions(this.value);
         });
         DOM.personSelectSearch.addEventListener('focus', function() {
-            /* preventScroll desteklenmeyen iOS: focus sonrası kaymayı geri al, menüyü klavye üstüne sığdır */
-            resetPersonSelectViewportJump();
-            onPersonSelectViewportChange();
-            setTimeout(function() {
-                resetPersonSelectViewportJump();
-                onPersonSelectViewportChange();
-            }, 300);
-        });
-        DOM.personSelectSearch.addEventListener('blur', function() {
-            setTimeout(function() {
-                resetPersonSelectViewportJump();
-                if (DOM.personSelectMenu && !DOM.personSelectMenu.hidden) {
-                    onPersonSelectViewportChange();
-                }
-            }, 280);
+            setTimeout(onPersonSelectViewportChange, 80);
+            setTimeout(onPersonSelectViewportChange, 320);
         });
         DOM.personSelectSearch.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closeCustomPersonSelect();
-                if (!isCoarsePointerUi()) DOM.personSelectTrigger?.focus({ preventScroll: true });
+                DOM.personSelectTrigger?.focus();
             }
         });
     }
@@ -1149,7 +1078,7 @@ function loadDataFromServer() {
         headers: { 
             'Accept': 'application/json'
         } 
-    }, INITIAL_DATA_LOAD_TIMEOUT_MS)
+    })
     .then(async response => {
         const text = await response.text();
         const source = response.headers.get('X-Data-Source') || '';
@@ -1182,24 +1111,14 @@ function loadDataFromServer() {
  * @returns {Promise<LoadDataResult>}
  */
 async function loadData() {
-    const pendingData = await readPersistedPeopleData(LOCAL_PENDING_DATA_KEY);
-    const lastSyncedData = await readPersistedPeopleData(LAST_SYNCED_DATA_KEY);
-    const hasPendingChanges = !!(pendingData && pendingData.metadata && pendingData.metadata.unsynced === true);
-    const localData = pendingData || lastSyncedData;
-    const localSource = hasPendingChanges ? 'pending' : (pendingData ? 'legacy' : (lastSyncedData ? 'snapshot' : 'none'));
+    let localData = null;
+    try {
+        const savedData = await advancedStorage.getItem('sahsiHesapTakibiData');
+        if (savedData) localData = JSON.parse(savedData);
+    } catch (_) {}
 
-    if (!navigator.onLine) {
-        hasLoadedServerData = false;
-        if (localData) {
-            allData = localData;
-            updateServerStatus('error', localSource === 'snapshot'
-                ? 'Cevrimdisi: son senkronlanan veriler acildi'
-                : 'Cevrimdisi: yerel degisiklikler acildi');
-            const hasPD = hasPersistedPeopleData(allData);
-            return { ok: true, hasPeopleData: hasPD, source: localSource === 'snapshot' ? 'offline-snapshot' : 'offline-local' };
-        }
-        updateServerStatus('error', 'Cevrimdisi: cihazda kayitli veri yok');
-        return { ok: false, hasPeopleData: false, source: 'offline-empty' };
+    if (!hasPersistedPeopleData(localData)) {
+        localData = null;
     }
 
     try {
@@ -1208,24 +1127,19 @@ async function loadData() {
         const serverSource = serverResult && serverResult.source ? serverResult.source : '';
         const isMetadataOnlyServerData = (serverSource === 'main' || serverSource === 'backup') && !hasPersistedPeopleData(serverData);
         if (hasPersistedPeopleData(serverData)) {
-            if (hasPendingChanges) {
+            if (localData && localData.metadata && localData.metadata.unsynced === true) {
                 allData = localData;
                 hasLoadedServerData = false;
                 updateServerStatus('', 'Yerel degisiklikler korunuyor, sunucuya gonderiliyor...');
                 try {
                     allData.metadata.unsynced = false;
                     await saveDataToServer(allData, false);
-                    const snapshotSaved = await persistLastSyncedData(allData);
-                    if (snapshotSaved) {
-                        await advancedStorage.removeItem(LOCAL_PENDING_DATA_KEY);
-                    } else {
-                        await advancedStorage.setItem(LOCAL_PENDING_DATA_KEY, JSON.stringify(allData));
-                    }
+                    await advancedStorage.removeItem('sahsiHesapTakibiData');
                     updateServerStatus('success', 'Yerel veri sunucuya gonderildi');
                 } catch (pushErr) {
                     allData.metadata.unsynced = true;
                     try {
-                        await advancedStorage.setItem(LOCAL_PENDING_DATA_KEY, JSON.stringify(allData));
+                        await advancedStorage.setItem('sahsiHesapTakibiData', JSON.stringify(allData));
                     } catch (_) {}
                     updateServerStatus('error', 'Yerel veri sunucuya gonderilemedi');
                 }
@@ -1234,10 +1148,6 @@ async function loadData() {
             }
             allData = serverData;
             hasLoadedServerData = true;
-            const snapshotSaved = await persistLastSyncedData(serverData);
-            if (snapshotSaved && pendingData && !hasPendingChanges) {
-                await advancedStorage.removeItem(LOCAL_PENDING_DATA_KEY);
-            }
             updateServerStatus('success', serverSource === 'backup' ? 'Yedek veriden yuklendi' : 'Sunucudan yuklendi');
             return { ok: true, hasPeopleData: true, source: serverSource === 'backup' ? 'backup' : 'server' };
         }
@@ -1247,27 +1157,22 @@ async function loadData() {
         if (localData) {
             allData = localData;
             hasLoadedServerData = false;
-            const localMessage = localSource === 'snapshot'
-                ? 'Son senkronlanan veriler cihazdan yuklendi'
-                : 'Yerel degisiklikler cihazdan yuklendi';
-            updateServerStatus(isMetadataOnlyServerData || serverSource === 'default' ? 'error' : 'success', localMessage);
+            updateServerStatus(isMetadataOnlyServerData || serverSource === 'default' ? 'error' : 'success', isMetadataOnlyServerData ? 'Sunucuda yalnizca metadata var, yerel veri yuklendi' : (serverSource === 'default' ? 'Sunucuda veri bulunamadi, yerel veri yuklendi' : 'Yerel veri yuklendi'));
         } else {
             hasLoadedServerData = false;
             updateServerStatus(isMetadataOnlyServerData || serverSource === 'default' ? 'error' : 'success', isMetadataOnlyServerData ? 'Sunucuda yalnizca metadata var, veri yuklenemedi' : (serverSource === 'default' ? 'Sunucuda veri veya yedek bulunamadi' : 'Yeni sistem hazir'));
         }
         const hasPD = hasPersistedPeopleData(allData);
         const source = localData
-            ? (localSource === 'snapshot' ? 'snapshot-fallback' : 'local-fallback')
+            ? 'local-fallback'
             : (isMetadataOnlyServerData ? 'metadata-only-empty' : (serverSource === 'default' ? 'empty-server' : 'new-system'));
         return { ok: hasPD, hasPeopleData: hasPD, source };
     } catch (error) {
         if (localData) {
             allData = localData;
-            updateServerStatus('error', localSource === 'snapshot'
-                ? 'Cevrimdisi: son senkronlanan veriler acildi'
-                : 'Cevrimdisi: yerel degisiklikler acildi');
+            updateServerStatus('error', 'Sunucuya ulasilamadi, yerel veri yuklendi');
             const hasPD = hasPersistedPeopleData(allData);
-            return { ok: true, hasPeopleData: hasPD, source: localSource === 'snapshot' ? 'offline-snapshot' : 'offline-local' };
+            return { ok: true, hasPeopleData: hasPD, source: 'offline-local' };
         }
         updateServerStatus('error', 'Baglanti hatasi');
         return { ok: false, hasPeopleData: hasPersistedPeopleData(allData), source: 'fatal' };
@@ -1849,14 +1754,14 @@ function handlePersonSelectOpenKeydown(e) {
     if (e.key === 'Escape') {
         e.preventDefault();
         closeCustomPersonSelect();
-        if (!isCoarsePointerUi()) DOM.personSelectTrigger?.focus({ preventScroll: true });
+        DOM.personSelectTrigger?.focus();
         return;
     }
 
     if (e.key === 'Backspace') {
         e.preventDefault();
         if (!DOM.personSelectSearch) return;
-        DOM.personSelectSearch.focus({ preventScroll: true });
+        DOM.personSelectSearch.focus();
         DOM.personSelectSearch.value = DOM.personSelectSearch.value.slice(0, -1);
         renderCustomPersonSelectOptions(DOM.personSelectSearch.value);
         return;
@@ -1865,7 +1770,7 @@ function handlePersonSelectOpenKeydown(e) {
     if (e.key.length === 1 && /[^\s]/.test(e.key)) {
         e.preventDefault();
         if (!DOM.personSelectSearch) return;
-        DOM.personSelectSearch.focus({ preventScroll: true });
+        DOM.personSelectSearch.focus();
         DOM.personSelectSearch.value += e.key;
         renderCustomPersonSelectOptions(DOM.personSelectSearch.value);
     }
@@ -1873,15 +1778,12 @@ function handlePersonSelectOpenKeydown(e) {
 
 function closeCustomPersonSelect() {
     if (!DOM.personSelectShell || !DOM.personSelectMenu || !DOM.personSelectTrigger) return;
-    if (DOM.personSelectSearch) {
-        DOM.personSelectSearch.blur();
-        DOM.personSelectSearch.value = '';
-    }
     DOM.personSelectShell.classList.remove('open');
     DOM.personSelectMenu.hidden = true;
+    DOM.personSelectMenu.classList.remove('person-select-menu--viewport');
     DOM.personSelectTrigger.setAttribute('aria-expanded', 'false');
+    if (DOM.personSelectSearch) DOM.personSelectSearch.value = '';
     setPersonSelectBackdropActive(false);
-    resetPersonSelectViewportJump();
 }
 
 function renderCustomPersonSelectOptions(filterText = '') {
@@ -1923,21 +1825,20 @@ function openCustomPersonSelect() {
     if (!DOM.personSelectShell || !DOM.personSelectMenu || !DOM.personSelectTrigger) return;
     closeSettingsAndNotificationMenus();
     closeQuickTransactionOverlay();
-    resetPersonSelectViewportJump();
     DOM.personSelectShell.classList.add('open');
     DOM.personSelectMenu.hidden = false;
     DOM.personSelectTrigger.setAttribute('aria-expanded', 'true');
     positionPersonSelectMenu();
     setPersonSelectBackdropActive(true);
     renderCustomPersonSelectOptions(DOM.personSelectSearch?.value || '');
-    /*
-     * Mobilde arama input'una otomatik focus klavyeyi açıp visualViewport'u yukarı
-     * kaydırıyordu (ekran zıplaması). Masaüstünde klavye araması için focus kalsın.
-     */
-    if (DOM.personSelectSearch && !isCoarsePointerUi()) {
+    if (DOM.personSelectSearch) {
+        /* preventScroll: iOS sayfayı kaydırıp menüyü klavyenin altına gömmesin */
         DOM.personSelectSearch.focus({ preventScroll: true });
         DOM.personSelectSearch.select();
     }
+    requestAnimationFrame(positionPersonSelectMenu);
+    setTimeout(positionPersonSelectMenu, 120);
+    setTimeout(positionPersonSelectMenu, 360);
 }
 
 function toggleCustomPersonSelect() {
@@ -4503,7 +4404,7 @@ async function attemptBackupAndClear() {
     }
 }
 
-async function finalizeClear() {
+function finalizeClear() {
     const overlay = document.getElementById('customMemoryOverlay');
     const btn = overlay?.querySelector('.btn-yes');
     const noBtn = overlay?.querySelector('.btn-no');
@@ -4513,14 +4414,7 @@ async function finalizeClear() {
     const alertTitle = document.getElementById('memAlertTitle');
     const alertMessage = document.getElementById('memAlertMessage');
 
-    await Promise.all([
-        advancedStorage.removeItem(LOCAL_PENDING_DATA_KEY),
-        advancedStorage.removeItem(LAST_SYNCED_DATA_KEY),
-        advancedStorage.removeItem('sahsiHesapTakibiNotifications')
-    ]).catch(() => {});
-
-    localStorage.removeItem(LOCAL_PENDING_DATA_KEY);
-    localStorage.removeItem(LAST_SYNCED_DATA_KEY);
+    localStorage.removeItem('sahsiHesapTakibiData');
     localStorage.removeItem('sahsiHesapTakibiNotifications');
 
     if (alertTitle) alertTitle.textContent = '✅ BAŞARILI';

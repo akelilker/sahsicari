@@ -780,12 +780,6 @@ body.person-select-open .content-scroll-wrapper {
     transition: filter 0.3s var(--ease-smooth);
 }
 
-/* iOS: kişi seçimi açıkken klavye kaynaklı viewport kaymasını sınırla */
-body.person-select-open {
-    overscroll-behavior: none;
-    -webkit-overflow-scrolling: auto;
-}
-
 body.person-select-open .person-select-shell {
     pointer-events: auto !important;
     touch-action: auto !important;
@@ -1405,11 +1399,19 @@ button.delete-notif-btn {
     box-sizing: border-box;
 }
 
+/* Mobil: arama + liste visualViewport yüksekliğine sığsın (klavye üstü) */
+.person-select-menu.person-select-menu--viewport {
+    display: flex;
+    flex-direction: column;
+    max-height: calc(var(--person-menu-max-height, 320px) + 72px);
+    overflow: hidden;
+}
+
 .person-select-menu[hidden] {
     display: none !important;
 }
 
-/* Masaüstü: hızlı kişi grid — dış kapsayıcı yok, 2 sütun */
+/* Masaüstü: hızlı kişi grid — dış kapsayıcı yok, 3 sütun */
 @media screen and (min-width: 769px) {
     .person-select-menu.person-select-menu--centered {
         top: 50%;
@@ -1439,25 +1441,12 @@ button.delete-notif-btn {
     }
 
     .person-select-menu.person-select-menu--centered .person-select-search {
-        flex: 1;
-        min-width: 0;
-        height: 100%;
-        padding: 0;
-        border: none;
-        border-radius: 0;
-        background: transparent;
-        box-shadow: none;
         text-align: left;
-    }
-
-    .person-select-menu.person-select-menu--centered .person-select-search:focus {
-        border: none;
-        box-shadow: none;
     }
 
     .person-select-menu.person-select-menu--centered .person-select-options {
         display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 6px;
         max-height: min(65vh, 520px);
         padding: 5px 0;
@@ -1465,12 +1454,10 @@ button.delete-notif-btn {
 
     .person-select-menu.person-select-menu--centered .person-select-option {
         min-height: 0;
-        width: 100%;
         margin-bottom: 0;
         padding: 8px 6px;
         font-size: 0.8em;
         font-weight: 600;
-        justify-self: center;
         text-align: center;
         justify-content: center;
         align-items: center;
@@ -1525,9 +1512,6 @@ button.delete-notif-btn {
     background: rgba(8, 15, 29, 0.88);
     color: #e6f4ff;
     font-size: 13px;
-    /* iOS Safari focus'ta scrollIntoView zıplamasını yumuşat */
-    scroll-margin: 0;
-    scroll-padding: 0;
 }
 
 .person-select-search:focus {
@@ -1541,13 +1525,25 @@ button.delete-notif-btn {
 }
 
 .person-select-options {
-    max-height: min(50vh, var(--person-menu-max-height, 320px));
+    max-height: var(--person-menu-max-height, 320px);
     overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 4px;
     padding-right: 2px;
     -webkit-overflow-scrolling: touch;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+.person-select-menu.person-select-menu--viewport .person-select-search-wrap {
+    flex: 0 0 auto;
+    position: relative;
+    z-index: 1;
+}
+
+.person-select-menu.person-select-menu--viewport .person-select-search {
+    font-size: 16px; /* iOS otomatik zoom’u engeller */
 }
 
 .person-select-option,
@@ -3994,7 +3990,6 @@ select option {
     left: 0;
     width: 100%;
     height: 100%;
-    box-sizing: border-box;
     z-index: 4000;
     display: flex;
     justify-content: center;
@@ -4003,12 +3998,6 @@ select option {
     padding-bottom: 80px;
     background: transparent;
     backdrop-filter: none;
-}
-
-#quickOverlayContainer {
-    bottom: calc(var(--footer-h) + var(--sa-bot));
-    height: auto;
-    padding-bottom: 20px;
 }
 
 #allocationOverlay {
@@ -4202,7 +4191,6 @@ select option {
 
 .quick-person-list {
     max-height: 50vh;
-    max-height: min(50dvh, calc(100dvh - var(--footer-h) - var(--sa-bot) - 180px));
     overflow-y: auto;
     background: transparent;
     padding: 5px 20px;
