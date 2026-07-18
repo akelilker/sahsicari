@@ -23,17 +23,21 @@ jobs:
           protocol: ftps
           timeout: 60000
           server-dir: /public_html/sahsicari/
+          state-name: .ftp-deploy-sync-state-v2.json
           dangerous-clean-slate: false
           exclude: |
             .git/**
             .github/**
             .claude/**
             .vscode/**
+            .cursor/**
             **/.git/**
             **/.github/**
             **/.claude/**
             **/.vscode/**
+            **/.cursor/**
             node_modules/**
+            reports/**
             backups/**
             kd_backups/**
             veriler.json

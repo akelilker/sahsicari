@@ -1,6 +1,6 @@
-// Service Worker with Smart Caching - v78.77
+// Service Worker with Smart Caching - v78.78
 const DEBUG = false; // Set to true for development
-const SW_VERSION = '78.77';
+const SW_VERSION = '78.78';
 const CACHE_PREFIX = 'sahsi-hesap-v';
 const CACHE_NAME = `${CACHE_PREFIX}${SW_VERSION}`;
 const APP_SCOPE_URL = self.registration.scope;
@@ -29,7 +29,6 @@ const urlsToCache = [
     'icons/android-chrome-192x192.png',
     'icons/android-chrome-512x512.png',
     'icons/maskable-512x512.png',
-    'icons/favicon-16x16.png',
     'icons/favicon-32x32.png'
 ].map(scopedUrl);
 
