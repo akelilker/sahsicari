@@ -1399,12 +1399,34 @@ button.delete-notif-btn {
     box-sizing: border-box;
 }
 
-/* Mobil: arama + liste visualViewport yüksekliğine sığsın (klavye üstü) */
+/* Mobil: header altı ↔ footer/klavye üstü arası dolu panel */
 .person-select-menu.person-select-menu--viewport {
     display: flex;
     flex-direction: column;
-    max-height: calc(var(--person-menu-max-height, 320px) + 72px);
+    height: var(--person-menu-height, auto);
+    max-height: var(--person-menu-height, none);
+    padding: 8px;
     overflow: hidden;
+}
+
+.person-select-menu.person-select-menu--viewport .person-select-search-wrap,
+.person-select-menu.person-select-menu--viewport.quick-search-wrapper,
+.person-select-menu.person-select-menu--viewport .quick-search-wrapper {
+    flex: 0 0 auto;
+    position: relative;
+    z-index: 1;
+    margin-bottom: 6px;
+}
+
+.person-select-menu.person-select-menu--viewport .person-select-search {
+    font-size: 16px; /* iOS otomatik zoom’u engeller */
+}
+
+.person-select-menu.person-select-menu--viewport .person-select-options {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+    height: auto;
 }
 
 .person-select-menu[hidden] {
@@ -1534,16 +1556,6 @@ button.delete-notif-btn {
     -webkit-overflow-scrolling: touch;
     flex: 1 1 auto;
     min-height: 0;
-}
-
-.person-select-menu.person-select-menu--viewport .person-select-search-wrap {
-    flex: 0 0 auto;
-    position: relative;
-    z-index: 1;
-}
-
-.person-select-menu.person-select-menu--viewport .person-select-search {
-    font-size: 16px; /* iOS otomatik zoom’u engeller */
 }
 
 .person-select-option,

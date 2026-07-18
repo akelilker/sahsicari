@@ -1,8 +1,8 @@
 /* formatDateTR → js/utils.js */
 /** Önbellek / service worker — asset ?v= güncellerken bunu artır */
-const APP_VERSION = '78.73';
+const APP_VERSION = '78.74';
 /** Footer’da görünen sürüm — yalnızca kullanıcıya yansıyan sürüm değişince güncelle */
-const FOOTER_VERSION = '78.73';
+const FOOTER_VERSION = '78.34';
 const APP_DEBUG = false;
 
 /* -----------------------------------------------------------------------------
@@ -469,39 +469,51 @@ function positionPersonSelectMenu() {
         menu.style.removeProperty('--person-menu-top');
         menu.style.removeProperty('--person-menu-left');
         menu.style.removeProperty('--person-menu-width');
+        menu.style.removeProperty('--person-menu-height');
         menu.style.removeProperty('--person-menu-max-height');
         menu.classList.remove('person-select-menu--viewport');
         return;
     }
 
     /*
-     * Mobil: menüyü tetikleyicinin altına değil visualViewport içine yerleştir.
-     * Klavye açılınca arama kutusu üstte kalır, liste kalan yüksekliğe sığar.
+     * Mobil: header altı ↔ footer üstü (klavye açıksa visualViewport altı).
+     * Neredeyse tam ekran, ama başlık ve status bar’ın üzerine binmez.
      */
     const vv = window.visualViewport;
-    const viewH = vv ? vv.height : window.innerHeight;
+    const viewTop = vv ? vv.offsetTop : 0;
+    const viewBottom = vv ? (vv.offsetTop + vv.height) : window.innerHeight;
     const viewW = vv ? vv.width : window.innerWidth;
-    const offsetTop = vv ? vv.offsetTop : 0;
     const offsetLeft = vv ? vv.offsetLeft : 0;
-    const side = 12;
-    const topPad = 10;
-    const bottomPad = 10;
-    const searchChrome = 72;
-    const shellRect = DOM.personSelectShell?.getBoundingClientRect();
-    const triggerRect = trigger.getBoundingClientRect();
-    const preferredWidth = shellRect ? shellRect.width : triggerRect.width;
-    const width = Math.min(Math.max(preferredWidth, viewW - side * 2), viewW - side * 2);
-    const left = Math.max(offsetLeft + side, Math.min(
-        (shellRect ? shellRect.left : triggerRect.left),
-        offsetLeft + viewW - width - side
-    ));
-    const top = offsetTop + topPad;
-    const listMax = Math.max(120, Math.floor(viewH - topPad - bottomPad - searchChrome));
+    const side = 10;
+    const gap = 6;
+
+    const headerEl = document.querySelector('.header');
+    const footerEl = document.querySelector('.global-status-bar');
+    const headerBottom = headerEl ? headerEl.getBoundingClientRect().bottom : viewTop;
+    const footerTop = footerEl ? footerEl.getBoundingClientRect().top : viewBottom;
+
+    let top = Math.max(viewTop + gap, headerBottom + gap);
+    let bottom = Math.min(viewBottom - gap, footerTop - gap);
+    if (bottom - top < 160) {
+        top = viewTop + gap;
+        bottom = viewBottom - gap;
+    }
+
+    const menuHeight = Math.max(160, Math.floor(bottom - top));
+    const searchWrap = menu.querySelector('.person-select-search-wrap');
+    const searchChrome = searchWrap
+        ? Math.ceil(searchWrap.getBoundingClientRect().height + 8)
+        : 56;
+    const menuPadY = 16;
+    const listMax = Math.max(100, menuHeight - searchChrome - menuPadY);
+    const width = Math.max(200, viewW - side * 2);
+    const left = offsetLeft + side;
 
     menu.classList.add('person-select-menu--viewport');
     menu.style.setProperty('--person-menu-top', Math.round(top) + 'px');
     menu.style.setProperty('--person-menu-left', Math.round(left) + 'px');
     menu.style.setProperty('--person-menu-width', Math.round(width) + 'px');
+    menu.style.setProperty('--person-menu-height', Math.round(menuHeight) + 'px');
     menu.style.setProperty('--person-menu-max-height', Math.round(listMax) + 'px');
 }
 
