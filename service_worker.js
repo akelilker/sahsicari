@@ -1,6 +1,6 @@
-// Service Worker with Smart Caching - v78.75
+// Service Worker with Smart Caching - v78.76
 const DEBUG = false; // Set to true for development
-const SW_VERSION = '78.75';
+const SW_VERSION = '78.76';
 const CACHE_PREFIX = 'sahsi-hesap-v';
 const CACHE_NAME = `${CACHE_PREFIX}${SW_VERSION}`;
 const APP_SCOPE_URL = self.registration.scope;
@@ -21,7 +21,7 @@ const urlsToCache = [
     'app.js?v=78.75',
     'kasa.css?v=1.11',
     'kasa.js?v=1.11',
-    'manifest.json?v=20260718',
+    'manifest.json?v=20260718b',
     'manifest.json',
     'favicon.ico',
     'apple-touch-icon.png',
