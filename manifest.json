@@ -14,19 +14,19 @@
   "prefer_related_applications": false,
   "icons": [
     {
-      "src": "icons/android-chrome-192x192.png?v=20260719c",
+      "src": "icons/android-chrome-192x192.png?v=20260719d",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icons/android-chrome-512x512.png?v=20260719c",
+      "src": "icons/android-chrome-512x512.png?v=20260719d",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icons/maskable-512x512.png?v=20260719c",
+      "src": "icons/maskable-512x512.png?v=20260719d",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
@@ -40,7 +40,7 @@
       "url": "./index.html?action=new",
       "icons": [
         {
-          "src": "icons/android-chrome-192x192.png?v=20260719c",
+          "src": "icons/android-chrome-192x192.png?v=20260719d",
           "sizes": "192x192",
           "type": "image/png"
         }
@@ -53,7 +53,7 @@
       "url": "./kasa.html",
       "icons": [
         {
-          "src": "icons/android-chrome-192x192.png?v=20260719c",
+          "src": "icons/android-chrome-192x192.png?v=20260719d",
           "sizes": "192x192",
           "type": "image/png"
         }
