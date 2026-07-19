@@ -2216,7 +2216,7 @@ overflow: hidden;
 }
 
 #generalStatusModal .modal-header h2 {
-    background: linear-gradient(to bottom, #f5f7fa 0%, #ffffff 45%, #cfd8dc 55%, #eceff1 100%);
+    background: linear-gradient(to bottom, #cfd8dc 0%, #eceff1 40%, #78909c 52%, #90a4ae 100%);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -4345,18 +4345,19 @@ select option {
     font-weight: 800;
     text-transform: none;
     letter-spacing: 0.5px;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.25);
+    text-shadow: none;
+    color: #90a4ae;
 }
 
 .report-col.left-col .report-header {
     background: transparent;
-    color: var(--expense-red);
+    color: #90a4ae;
     border: none;
 }
 
 .report-col.right-col .report-header {
     background: transparent;
-    color: #00e676;
+    color: #90a4ae;
     border: none;
 }
 
