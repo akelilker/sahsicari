@@ -995,22 +995,23 @@ window.addEventListener('load', async function() {
     bindPageEvents();
     bindModalEvents();
     updateVersionDisplay();
-    await loadGlowTheme();
     updateServerStatus('', '📡 Veriler yükleniyor...');
 
-    loadData().then(async (loadResult) => {
-        const savedNotifications = await advancedStorage.getItem('sahsiHesapTakibiNotifications');
-        if (savedNotifications) notificationHistory = JSON.parse(savedNotifications);
+    const glowThemePromise = loadGlowTheme();
+    const loadDataPromise = loadData();
+    const [loadResult] = await Promise.all([loadDataPromise, glowThemePromise]);
 
-        migrateOldDataSafely();
-        updateMainDisplay();
-        setCurrentDate();
+    const savedNotifications = await advancedStorage.getItem('sahsiHesapTakibiNotifications');
+    if (savedNotifications) notificationHistory = JSON.parse(savedNotifications);
 
-        registerQuickOverlayDeferredListeners();
-        if (loadResult && loadResult.ok && loadResult.hasPeopleData) {
-            checkSiriParams();
-        }
-    });
+    migrateOldDataSafely();
+    updateMainDisplay();
+    setCurrentDate();
+
+    registerQuickOverlayDeferredListeners();
+    if (loadResult && loadResult.ok && loadResult.hasPeopleData) {
+        checkSiriParams();
+    }
 });
 
 function updateServerStatus(type, message) {
