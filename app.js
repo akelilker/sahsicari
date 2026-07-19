@@ -4218,7 +4218,7 @@ function showGeneralStatusReport() {
     let html = '<div class="report-grid">';
     
     html += '<div class="report-col left-col">';
-    html += '<div class="report-header"><span>BORÇLAR</span></div>';
+    html += '<div class="report-header"><span>Borçlar</span></div>';
     html += '<div class="report-list">';
     creditors.forEach(c => {
         html += `<div class="report-item">
@@ -4231,7 +4231,7 @@ function showGeneralStatusReport() {
     html += '</div>'; 
 
     html += '<div class="report-col right-col">';
-    html += '<div class="report-header"><span>ALACAKLAR</span></div>';
+    html += '<div class="report-header"><span>Alacaklar</span></div>';
     html += '<div class="report-list">';
     debtors.forEach(d => {
         html += `<div class="report-item">
@@ -4251,13 +4251,13 @@ function showGeneralStatusReport() {
     
     if (netBalance > 0.01) {
         netColorClass = 'val-green'; 
-        resultText = 'Net alacağınız';
+        resultText = 'Net Alacağınız';
     } else if (netBalance < -0.01) {
         netColorClass = 'val-red'; 
-        resultText = 'Net borcunuz';
+        resultText = 'Net Borcunuz';
     } else {
         netColorClass = 'val-neutral';
-        resultText = 'Net durum';
+        resultText = 'Net Durum';
     }
     
     const resultAmount = formatAmount(Math.abs(netBalance));
@@ -4266,12 +4266,12 @@ function showGeneralStatusReport() {
     <div class="new-summary-container">
         <div class="summary-top-row">
             <div class="summary-box-item">
-                <span class="summary-label">Toplam borcunuz</span>
+                <span class="summary-label">Toplam Borcunuz</span>
                 <span class="summary-val val-red">${formatAmount(totalDebt)}</span>
             </div>
             
             <div class="summary-box-item">
-                <span class="summary-label">Toplam alacağınız</span>
+                <span class="summary-label">Toplam Alacağınız</span>
                 <span class="summary-val val-green">${formatAmount(totalCredit)}</span>
             </div>
         </div>
