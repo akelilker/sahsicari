@@ -4251,13 +4251,13 @@ function showGeneralStatusReport() {
     
     if (netBalance > 0.01) {
         netColorClass = 'val-green'; 
-        resultText = 'NET ALACAĞINIZ';
+        resultText = 'Net alacağınız';
     } else if (netBalance < -0.01) {
         netColorClass = 'val-red'; 
-        resultText = 'NET BORCUNUZ';
+        resultText = 'Net borcunuz';
     } else {
         netColorClass = 'val-neutral';
-        resultText = 'NET DURUM';
+        resultText = 'Net durum';
     }
     
     const resultAmount = formatAmount(Math.abs(netBalance));
@@ -4266,12 +4266,12 @@ function showGeneralStatusReport() {
     <div class="new-summary-container">
         <div class="summary-top-row">
             <div class="summary-box-item">
-                <span class="summary-label">TOPLAM BORCUNUZ</span>
+                <span class="summary-label">Toplam borcunuz</span>
                 <span class="summary-val val-red">${formatAmount(totalDebt)}</span>
             </div>
             
             <div class="summary-box-item">
-                <span class="summary-label">TOPLAM ALACAĞINIZ</span>
+                <span class="summary-label">Toplam alacağınız</span>
                 <span class="summary-val val-green">${formatAmount(totalCredit)}</span>
             </div>
         </div>

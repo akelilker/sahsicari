@@ -2216,7 +2216,7 @@ overflow: hidden;
 }
 
 #generalStatusModal .modal-header h2 {
-    background: var(--chrome-title-gradient);
+    background: linear-gradient(to bottom, #f5f7fa 0%, #ffffff 45%, #cfd8dc 55%, #eceff1 100%);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -4450,7 +4450,7 @@ select option {
     margin-bottom: 0;
     letter-spacing: 0.3px;
     font-weight: 600;
-    text-transform: uppercase;
+    text-transform: none;
     flex-shrink: 0;
 }
 
