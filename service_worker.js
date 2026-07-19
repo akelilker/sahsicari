@@ -1,6 +1,6 @@
-// Service Worker with Smart Caching - v78.83
+// Service Worker with Smart Caching - v78.85
 const DEBUG = false; // Set to true for development
-const SW_VERSION = '78.83';
+const SW_VERSION = '78.85';
 const CACHE_PREFIX = 'sahsi-hesap-v';
 const CACHE_NAME = `${CACHE_PREFIX}${SW_VERSION}`;
 const APP_SCOPE_URL = self.registration.scope;
@@ -9,28 +9,18 @@ const APP_SHELL_URL = scopedUrl('index.html');
 const OFFLINE_URL = scopedUrl('offline.html');
 const API_BYPASS_FILES = new Set(['load.php', 'get_data.php', 'save.php', 'write_data.php', 'kd_load.php', 'kd_save.php']);
 const urlsToCache = [
-    './',
     'index.html',
     'kasa.html',
     'offline.html',
     'storage.js?v=1.0',
     'js/utils.js?v=78.81',
     // XLSX/FileSaver: Excel tıklanınca lazy-load (ilk açılışta cache'e alma)
-    'style.css?v=78.75',
-    'app.js?v=78.83',
+    'style.css?v=78.84',
+    'app.js?v=78.85',
     'kasa.css?v=1.11',
     'kasa.js?v=1.12',
     'manifest.json?v=20260718d',
-    'manifest.json',
-    'favicon.ico?v=20260718d',
-    'apple-touch-icon.png?v=20260718d',
-    'og-image.png?v=20260718d',
-    // PWA Icons (referenced in manifest.json)
-    'icons/android-chrome-192x192.png',
-    'icons/android-chrome-512x512.png',
-    'icons/maskable-512x512.png',
-    'icons/favicon-32x32.png',
-    'icons/favicon-16x16.png'
+    'favicon.ico?v=20260718d'
 ].map(scopedUrl);
 
 // Install Event: çekirdek dosyalar eksikse yeni worker aktive edilmez; sağlam eski cache korunur.
