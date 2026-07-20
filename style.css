@@ -4713,6 +4713,7 @@ label[for="editDateInput"] {
 
     .header h1 {
         font-size: 1.6em;
+        border-width: 1.5px;
         padding: 15px 0 21px 0;
         margin-top: 8px;
         min-height: 75px;
@@ -4779,6 +4780,7 @@ label[for="editDateInput"] {
     }
 
     .summary-card {
+        border-width: 1.5px;
         padding: 3px 2px;
         min-height: 61px;
     }
