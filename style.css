@@ -2259,43 +2259,45 @@ overflow: hidden;
     padding-bottom: calc(var(--footer-h) + var(--sa-bot) + 22px);
 }
 
-/* Tek satırlı header: yeşil bandı dikeyde uzat; geri altta, başlık/X ince ayar */
+/* Tek satırlı header: yeşil band uzar; geri altta, X üstte (farklı hizalar) */
 #categoryDetailModal .modal-header {
     background: linear-gradient(to bottom, #2e7d32 0%, #2e7d32 35%, #14182a 100%);
-    padding: 16px 12px 8px 12px;
-    min-height: 58px;
+    padding: 8px 12px 10px 12px;
+    min-height: 62px;
     box-sizing: border-box;
 }
 
 #categoryDetailModal .modal-header .header-top-row {
     display: grid;
     grid-template-columns: 30px minmax(0, 1fr) 30px;
-    align-items: end;
+    align-items: center;
     gap: 10px;
     margin-bottom: 0;
-    min-height: 34px;
+    min-height: 44px;
 }
 
 #categoryDetailModal .modal-header h2 {
     margin: 0;
     text-align: center;
     line-height: 1.2;
-    transform: translateY(-10px);
+    align-self: center;
+    transform: translateY(-4px);
 }
 
 #categoryDetailModal .modal-header .back-modal-btn {
     justify-self: start;
     align-self: end;
     font-size: 1.3em;
+    transform: none;
 }
 
 #categoryDetailModal .modal-header .close-modal-btn:not(.back-modal-btn) {
     justify-self: end;
-    align-self: end;
-    font-size: 1.15em;
-    width: 26px;
-    height: 26px;
-    transform: translateY(-8px);
+    align-self: start;
+    font-size: 1.1em;
+    width: 24px;
+    height: 24px;
+    transform: none;
 }
 
 #categoryDetailModal .category-detail-toolbar {
