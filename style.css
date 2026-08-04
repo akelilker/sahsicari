@@ -3799,31 +3799,231 @@ select option {
     }
 }
 
-/* iPhone yan (landscape): Kişi modali kategori detayı – sütun aralığı dar, Açıklama geniş ve alt satıra geçsin */
-@media screen and (orientation: landscape) and (max-width: 932px) {
+/* Yatay telefon: kısa viewport'ta kişi/ekstre modallarına gerçek çalışma alanı aç */
+@media screen and (orientation: landscape) and (max-width: 1024px) and (max-height: 500px) {
+    :root {
+        --footer-h: 28px;
+        --modal-footer-gap: 4px;
+    }
+
+    .global-status-bar {
+        padding: 2px 10px;
+        padding-bottom: var(--sa-bot);
+        font-size: 0.68em;
+    }
+
+    .global-status-bar::before {
+        border-top-width: 1px;
+    }
+
+    .status-dot {
+        width: 14px;
+        height: 14px;
+    }
+
+    .status-dot::before {
+        font-size: 11px;
+    }
+
+    #personModal {
+        padding-top: calc(var(--sa-top) + 4px);
+        padding-bottom: var(--modal-viewport-bottom);
+    }
+
+    #personModal .modal-content {
+        flex: 0 1 auto;
+        width: min(96vw, 900px);
+        max-width: calc(100vw - var(--sa-left) - var(--sa-right) - 12px);
+        height: calc(100dvh - var(--sa-top) - var(--modal-viewport-bottom) - 4px);
+        max-height: calc(100dvh - var(--sa-top) - var(--modal-viewport-bottom) - 4px);
+    }
+
+    #personModal .modal-header {
+        padding: 2px 10px 0;
+    }
+
+    #personModal .modal-header .header-top-row {
+        min-height: 24px;
+        margin-bottom: 0;
+    }
+
+    #personModal .modal-header h2 {
+        margin-left: 24px;
+        font-size: 14px;
+        line-height: 1.1;
+    }
+
+    #personModal .modal-header .close-modal-btn {
+        width: 24px;
+        height: 24px;
+        font-size: 1.1em;
+    }
+
+    #personModal #personTotalInfo .balance-breakdown {
+        align-items: center;
+        padding: 0 4px;
+        gap: 12px;
+    }
+
+    #personModal .info-col.left-side {
+        flex: 1 1 auto;
+        flex-direction: row;
+        align-items: center;
+        gap: 14px;
+    }
+
+    #personModal .info-col.right-side {
+        flex: 0 0 auto;
+    }
+
+    #personModal .info-col .balance-row {
+        flex-wrap: nowrap;
+        gap: 3px;
+        line-height: 1.1;
+    }
+
+    #personModal .info-label,
+    #personModal .info-amount {
+        font-size: 11px;
+        line-height: 1.1;
+    }
+
+    #personModal .tab-buttons {
+        margin-top: 2px;
+    }
+
+    #personModal .modal-header .tab-buttons .tab-btn {
+        min-width: 0;
+        min-height: 32px;
+        padding: 4px 6px 3px;
+        font-size: 12px;
+        line-height: 1.1;
+    }
+
+    #personModal .modal-body {
+        max-height: none;
+        padding: 2px 10px 4px;
+    }
+
+    #personModal #islemGecmisi {
+        flex: 1 1 auto;
+        min-height: 0;
+        padding-bottom: 0;
+        overflow: hidden;
+    }
+
+    #personModal .history-container {
+        flex: 1 1 auto;
+        min-height: 0;
+        max-height: none;
+        padding-bottom: 0;
+        overflow-y: auto;
+    }
+
+    #personModal #transactionHistory {
+        margin-top: 3px;
+        padding: 4px 8px;
+    }
+
+    #personModal .transaction-history-title {
+        margin: 0 0 2px;
+        font-size: 12px;
+        line-height: 1.2;
+    }
+
+    #personModal .history-item {
+        min-height: 31px;
+        align-items: center;
+        gap: 10px;
+        padding: 4px 8px;
+    }
+
+    #personModal .history-left {
+        flex-direction: row;
+        align-items: baseline;
+        gap: 12px;
+        overflow: hidden;
+    }
+
+    #personModal .history-top-row {
+        flex: 0 0 auto;
+        flex-wrap: nowrap;
+        gap: 8px;
+    }
+
+    #personModal .history-type,
+    #personModal .history-amount {
+        font-size: 13px;
+    }
+
+    #personModal .history-date {
+        font-size: 11px;
+        white-space: nowrap;
+    }
+
+    #personModal .history-amount {
+        min-width: 88px;
+        margin-left: 0;
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    #personModal .history-meta {
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        word-break: normal;
+        overflow-wrap: normal;
+        font-size: 12px;
+        line-height: 1.15;
+    }
+
+    #personModal .history-right {
+        gap: 0;
+        padding-right: 20px;
+    }
+
     #categoryDetailModal {
         padding-top: calc(var(--sa-top) + 4px);
-        padding-bottom: calc(var(--footer-h) + var(--sa-bot) + 12px);
+        padding-bottom: calc(var(--footer-h) + var(--sa-bot) + 4px);
     }
 
     #categoryDetailModal .modal-content {
-        width: min(92vw, 780px);
-        max-width: calc(100vw - 28px);
-        height: calc(100dvh - var(--sa-top) - var(--footer-h) - var(--sa-bot) - 16px);
-        max-height: calc(100dvh - var(--sa-top) - var(--footer-h) - var(--sa-bot) - 16px);
+        width: min(96vw, 900px);
+        max-width: calc(100vw - var(--sa-left) - var(--sa-right) - 12px);
+        height: calc(100dvh - var(--sa-top) - var(--footer-h) - var(--sa-bot) - 8px);
+        max-height: calc(100dvh - var(--sa-top) - var(--footer-h) - var(--sa-bot) - 8px);
+    }
+
+    #categoryDetailModal .modal-header {
+        min-height: 44px;
+        padding: 4px 10px;
+    }
+
+    #categoryDetailModal .modal-header .header-top-row {
+        min-height: 34px;
+    }
+
+    #categoryDetailModal .modal-header h2 {
+        transform: none;
     }
 
     #categoryDetailModal .modal-body {
+        flex: 1 1 auto;
+        min-height: 0;
+        max-height: none;
         padding-left: 14px;
         padding-right: 14px;
-        padding-bottom: calc(var(--footer-h) + var(--sa-bot) + 14px);
+        padding-bottom: 6px;
     }
 
     #categoryDetailModal .category-detail-toolbar {
         gap: 12px;
         justify-content: center;
-        margin-top: 18px;
-        margin-bottom: 10px;
+        margin-top: 6px;
+        margin-bottom: 6px;
     }
 
     .category-detail-date-group {
