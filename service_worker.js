@@ -1,6 +1,6 @@
-// Service Worker with Smart Caching - v78.93
+// Service Worker with Smart Caching - v78.94
 const DEBUG = false; // Set to true for development
-const SW_VERSION = '78.93';
+const SW_VERSION = '78.94';
 const CACHE_PREFIX = 'sahsi-hesap-v';
 const CACHE_NAME = `${CACHE_PREFIX}${SW_VERSION}`;
 const APP_SCOPE_URL = self.registration.scope;
@@ -14,11 +14,13 @@ const urlsToCache = [
     'offline.html',
     'storage.js?v=1.0',
     'js/utils.js?v=78.81',
-    // XLSX/FileSaver: Excel tıklanınca lazy-load (ilk açılışta cache'e alma)
+    'js/report-exports.js?v=78.94',
+    'js/FileSaver.min.js',
+    'js/xlsx.bundle.min.js',
     'style.css?v=78.89',
-    'app.js?v=78.87',
+    'app.js?v=78.94',
     'kasa.css?v=1.11',
-    'kasa.js?v=1.12',
+    'kasa.js?v=1.13',
     'manifest.json?v=20260719e',
     'manifest.json',
     'favicon.ico?v=20260719e',
@@ -110,27 +112,29 @@ self.addEventListener('fetch', (event) => {
 
     // Static assets (CSS, JS, images): Cache-first
     event.respondWith(
-        caches.open(CACHE_NAME).then((cache) => cache.match(request)
-            .then((cachedResponse) => {
-                if (cachedResponse) {
-                    // Serve from cache, update in background
-                    fetch(request).then((response) => {
-                        if (!response || response.status !== 200) return;
-                        cache.put(request, response.clone());
-                    }).catch(() => {}); // Ignore fetch errors in background
-                    return cachedResponse;
-                }
+        caches.open(CACHE_NAME).then(async (cache) => {
+            const exactMatch = await cache.match(request);
+            const cachedResponse = exactMatch || await cache.match(request, { ignoreSearch: true });
 
-                // Not in cache: fetch and cache
-                return fetch(request).then((response) => {
-                    // Only cache successful responses
-                    if (response && response.status === 200) {
-                        const responseClone = response.clone();
-                        cache.put(request, responseClone);
-                    }
-                    return response;
-                });
-            }))
+            if (cachedResponse) {
+                // Serve from cache, update in background
+                fetch(request).then((response) => {
+                    if (!response || response.status !== 200) return;
+                    cache.put(request, response.clone());
+                }).catch(() => {}); // Ignore fetch errors in background
+                return cachedResponse;
+            }
+
+            // Not in cache: fetch and cache
+            return fetch(request).then((response) => {
+                // Only cache successful responses
+                if (response && response.status === 200) {
+                    const responseClone = response.clone();
+                    cache.put(request, responseClone);
+                }
+                return response;
+            });
+        })
     );
 });
 

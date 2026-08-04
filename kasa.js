@@ -1,6 +1,6 @@
 /* =================================================================
-KASA DEFTERİ JS - v1.10 (DÜZELTILMIŞ)
-✅ Negatif Sayı Koruma Eklendi
+KASA DEFTERİ JS - v1.13
+Yerel öncelikli kayıt + bağlantı geri geldiğinde sunucu senkronizasyonu
 ================================================================= */
 
 // ==================== GLOBAL ====================
@@ -16,6 +16,15 @@ let currentKasaCategory = null;
 let historyClickBound = false;
 let kategoriGridClickBound = false;
 let kategoriListClickBound = false;
+const KASA_STORAGE_KEY = 'sahsiKasaDefteriData';
+const KASA_SW_VERSION = '78.94';
+let kasaDataRevision = 0;
+let kasaSyncPromise = null;
+let kasaPersistPromise = Promise.resolve();
+
+if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+navigator.serviceWorker.register('service_worker.js?v=' + KASA_SW_VERSION).catch(console.error);
+}
 
 // Kategori ikonları
 const katIkonlar = {
@@ -26,10 +35,23 @@ const katIkonlar = {
 };
 
 // ==================== INIT ====================
-document.addEventListener('DOMContentLoaded', function() {
-loadData();
+document.addEventListener('DOMContentLoaded', async function() {
 setDefaultDate();
 if (window.navigator.standalone === true) document.body.classList.add('ios-pwa');
+await loadData();
+});
+
+window.addEventListener('online', function() {
+updateKasaServerStatus('syncing', 'Bağlantı geldi, veriler eşitleniyor...');
+syncKasaDataToServer(true);
+});
+
+window.addEventListener('offline', function() {
+updateKasaServerStatus('offline', 'Çevrimdışı · kayıtlar cihazda');
+});
+
+document.addEventListener('visibilitychange', function() {
+if (document.visibilityState === 'visible' && navigator.onLine) syncKasaDataToServer(false);
 });
 
 function sanitizeHTML(str) {
@@ -62,29 +84,224 @@ return fetch(url, opts).finally(function () { clearTimeout(id); });
 }
 
 // ==================== DATA ====================
+function normalizeKasaData(data) {
+if (!data || typeof data !== 'object' || Array.isArray(data)) return null;
+
+const kategoriler = Array.isArray(data.kategoriler)
+? data.kategoriler.filter(kategori => typeof kategori === 'string' && kategori.trim())
+: [...kasaData.kategoriler];
+
+if (!kategoriler.includes('Kasa')) kategoriler.unshift('Kasa');
+
+return {
+baslangicBakiye: Number.isFinite(Number(data.baslangicBakiye)) ? Number(data.baslangicBakiye) : 0,
+kategoriler: [...new Set(kategoriler)],
+islemler: Array.isArray(data.islemler) ? data.islemler : []
+};
+}
+
+async function readLocalKasaState() {
+try {
+const rawData = await advancedStorage.getItem(KASA_STORAGE_KEY);
+if (!rawData) return { data: null, pending: false, revision: 0 };
+
+const storedValue = JSON.parse(rawData);
+if (storedValue && storedValue.data) {
+return {
+data: normalizeKasaData(storedValue.data),
+pending: storedValue.pending === true,
+revision: Number.isInteger(storedValue.revision) ? storedValue.revision : 0
+};
+}
+
+// v1.12 ve öncesinde düz veri saklandıysa kayıpsız biçimde kabul et.
+return { data: normalizeKasaData(storedValue), pending: false, revision: 0 };
+} catch (error) {
+console.error('Kasa yerel verisi okunamadı:', error);
+return { data: null, pending: false, revision: 0 };
+}
+}
+
+async function readLocalKasaData() {
+return (await readLocalKasaState()).data;
+}
+
+async function writeKasaDataState(data, markPending, revision) {
+const snapshot = JSON.stringify({
+data: data,
+pending: markPending === true,
+revision: revision,
+updatedAt: new Date().toISOString()
+});
+await advancedStorage.setItem(KASA_STORAGE_KEY, snapshot);
+
+const storedSnapshot = await advancedStorage.getItem(KASA_STORAGE_KEY);
+if (storedSnapshot !== snapshot) throw new Error('Yerel Kasa kaydı doğrulanamadı');
+}
+
+function persistKasaDataLocally(markPending) {
+const dataSnapshot = JSON.parse(JSON.stringify(kasaData));
+const revisionSnapshot = kasaDataRevision;
+const persistOperation = kasaPersistPromise
+.catch(() => {})
+.then(() => writeKasaDataState(dataSnapshot, markPending, revisionSnapshot));
+kasaPersistPromise = persistOperation;
+return persistOperation;
+}
+
+function updateKasaServerStatus(type, message) {
+const dot = document.getElementById('statusDot');
+const text = document.getElementById('serverStatusText');
+if (!dot || !text) return;
+
+dot.className = 'status-dot';
+text.className = '';
+
+if (type === 'online') {
+dot.classList.add('online');
+text.classList.add('text-online');
+} else if (type === 'syncing') {
+dot.classList.add('syncing');
+text.classList.add('text-status-syncing');
+} else {
+dot.classList.add('offline');
+text.classList.add('text-offline');
+}
+
+text.textContent = message;
+}
+
 async function loadData() {
+const localState = await readLocalKasaState();
+const localData = localState.data;
+const pendingLocalData = localData ? localState.pending : false;
+
+if (localData) {
+kasaData = localData;
+kasaDataRevision = localState.revision;
+updateAll();
+}
+
+if (!navigator.onLine) {
+updateKasaServerStatus('offline', localData ? 'Çevrimdışı · cihazdaki veri' : 'Çevrimdışı · yeni kayıt hazır');
+updateAll();
+return;
+}
+
+if (pendingLocalData) {
+updateKasaServerStatus('syncing', 'Cihazdaki değişiklikler eşitleniyor...');
+await syncKasaDataToServer(false);
+updateAll();
+return;
+}
+
+const loadRevision = kasaDataRevision;
+updateKasaServerStatus('syncing', 'Kasa verileri yükleniyor...');
 try {
 const res = await fetchWithTimeout(`kd_load.php?t=${Date.now()}`);
-if (res.ok) {
+if (!res.ok) throw new Error('HTTP ' + res.status);
+
+if (loadRevision === kasaDataRevision) {
 const data = await res.json();
-if (data && typeof data === 'object') kasaData = { ...kasaData, ...data };
+const normalizedData = normalizeKasaData(data);
+if (normalizedData) {
+kasaData = normalizedData;
+await persistKasaDataLocally(false);
 }
-} catch (e) { if (e && e.name === 'AbortError') showNotification('Bağlantı zaman aşımı', 'error'); }
+}
+updateKasaServerStatus('online', 'Sunucuyla eşitlendi');
+} catch (error) {
+console.error('Kasa verisi yüklenemedi:', error);
+updateKasaServerStatus('offline', localData ? 'Sunucu yok · cihazdaki veri' : 'Sunucu yok · yerel kullanım');
+}
 updateAll();
 }
 
 async function saveData() {
+kasaDataRevision++;
 try {
+await persistKasaDataLocally(true);
+updateAll();
+} catch (error) {
+console.error('Kasa yerel kaydı başarısız:', error);
+showNotification('Cihaza kayıt yapılamadı!', 'error');
+return { ok: false, localOnly: true };
+}
+
+const localOnly = !navigator.onLine;
+if (localOnly) {
+updateKasaServerStatus('offline', 'Çevrimdışı · değişiklik bekliyor');
+} else {
+updateKasaServerStatus('syncing', 'Sunucuya kaydediliyor...');
+syncKasaDataToServer(false);
+}
+
+return { ok: true, localOnly: localOnly };
+}
+
+async function syncKasaDataToServer(notifyOnSuccess) {
+if (!navigator.onLine) return false;
+if (kasaSyncPromise) return kasaSyncPromise;
+
+kasaSyncPromise = (async function() {
+let syncedAnyData = false;
+
+while (navigator.onLine) {
+await kasaPersistPromise.catch(() => {});
+const localState = await readLocalKasaState();
+if (!localState.pending) break;
+
+const revisionBeingSynced = localState.revision;
+const localData = localState.data;
+if (!localData) return false;
+
 const res = await fetchWithTimeout('kd_save.php', {
 method: 'POST',
-headers: { 'Content-Type': 'application/json' },
-body: JSON.stringify(kasaData)
+headers: {
+'Content-Type': 'application/json',
+'Accept': 'application/json',
+'X-Requested-With': 'XMLHttpRequest'
+},
+credentials: 'same-origin',
+body: JSON.stringify(localData)
 }, 45000);
-return res.ok;
-} catch (e) {
-showNotification(e && e.name === 'AbortError' ? 'Kayıt zaman aşımı' : 'Kayıt hatası!', 'error');
-return false;
+
+if (!res.ok) throw new Error('HTTP ' + res.status);
+
+const responseData = await res.json().catch(() => null);
+if (!responseData || responseData.status !== 'success') throw new Error('Sunucu yanıtı geçersiz');
+
+syncedAnyData = true;
+if (revisionBeingSynced !== kasaDataRevision) {
+continue;
 }
+
+await persistKasaDataLocally(false);
+if (revisionBeingSynced !== kasaDataRevision) {
+await persistKasaDataLocally(true);
+continue;
+}
+
+updateKasaServerStatus('online', 'Sunucuyla eşitlendi');
+}
+
+if (!syncedAnyData) updateKasaServerStatus('online', 'Bağlantı hazır');
+if (notifyOnSuccess && syncedAnyData) showNotification('Bekleyen Kasa kayıtları sunucuya aktarıldı!', 'success');
+return syncedAnyData;
+})().catch(function(error) {
+console.error('Kasa senkronizasyonu başarısız:', error);
+updateKasaServerStatus('offline', 'Sunucuya ulaşılamadı · cihazda bekliyor');
+return false;
+}).finally(function() {
+kasaSyncPromise = null;
+});
+
+return kasaSyncPromise;
+}
+
+function showKasaSaveNotification(message, result) {
+if (!result || !result.ok) return;
+showNotification(result.localOnly ? message + ' Cihazda saklandı.' : message, result.localOnly ? 'warning' : 'success');
 }
 
 // ==================== UI UPDATE ====================
@@ -349,12 +566,11 @@ kasaData.islemler.push({
     olusturma: new Date().toISOString()
 });
 
-saveData().then(ok => {
-    if (ok) {
-        showNotification(currentIslemTip === 'giris' ? 'Para girişi kaydedildi!' : 'Para çıkışı kaydedildi!');
+saveData().then(result => {
+    if (result.ok) {
+        showKasaSaveNotification(currentIslemTip === 'giris' ? 'Para girişi kaydedildi!' : 'Para çıkışı kaydedildi!', result);
         document.getElementById('islemTutar').value = '';
         document.getElementById('islemAciklama').value = '';
-        updateAll();
     }
 });
 
@@ -454,11 +670,10 @@ if (index > -1) {
     kasaData.islemler[index].tarih = tarih;
     kasaData.islemler[index].aciklama = aciklama;
     
-    saveData().then(ok => {
-        if (ok) {
-            showNotification('İşlem güncellendi!');
+    saveData().then(result => {
+        if (result.ok) {
+            showKasaSaveNotification('İşlem güncellendi!', result);
             closeEditModal();
-            updateAll();
         }
     });
 }
@@ -473,11 +688,10 @@ selectedIslemId = null;
 function islemSil() {
 if (!selectedIslemId || !confirm('Bu işlemi silmek istediğinize emin misiniz?')) return;
 kasaData.islemler = kasaData.islemler.filter(i => i.id !== selectedIslemId);
-saveData().then(ok => {
-if (ok) {
-showNotification('İşlem silindi!');
+saveData().then(result => {
+if (result.ok) {
+showKasaSaveNotification('İşlem silindi!', result);
 closeEditModal();
-updateAll();
 }
 });
 }
@@ -491,10 +705,9 @@ if (kasaData.kategoriler.includes(ad)) return showNotification('Bu kategori zate
 
 kasaData.kategoriler.push(ad);
 inp.value = '';
-saveData().then(ok => {
-    if (ok) {
-        showNotification('Kategori eklendi!');
-        updateAll();
+saveData().then(result => {
+    if (result.ok) {
+        showKasaSaveNotification('Kategori eklendi!', result);
     }
 });
 
@@ -506,10 +719,9 @@ if (kasaData.islemler.some(i => i.kategori === ad)) {
 if (!confirm('Bu kategoride işlem var. Silmek istiyor musunuz?')) return;
 }
 kasaData.kategoriler = kasaData.kategoriler.filter(k => k !== ad);
-saveData().then(ok => {
-if (ok) {
-showNotification('Kategori silindi!');
-updateAll();
+saveData().then(result => {
+if (result.ok) {
+showKasaSaveNotification('Kategori silindi!', result);
 }
 });
 }
@@ -651,10 +863,9 @@ function bakiyeKaydet() {
 const val = parseMoney(document.getElementById('baslangicBakiyeInput').value);
 if (isNaN(val)) return showNotification('Geçerli tutar girin!', 'error');
 kasaData.baslangicBakiye = val;
-saveData().then(ok => {
-if (ok) {
-showNotification('Bakiye güncellendi!');
-updateAll();
+saveData().then(result => {
+if (result.ok) {
+showKasaSaveNotification('Bakiye güncellendi!', result);
 }
 });
 }
@@ -793,7 +1004,7 @@ document.getElementById('tarihDisplay').textContent = formatDate(d);
 function showNotification(msg, type = 'success') {
 const n = document.getElementById('notification');
 n.textContent = msg;
-n.className = 'notification show' + (type === 'error' ? ' error' : '');
+n.className = 'notification show ' + (type === 'error' ? 'error' : (type === 'warning' ? 'warning' : 'success'));
 setTimeout(() => n.classList.remove('show'), 3000);
 }
 
