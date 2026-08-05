@@ -4927,7 +4927,7 @@ label[for="editDateInput"] {
         justify-content: flex-start;
         padding-bottom: calc(var(--footer-h) + var(--sa-bot));
         overflow: hidden !important;
-        gap: 6px;
+        gap: 9px;
         display: flex;
         flex-direction: column;
     }
@@ -4985,15 +4985,15 @@ label[for="editDateInput"] {
 
    .top-controls {
         gap: 25px;
-        margin-top: 4px;
-        margin-bottom: 1px;
+        margin-top: 7px;
+        margin-bottom: 4px;
         padding-right: 14px;
         padding-left: 10px;
     }
 
     .quick-transaction-area {
-        margin-top: 2px;
-        margin-bottom: 2px;
+        margin-top: 5px;
+        margin-bottom: 5px;
     }
 
    .total-summary {
@@ -5047,7 +5047,7 @@ label[for="editDateInput"] {
     }
 
     .debt-status-section {
-        padding: 14px 12px;
+        padding: 17px 12px;
     }
 
     .debt-status-section h3 {
@@ -5059,7 +5059,7 @@ label[for="editDateInput"] {
     }
 
     .control-panel {
-        padding: 12px 8px 10px 8px;
+        padding: 14px 8px 12px 8px;
         margin-bottom: 0;
         display: grid;
         grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -5140,7 +5140,7 @@ label[for="editDateInput"] {
     }
 
     .quick-access-section h3 {
-        margin-bottom: 3px;
+        margin-bottom: 6px;
     }
 
     .q-name {
