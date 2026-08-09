@@ -561,11 +561,11 @@ body {
 }
 
 /* iOS PWA pull-down bounce engelleme + footer her zaman görünsün */
-body.ios-pwa {
+html.ios-pwa {
     overscroll-behavior-y: none;
     -webkit-overflow-scrolling: auto;
 }
-body.ios-pwa .container {
+html.ios-pwa .container {
     min-height: 100vh;
     min-height: 100dvh;
     max-height: 100vh;
@@ -573,7 +573,7 @@ body.ios-pwa .container {
 }
 
 /* iOS PWA: Hızlı İşlem + Veriler footer'a yakın; spacer ile üstte esnek boşluk (detay: dosya sonu) */
-body.ios-pwa .content-scroll-wrapper {
+html.ios-pwa .content-scroll-wrapper {
     padding-bottom: calc(5px + var(--footer-h) + var(--sa-bot));
 }
 
@@ -595,71 +595,71 @@ body.ios-pwa .content-scroll-wrapper {
 }
 
 /* iOS PWA - Yeni İşlem sekmesi elemanları */
-body.ios-pwa #yeniIslem .form-group {
+html.ios-pwa #yeniIslem .form-group {
     margin-bottom: 12px;
     margin-top: 14px;
     gap: 2px;
 }
-body.ios-pwa #yeniIslem .form-group label {
+html.ios-pwa #yeniIslem .form-group label {
     margin-bottom: 2px;
 }
 
-body.ios-pwa #yeniIslem .form-group:has(#description) {
+html.ios-pwa #yeniIslem .form-group:has(#description) {
     margin-bottom: 9px;
 }
 
-body.ios-pwa #yeniIslem .form-group--date {
+html.ios-pwa #yeniIslem .form-group--date {
     margin-top: 11px;
 }
 
-body.ios-pwa #yeniIslem input[type="text"],
-body.ios-pwa #yeniIslem select {
+html.ios-pwa #yeniIslem input[type="text"],
+html.ios-pwa #yeniIslem select {
     padding: 6px 14px;
     font-size: 1.02em;
 }
 
-body.ios-pwa #yeniIslem .type-buttons {
+html.ios-pwa #yeniIslem .type-buttons {
     gap: 12px;
 }
 
-body.ios-pwa #yeniIslem .type-btn {
+html.ios-pwa #yeniIslem .type-btn {
     padding: 11px 14px;
     flex: 1;
     border-radius: 12px;
 }
 
-body.ios-pwa .modal-body {
+html.ios-pwa .modal-body {
     padding-bottom: 10px;
 }
 
 /* iOS PWA - İşlem Geçmişi okunabilirlik */
-body.ios-pwa .history-item {
+html.ios-pwa .history-item {
     padding: 12px 10px;
     margin-bottom: 8px;
 }
 
-body.ios-pwa .history-item .type-badge {
+html.ios-pwa .history-item .type-badge {
     font-size: 0.82em;
 }
 
-body.ios-pwa .history-item .date {
+html.ios-pwa .history-item .date {
     font-size: 0.82em;
 }
 
-body.ios-pwa .history-item .amount {
+html.ios-pwa .history-item .amount {
     font-size: 1.05em;
 }
 
-body.ios-pwa .history-item .history-category {
+html.ios-pwa .history-item .history-category {
     font-size: 0.92em;
 }
 
-body.ios-pwa .history-item .description {
+html.ios-pwa .history-item .description {
     font-size: 0.88em;
 }
 
 /* iOS PWA UI ayarları (plan 1–5, 7–8) */
-body.ios-pwa .header h1 {
+html.ios-pwa .header h1 {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -668,29 +668,29 @@ body.ios-pwa .header h1 {
     overflow: visible;
     box-sizing: border-box;
 }
-body.ios-pwa .header h1 .title-text {
+html.ios-pwa .header h1 .title-text {
     font-size: calc(0.8em + 0.7pt);
 }
-body.ios-pwa .quick-transaction-area {
+html.ios-pwa .quick-transaction-area {
     margin-top: 0;
     margin-bottom: 5px;
 }
-body.ios-pwa .top-controls {
+html.ios-pwa .top-controls {
     margin-top: 3px;
     margin-bottom: 0;
 }
-body.ios-pwa .notification-icon-btn {
+html.ios-pwa .notification-icon-btn {
     padding: 4px 0;
     margin-bottom: 0;
 }
-body.ios-pwa .tab-btn.active::after {
+html.ios-pwa .tab-btn.active::after {
     width: 80%;
     left: 50%;
     transform: translateX(-50%);
     background: var(--tab-purple);
     box-shadow: 0 0 10px var(--tab-purple);
 }
-body.ios-pwa .category-item {
+html.ios-pwa .category-item {
     border-color: rgba(98, 0, 234, 0.85);
 }
 
@@ -4084,7 +4084,7 @@ select option {
 
 /* iOS PWA landscape: Açıklama kesilmesin, mutlaka alt satıra geçsin */
 @media screen and (orientation: landscape) {
-    body.ios-pwa #categoryDetailContent .detail-table tbody td:last-child {
+    html.ios-pwa #categoryDetailContent .detail-table tbody td:last-child {
         -webkit-line-clamp: unset !important;
         line-clamp: unset !important;
         display: table-cell !important;
@@ -4952,7 +4952,7 @@ label[for="editDateInput"] {
     }
 
     /* iOS PWA: başlık metni çerçevede yatay/dikey ortalı; alt çizgi (absolute) merkezi etkilemez */
-    body.ios-pwa .header h1 {
+    html.ios-pwa .header h1 {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -6435,7 +6435,7 @@ label[for="editDateInput"] {
     }
 
     /* iOS PWA: ayarlar açılır menüsü ekran genişliğinin %50’si */
-    body.ios-pwa #settingsMenu {
+    html.ios-pwa #settingsMenu {
         width: 50vw;
         max-width: 50vw;
         box-sizing: border-box;
@@ -7233,31 +7233,53 @@ input[type="date"]::-webkit-datetime-edit-year-field {
 
 /* iOS PWA / mobil standalone: alt işlem grubunu footer'a yasla */
 @media screen and (max-width: 768px) and (display-mode: standalone) {
-    .main-layout-spacer {
-        display: block;
-        flex: 1 1 auto;
+    .content-scroll-wrapper {
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        padding-bottom: calc(5px + var(--footer-h) + var(--sa-bot)) !important;
     }
 
-    .content-scroll-wrapper {
-        padding-bottom: calc(5px + var(--footer-h) + var(--sa-bot)) !important;
+    .main-layout-spacer {
+        display: block !important;
+        flex: 1 1 0 !important;
+        min-height: 0;
+        width: 100%;
     }
 
     .quick-transaction-area {
         margin-top: 0 !important;
+        flex-shrink: 0;
+    }
+
+    .control-panel {
+        flex-shrink: 0;
     }
 }
 
 @media screen and (max-width: 768px) {
-    body.ios-pwa .main-layout-spacer {
-        display: block;
-        flex: 1 1 auto;
-    }
-
-    body.ios-pwa .content-scroll-wrapper {
+    html.ios-pwa .content-scroll-wrapper {
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
         padding-bottom: calc(5px + var(--footer-h) + var(--sa-bot)) !important;
     }
 
-    body.ios-pwa .quick-transaction-area {
+    html.ios-pwa .main-layout-spacer {
+        display: block !important;
+        flex: 1 1 0 !important;
+        min-height: 0;
+        width: 100%;
+    }
+
+    html.ios-pwa .quick-transaction-area {
         margin-top: 0 !important;
+        flex-shrink: 0;
+    }
+
+    html.ios-pwa .control-panel {
+        flex-shrink: 0;
     }
 }

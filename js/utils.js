@@ -205,4 +205,29 @@
     global.renderCategoryItem = renderCategoryItem;
     global.renderTransactionHistoryItem = renderTransactionHistoryItem;
     global.ensureExcelLibs = ensureExcelLibs;
+
+    function isIosDevice() {
+        var ua = navigator.userAgent || navigator.vendor || window.opera || '';
+        return /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+    }
+
+    function isStandalonePwa() {
+        return window.matchMedia('(display-mode: standalone)').matches
+            || window.navigator.standalone === true;
+    }
+
+    function isIosStandalonePwa() {
+        return isIosDevice() && isStandalonePwa();
+    }
+
+    function applyIosPwaClass() {
+        if (!isIosStandalonePwa()) return;
+        document.documentElement.classList.add('ios-pwa');
+        if (document.body) document.body.classList.add('ios-pwa');
+    }
+
+    global.isIosDevice = isIosDevice;
+    global.isStandalonePwa = isStandalonePwa;
+    global.isIosStandalonePwa = isIosStandalonePwa;
+    global.applyIosPwaClass = applyIosPwaClass;
 })(typeof window !== 'undefined' ? window : this);

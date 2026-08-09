@@ -1,6 +1,6 @@
 /* formatDateTR → js/utils.js */
 /** Önbellek / service worker — asset ?v= güncellerken bunu artır */
-const APP_VERSION = '78.95';
+const APP_VERSION = '78.96';
 /** Footer’da görünen sürüm — yalnızca kullanıcıya yansıyan sürüm değişince güncelle */
 const FOOTER_VERSION = '78.34';
 const APP_DEBUG = false;
@@ -353,7 +353,38 @@ if (location.protocol !== 'file:') {
 }
 
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
-    navigator.serviceWorker.register('service_worker.js?v=' + APP_VERSION).catch(console.error);
+    registerAppServiceWorker();
+}
+
+function registerAppServiceWorker() {
+    let refreshing = false;
+
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (refreshing) return;
+        refreshing = true;
+        window.location.reload();
+    });
+
+    navigator.serviceWorker.register('service_worker.js?v=' + APP_VERSION)
+        .then((registration) => {
+            if (registration.waiting) {
+                registration.waiting.postMessage('skipWaiting');
+            }
+
+            registration.addEventListener('updatefound', () => {
+                const worker = registration.installing;
+                if (!worker) return;
+                worker.addEventListener('statechange', () => {
+                    if (worker.state === 'installed' && navigator.serviceWorker.controller) {
+                        worker.postMessage('skipWaiting');
+                    }
+                });
+            });
+
+            // Arka planda güncel SW kontrolü (PWA eski cache'te takılmasın)
+            setInterval(() => registration.update(), 60 * 60 * 1000);
+        })
+        .catch(console.error);
 }
 
 /** Ayarlar / bildirim açılır menüleri — görünürlük yalnızca sınıf ile */
@@ -4110,11 +4141,11 @@ function initApp() {
     root.style.setProperty("--sa-right", "env(safe-area-inset-right)");
     root.style.setProperty("--safe-area-top", "env(safe-area-inset-top)");
 
-    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-    const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
-    const isPWA = window.matchMedia('(display-mode: standalone)').matches || (window.navigator.standalone === true);
-    if (isIOS && isPWA) {
-        document.body.classList.add('ios-pwa');
+    if (typeof applyIosPwaClass === 'function') {
+        applyIosPwaClass();
+    } else if (typeof isIosStandalonePwa === 'function' && isIosStandalonePwa()) {
+        root.classList.add('ios-pwa');
+        document.body?.classList.add('ios-pwa');
     }
 }
 
