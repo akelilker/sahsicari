@@ -1,5 +1,5 @@
 /* =================================================================
-KASA DEFTERİ JS - v1.13
+KASA DEFTERİ JS - v78.99
 Yerel öncelikli kayıt + bağlantı geri geldiğinde sunucu senkronizasyonu
 ================================================================= */
 
@@ -17,7 +17,7 @@ let historyClickBound = false;
 let kategoriGridClickBound = false;
 let kategoriListClickBound = false;
 const KASA_STORAGE_KEY = 'sahsiKasaDefteriData';
-const KASA_SW_VERSION = '78.98';
+const KASA_SW_VERSION = (typeof SAHSI_ASSET_VERSION !== 'undefined') ? SAHSI_ASSET_VERSION : '78.99';
 let kasaDataRevision = 0;
 let kasaSyncPromise = null;
 let kasaPersistPromise = Promise.resolve();
@@ -42,6 +42,10 @@ if (typeof applyIosPwaClass === 'function') {
 } else if (window.navigator.standalone === true) {
     document.documentElement.classList.add('ios-pwa');
     document.body.classList.add('ios-pwa');
+}
+const versionEl = document.querySelector('.version');
+if (versionEl && typeof SAHSI_FOOTER_VERSION !== 'undefined') {
+    versionEl.textContent = 'v' + SAHSI_FOOTER_VERSION;
 }
 await loadData();
 });

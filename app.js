@@ -1,8 +1,8 @@
 /* formatDateTR → js/utils.js */
-/** Önbellek / service worker — asset ?v= güncellerken bunu artır */
-const APP_VERSION = '78.98';
-/** Footer’da görünen sürüm — yalnızca kullanıcıya yansıyan sürüm değişince güncelle */
-const FOOTER_VERSION = '78.34';
+/** Önbellek / service worker — js/version.js ile senkron tut */
+const APP_VERSION = (typeof SAHSI_ASSET_VERSION !== 'undefined') ? SAHSI_ASSET_VERSION : '78.99';
+/** Footer’da görünen sürüm */
+const FOOTER_VERSION = (typeof SAHSI_FOOTER_VERSION !== 'undefined') ? SAHSI_FOOTER_VERSION : APP_VERSION;
 const APP_DEBUG = false;
 
 /* -----------------------------------------------------------------------------
