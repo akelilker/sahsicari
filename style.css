@@ -574,7 +574,7 @@ body.ios-pwa .container {
 
 /* iOS PWA: Hızlı İşlem + Veriler footer'a yakın; üst bölümde esnek boşluk */
 body.ios-pwa .content-scroll-wrapper {
-    padding-bottom: calc(15px + var(--footer-h) + var(--sa-bot));
+    padding-bottom: calc(5px + var(--footer-h) + var(--sa-bot));
 }
 
 /* Masaüstü standalone: container yüksekliği + footer viewport altında sabit */
