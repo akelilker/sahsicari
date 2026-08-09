@@ -572,11 +572,6 @@ html.ios-pwa .container {
     max-height: 100dvh;
 }
 
-/* iOS PWA: Hızlı İşlem + Veriler footer'a yakın; spacer ile üstte esnek boşluk (detay: dosya sonu) */
-html.ios-pwa .content-scroll-wrapper {
-    padding-bottom: calc(5px + var(--footer-h) + var(--sa-bot));
-}
-
 /* Masaüstü standalone: container yüksekliği + footer viewport altında sabit */
 @media (display-mode: standalone) and (min-width: 769px) {
     .container {
@@ -672,7 +667,7 @@ html.ios-pwa .header h1 .title-text {
     font-size: calc(0.8em + 0.7pt);
 }
 html.ios-pwa .quick-transaction-area {
-    margin-top: 0;
+    margin-top: 5px;
     margin-bottom: 5px;
 }
 html.ios-pwa .top-controls {
@@ -7219,67 +7214,6 @@ input[type="date"]::-webkit-datetime-edit-year-field {
     .pwa-install-close {
         color: #00e676;
         font-size: 18px;
-        flex-shrink: 0;
-    }
-}
-
-/* Varsayılan: spacer gizli (masaüstü) */
-.main-layout-spacer {
-    display: none;
-    flex: 0 0 0;
-    min-height: 0;
-    width: 100%;
-}
-
-/* iOS PWA / mobil standalone: alt işlem grubunu footer'a yasla */
-@media screen and (max-width: 768px) and (display-mode: standalone) {
-    .content-scroll-wrapper {
-        flex: 1 1 auto !important;
-        min-height: 0 !important;
-        display: flex !important;
-        flex-direction: column !important;
-        padding-bottom: calc(5px + var(--footer-h) + var(--sa-bot)) !important;
-    }
-
-    .main-layout-spacer {
-        display: block !important;
-        flex: 1 1 0 !important;
-        min-height: 0;
-        width: 100%;
-    }
-
-    .quick-transaction-area {
-        margin-top: 0 !important;
-        flex-shrink: 0;
-    }
-
-    .control-panel {
-        flex-shrink: 0;
-    }
-}
-
-@media screen and (max-width: 768px) {
-    html.ios-pwa .content-scroll-wrapper {
-        flex: 1 1 auto !important;
-        min-height: 0 !important;
-        display: flex !important;
-        flex-direction: column !important;
-        padding-bottom: calc(5px + var(--footer-h) + var(--sa-bot)) !important;
-    }
-
-    html.ios-pwa .main-layout-spacer {
-        display: block !important;
-        flex: 1 1 0 !important;
-        min-height: 0;
-        width: 100%;
-    }
-
-    html.ios-pwa .quick-transaction-area {
-        margin-top: 0 !important;
-        flex-shrink: 0;
-    }
-
-    html.ios-pwa .control-panel {
         flex-shrink: 0;
     }
 }
