@@ -570,23 +570,11 @@ body.ios-pwa .container {
     min-height: 100dvh;
     max-height: 100vh;
     max-height: 100dvh;
-    /* İçerik kısa olduğunda Veriler–footer arasında boşluk bırakmasın; uzun içerikte kaydır */
-    overflow-y: auto !important;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
 }
 
-/* iOS PWA: footer viewport'a sabitlenmesin; Veriler kutusunun hemen altında ~15px boşlukla gelsin */
+/* iOS PWA: Hızlı İşlem + Veriler footer'a yakın; üst bölümde esnek boşluk */
 body.ios-pwa .content-scroll-wrapper {
-    flex: 0 0 auto;
-    overflow: visible !important;
-    padding-bottom: 15px;
-}
-
-body.ios-pwa .global-status-bar {
-    position: sticky;
-    bottom: 0;
-    margin-top: 0;
+    padding-bottom: calc(15px + var(--footer-h) + var(--sa-bot));
 }
 
 /* Masaüstü standalone: container yüksekliği + footer viewport altında sabit */
@@ -684,7 +672,7 @@ body.ios-pwa .header h1 .title-text {
     font-size: calc(0.8em + 0.7pt);
 }
 body.ios-pwa .quick-transaction-area {
-    margin-top: 5px;
+    margin-top: auto;
     margin-bottom: 5px;
 }
 body.ios-pwa .top-controls {
