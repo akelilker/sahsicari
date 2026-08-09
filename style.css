@@ -572,6 +572,11 @@ body.ios-pwa .container {
     max-height: 100dvh;
 }
 
+/* iOS PWA: Hızlı İşlem + Veriler footer'a yakın; üst bölümde esnek boşluk */
+body.ios-pwa .content-scroll-wrapper {
+    padding-bottom: calc(15px + var(--footer-h) + var(--sa-bot));
+}
+
 /* Masaüstü standalone: container yüksekliği + footer viewport altında sabit */
 @media (display-mode: standalone) and (min-width: 769px) {
     .container {
@@ -667,7 +672,7 @@ body.ios-pwa .header h1 .title-text {
     font-size: calc(0.8em + 0.7pt);
 }
 body.ios-pwa .quick-transaction-area {
-    margin-top: 5px;
+    margin-top: auto;
     margin-bottom: 5px;
 }
 body.ios-pwa .top-controls {
