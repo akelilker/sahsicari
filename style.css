@@ -7232,11 +7232,17 @@ input[type="date"]::-webkit-datetime-edit-year-field {
         margin-top: 3px;
     }
 
-    /* Kişi modalı X: sekme alt çizgisi moru (#6200ea) */
+    /* Kişi modalı X: sekme alt çizgisi moru (#6200ea) — yeşil header'da net görünsün */
     html.ios-pwa #personModal .modal-header .close-modal-btn {
-        color: #6200ea;
-        -webkit-text-fill-color: #6200ea;
-        opacity: 1;
-        text-shadow: 0 0 10px var(--tab-purple);
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
+        background-color: #6200ea !important;
+        border: 1px solid #b388ff !important;
+        border-radius: 6px !important;
+        opacity: 1 !important;
+        text-shadow: none !important;
+        box-shadow: 0 0 10px rgba(98, 0, 234, 0.65) !important;
+        font-weight: 700 !important;
+        line-height: 1 !important;
     }
 }
