@@ -7217,3 +7217,18 @@ input[type="date"]::-webkit-datetime-edit-year-field {
         flex-shrink: 0;
     }
 }
+
+/* iOS PWA: seçili bölümlerde +3px dikey ritim (yalnızca mobil) */
+@media screen and (max-width: 768px) {
+    html.ios-pwa .quick-access-section {
+        margin-top: 7px; /* mobil 4px + 3px: bilgi kutuları ↔ Sık Kullanılanlar */
+    }
+
+    html.ios-pwa .debt-status-section {
+        margin-top: 3px;
+    }
+
+    html.ios-pwa .control-panel {
+        margin-top: 3px;
+    }
+}
