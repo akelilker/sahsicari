@@ -1,6 +1,6 @@
-// Service Worker with Smart Caching - v78.95
+// Service Worker with Smart Caching - v78.96
 const DEBUG = false; // Set to true for development
-const SW_VERSION = '78.95';
+const SW_VERSION = '78.96';
 const CACHE_PREFIX = 'sahsi-hesap-v';
 const CACHE_NAME = `${CACHE_PREFIX}${SW_VERSION}`;
 const APP_SCOPE_URL = self.registration.scope;
@@ -13,12 +13,12 @@ const urlsToCache = [
     'kasa.html',
     'offline.html',
     'storage.js?v=1.0',
-    'js/utils.js?v=78.81',
-    'js/report-exports.js?v=78.94',
+    'js/utils.js?v=78.96',
+    'js/report-exports.js?v=78.96',
     'js/FileSaver.min.js',
     'js/xlsx.bundle.min.js',
-    'style.css?v=78.95',
-    'app.js?v=78.95',
+    'style.css?v=78.96',
+    'app.js?v=78.96',
     'kasa.css?v=1.11',
     'kasa.js?v=1.13',
     'manifest.json?v=20260719e',
@@ -33,6 +33,29 @@ const urlsToCache = [
     'icons/favicon-32x32.png?v=20260719e',
     'icons/favicon-16x16.png?v=20260719e'
 ].map(scopedUrl);
+
+function isVersionedUrl(url) {
+    return url.search.includes('v=');
+}
+
+function isVersionedStyleOrScript(url) {
+    return isVersionedUrl(url) && /\.(css|js)$/i.test(url.pathname);
+}
+
+async function networkFirstVersioned(request, cacheName) {
+    const cache = await caches.open(cacheName);
+    try {
+        const response = await fetch(request);
+        if (response && response.ok) {
+            await cache.put(request, response.clone());
+        }
+        return response;
+    } catch (error) {
+        const cached = await cache.match(request);
+        if (cached) return cached;
+        throw error;
+    }
+}
 
 // Install Event: çekirdek dosyalar eksikse yeni worker aktive edilmez; sağlam eski cache korunur.
 self.addEventListener('install', (event) => {
@@ -110,27 +133,30 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // Static assets (CSS, JS, images): Cache-first
+    // Versioned CSS/JS: network-first so ?v= bumps always reach clients
+    if (isVersionedStyleOrScript(url)) {
+        event.respondWith(networkFirstVersioned(request, CACHE_NAME));
+        return;
+    }
+
+    // Other static assets (images, fonts): cache-first
     event.respondWith(
         caches.open(CACHE_NAME).then(async (cache) => {
             const exactMatch = await cache.match(request);
-            const versionedAsset = url.search.includes('v=');
+            const versionedAsset = isVersionedUrl(url);
             const cachedResponse = exactMatch || (
                 !versionedAsset ? await cache.match(request, { ignoreSearch: true }) : null
             );
 
             if (cachedResponse) {
-                // Serve from cache, update in background
                 fetch(request).then((response) => {
                     if (!response || response.status !== 200) return;
                     cache.put(request, response.clone());
-                }).catch(() => {}); // Ignore fetch errors in background
+                }).catch(() => {});
                 return cachedResponse;
             }
 
-            // Not in cache: fetch and cache
             return fetch(request).then((response) => {
-                // Only cache successful responses
                 if (response && response.status === 200) {
                     const responseClone = response.clone();
                     cache.put(request, responseClone);
@@ -168,7 +194,6 @@ self.addEventListener('sync', (event) => {
 
 async function syncPendingData() {
     try {
-        // Get pending sync queue from IndexedDB
         const db = await openDatabase();
         const syncQueue = await getFromObjectStore(db, 'syncQueue');
 
@@ -246,4 +271,3 @@ function removeFromSyncQueue(db, itemId) {
         request.onerror = () => reject(request.error);
     });
 }
-

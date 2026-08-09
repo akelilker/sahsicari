@@ -17,7 +17,7 @@ let historyClickBound = false;
 let kategoriGridClickBound = false;
 let kategoriListClickBound = false;
 const KASA_STORAGE_KEY = 'sahsiKasaDefteriData';
-const KASA_SW_VERSION = '78.95';
+const KASA_SW_VERSION = '78.96';
 let kasaDataRevision = 0;
 let kasaSyncPromise = null;
 let kasaPersistPromise = Promise.resolve();
@@ -37,7 +37,12 @@ const katIkonlar = {
 // ==================== INIT ====================
 document.addEventListener('DOMContentLoaded', async function() {
 setDefaultDate();
-if (window.navigator.standalone === true) document.body.classList.add('ios-pwa');
+if (typeof applyIosPwaClass === 'function') {
+    applyIosPwaClass();
+} else if (window.navigator.standalone === true) {
+    document.documentElement.classList.add('ios-pwa');
+    document.body.classList.add('ios-pwa');
+}
 await loadData();
 });
 
