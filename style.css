@@ -572,7 +572,7 @@ body.ios-pwa .container {
     max-height: 100dvh;
 }
 
-/* iOS PWA: Hızlı İşlem + Veriler footer'a yakın; üst bölümde esnek boşluk */
+/* iOS PWA: Hızlı İşlem + Veriler footer'a yakın; spacer ile üstte esnek boşluk (detay: dosya sonu) */
 body.ios-pwa .content-scroll-wrapper {
     padding-bottom: calc(5px + var(--footer-h) + var(--sa-bot));
 }
@@ -672,7 +672,7 @@ body.ios-pwa .header h1 .title-text {
     font-size: calc(0.8em + 0.7pt);
 }
 body.ios-pwa .quick-transaction-area {
-    margin-top: auto;
+    margin-top: 0;
     margin-bottom: 5px;
 }
 body.ios-pwa .top-controls {
@@ -7220,5 +7220,44 @@ input[type="date"]::-webkit-datetime-edit-year-field {
         color: #00e676;
         font-size: 18px;
         flex-shrink: 0;
+    }
+}
+
+/* Varsayılan: spacer gizli (masaüstü) */
+.main-layout-spacer {
+    display: none;
+    flex: 0 0 0;
+    min-height: 0;
+    width: 100%;
+}
+
+/* iOS PWA / mobil standalone: alt işlem grubunu footer'a yasla */
+@media screen and (max-width: 768px) and (display-mode: standalone) {
+    .main-layout-spacer {
+        display: block;
+        flex: 1 1 auto;
+    }
+
+    .content-scroll-wrapper {
+        padding-bottom: calc(5px + var(--footer-h) + var(--sa-bot)) !important;
+    }
+
+    .quick-transaction-area {
+        margin-top: 0 !important;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    body.ios-pwa .main-layout-spacer {
+        display: block;
+        flex: 1 1 auto;
+    }
+
+    body.ios-pwa .content-scroll-wrapper {
+        padding-bottom: calc(5px + var(--footer-h) + var(--sa-bot)) !important;
+    }
+
+    body.ios-pwa .quick-transaction-area {
+        margin-top: 0 !important;
     }
 }

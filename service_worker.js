@@ -1,6 +1,6 @@
-// Service Worker with Smart Caching - v78.94
+// Service Worker with Smart Caching - v78.95
 const DEBUG = false; // Set to true for development
-const SW_VERSION = '78.94';
+const SW_VERSION = '78.95';
 const CACHE_PREFIX = 'sahsi-hesap-v';
 const CACHE_NAME = `${CACHE_PREFIX}${SW_VERSION}`;
 const APP_SCOPE_URL = self.registration.scope;
@@ -17,8 +17,8 @@ const urlsToCache = [
     'js/report-exports.js?v=78.94',
     'js/FileSaver.min.js',
     'js/xlsx.bundle.min.js',
-    'style.css?v=78.89',
-    'app.js?v=78.94',
+    'style.css?v=78.95',
+    'app.js?v=78.95',
     'kasa.css?v=1.11',
     'kasa.js?v=1.13',
     'manifest.json?v=20260719e',
@@ -114,7 +114,10 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
         caches.open(CACHE_NAME).then(async (cache) => {
             const exactMatch = await cache.match(request);
-            const cachedResponse = exactMatch || await cache.match(request, { ignoreSearch: true });
+            const versionedAsset = url.search.includes('v=');
+            const cachedResponse = exactMatch || (
+                !versionedAsset ? await cache.match(request, { ignoreSearch: true }) : null
+            );
 
             if (cachedResponse) {
                 // Serve from cache, update in background
