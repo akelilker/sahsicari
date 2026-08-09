@@ -2,7 +2,7 @@
 /** Önbellek / service worker — js/version.js ile senkron tut */
 const APP_VERSION = (typeof SAHSI_ASSET_VERSION !== 'undefined') ? SAHSI_ASSET_VERSION : '78.99';
 /** Footer’da görünen sürüm */
-const FOOTER_VERSION = (typeof SAHSI_FOOTER_VERSION !== 'undefined') ? SAHSI_FOOTER_VERSION : APP_VERSION;
+const FOOTER_VERSION = (typeof SAHSI_FOOTER_VERSION !== 'undefined') ? SAHSI_FOOTER_VERSION : '78.34';
 const APP_DEBUG = false;
 
 /* -----------------------------------------------------------------------------
