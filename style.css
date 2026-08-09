@@ -7231,4 +7231,12 @@ input[type="date"]::-webkit-datetime-edit-year-field {
     html.ios-pwa .control-panel {
         margin-top: 3px;
     }
+
+    /* Kişi modalı X: sekme alt çizgisi moru (#6200ea) */
+    html.ios-pwa #personModal .modal-header .close-modal-btn {
+        color: #6200ea;
+        -webkit-text-fill-color: #6200ea;
+        opacity: 1;
+        text-shadow: 0 0 10px var(--tab-purple);
+    }
 }
