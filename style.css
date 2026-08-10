@@ -7238,7 +7238,10 @@ input[type="date"]::-webkit-datetime-edit-year-field {
     html.ios-pwa .control-panel {
         margin-top: 3px;
         padding: 14px 8px 16px 8px;
-        row-gap: 9px;
+    }
+
+    html.ios-pwa .control-panel .file-upload {
+        margin-top: 4px;
     }
 
     html.ios-pwa .person-select-trigger {
