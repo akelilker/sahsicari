@@ -5769,6 +5769,30 @@ label[for="editDateInput"] {
         background-repeat: no-repeat;
         flex-shrink: 0;
     }
+
+    /* Kişi seçim popup: iç arama çerçevesini kaldır (dış .search-box korunur) */
+    .person-select-menu .person-select-search {
+        border: none;
+        box-shadow: none;
+        background: transparent;
+        outline: none;
+    }
+
+    .person-select-menu .person-select-search:focus {
+        border: none;
+        box-shadow: none;
+        outline: none;
+    }
+
+    /* Kişi seçim popup: isimleri ortala; aktif satırda translateX kaymasını kapat */
+    .person-select-menu .person-select-option {
+        text-align: center;
+    }
+
+    .person-select-menu .person-select-option:hover,
+    .person-select-menu .person-select-option.is-active {
+        transform: none;
+    }
 }
 
 .allocation-panel {
