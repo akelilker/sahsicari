@@ -668,7 +668,7 @@ html.ios-pwa .header h1 .title-text {
 }
 html.ios-pwa .quick-transaction-area {
     margin-top: 5px;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
 }
 html.ios-pwa .top-controls {
     margin-top: 3px;
@@ -7218,14 +7218,16 @@ input[type="date"]::-webkit-datetime-edit-year-field {
     }
 }
 
-/* iOS PWA: seçili bölümlerde +3px dikey ritim (yalnızca mobil) */
+/* iOS PWA: seçili bölümlerde dikey ritim (yalnızca mobil) */
 @media screen and (max-width: 768px) {
     html.ios-pwa .quick-access-section {
-        margin-top: 7px; /* mobil 4px + 3px: bilgi kutuları ↔ Sık Kullanılanlar */
+        margin-top: 10px; /* mobil 4px + 6px: bilgi kutuları ↔ Sık Kullanılanlar */
+        margin-bottom: 7px; /* mobil 2px + 5px: Sık Kullanılanlar ↔ Cari Kayıt */
     }
 
     html.ios-pwa .debt-status-section {
         margin-top: 3px;
+        margin-bottom: 4px; /* mobil 1px + 3px: Cari Kayıt ↔ Hızlı İşlem */
     }
 
     html.ios-pwa .control-panel {
