@@ -7234,6 +7234,16 @@ input[type="date"]::-webkit-datetime-edit-year-field {
         margin-top: 3px;
     }
 
+    html.ios-pwa .person-select-trigger {
+        min-height: 35px;
+    }
+
+    html.ios-pwa .control-panel .general-status-btn,
+    html.ios-pwa .control-panel .control-panel-grid .btn,
+    html.ios-pwa .control-panel .file-upload-btn {
+        min-height: 35px;
+    }
+
     /* Kişi modalı X: sekme alt çizgisi moru (#6200ea) — yeşil header'da net görünsün */
     html.ios-pwa #personModal .modal-header .close-modal-btn {
         color: #ffffff !important;
