@@ -7225,23 +7225,29 @@ input[type="date"]::-webkit-datetime-edit-year-field {
         margin-bottom: 7px; /* mobil 2px + 5px: Sık Kullanılanlar ↔ Cari Kayıt */
     }
 
+    html.ios-pwa .summary-card {
+        min-height: 65px;
+    }
+
     html.ios-pwa .debt-status-section {
         margin-top: 3px;
         margin-bottom: 4px; /* mobil 1px + 3px: Cari Kayıt ↔ Hızlı İşlem */
+        padding: 17px 12px 21px 12px;
     }
 
     html.ios-pwa .control-panel {
         margin-top: 3px;
+        padding: 14px 8px 16px 8px;
     }
 
     html.ios-pwa .person-select-trigger {
-        min-height: 35px;
+        min-height: 38px;
     }
 
     html.ios-pwa .control-panel .general-status-btn,
     html.ios-pwa .control-panel .control-panel-grid .btn,
     html.ios-pwa .control-panel .file-upload-btn {
-        min-height: 35px;
+        min-height: 38px;
         font-family: inherit;
         font-size: 12px;
         font-weight: 700;

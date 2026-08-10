@@ -1,5 +1,5 @@
 /* =================================================================
-KASA DEFTERİ JS - v79.04
+KASA DEFTERİ JS - v79.05
 Yerel öncelikli kayıt + bağlantı geri geldiğinde sunucu senkronizasyonu
 ================================================================= */
 
@@ -17,7 +17,7 @@ let historyClickBound = false;
 let kategoriGridClickBound = false;
 let kategoriListClickBound = false;
 const KASA_STORAGE_KEY = 'sahsiKasaDefteriData';
-const KASA_SW_VERSION = (typeof SAHSI_ASSET_VERSION !== 'undefined') ? SAHSI_ASSET_VERSION : '79.04';
+const KASA_SW_VERSION = (typeof SAHSI_ASSET_VERSION !== 'undefined') ? SAHSI_ASSET_VERSION : '79.05';
 let kasaDataRevision = 0;
 let kasaSyncPromise = null;
 let kasaPersistPromise = Promise.resolve();
