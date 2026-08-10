@@ -7242,6 +7242,10 @@ input[type="date"]::-webkit-datetime-edit-year-field {
     html.ios-pwa .control-panel .control-panel-grid .btn,
     html.ios-pwa .control-panel .file-upload-btn {
         min-height: 35px;
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 1;
     }
 
     /* Kişi modalı X: sekme alt çizgisi moru (#6200ea) — yeşil header'da net görünsün */
