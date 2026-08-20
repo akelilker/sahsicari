@@ -199,25 +199,51 @@ updateAll();
 }
 
 async function saveData() {
-kasaDataRevision++;
-try {
-await persistKasaDataLocally(true);
-updateAll();
-} catch (error) {
-console.error('Kasa yerel kaydı başarısız:', error);
-showNotification('Cihaza kayıt yapılamadı!', 'error');
-return { ok: false, localOnly: true };
-}
+    kasaDataRevision++;
+    try {
+        await persistKasaDataLocally(true);
+        updateAll();
+    } catch (error) {
+        console.error('Kasa yerel kaydı başarısız:', error);
+        showNotification('Cihaza kayıt yapılamadı!', 'error');
+        return { ok: false, localOnly: true };
+    }
 
-const localOnly = !navigator.onLine;
-if (localOnly) {
-updateKasaServerStatus('offline', 'Çevrimdışı · değişiklik bekliyor');
-} else {
-updateKasaServerStatus('syncing', 'Sunucuya kaydediliyor...');
-syncKasaDataToServer(false);
-}
+    const localOnly = !navigator.onLine;
+    if (localOnly) {
+        updateKasaServerStatus('offline', 'Çevrimdışı · değişiklik bekliyor');
+        
+        // **NEW: Add to Sync Queue and Register Sync**
+        try {
+            const dataSnapshot = JSON.parse(JSON.stringify(kasaData));
+            const syncItem = {
+                url: 'kd_save.php',
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify(dataSnapshot),
+                tag: 'kasa-sync' // Tag for this sync type
+            };
+            
+            await advancedStorage.addToSyncQueue(syncItem);
 
-return { ok: true, localOnly: localOnly };
+            if ('serviceWorker' in navigator && 'SyncManager' in window) {
+                const registration = await navigator.serviceWorker.ready;
+                await registration.sync.register('kasa-sync');
+            }
+        } catch (syncError) {
+            console.error('Failed to add to sync queue:', syncError);
+        }
+
+    } else {
+        updateKasaServerStatus('syncing', 'Sunucuya kaydediliyor...');
+        syncKasaDataToServer(false);
+    }
+    
+    return { ok: true, localOnly: localOnly };
 }
 
 async function syncKasaDataToServer(notifyOnSuccess) {

@@ -188,60 +188,43 @@ self.addEventListener('message', (event) => {
 self.addEventListener('sync', (event) => {
     DEBUG && console.log('[SW] Background sync triggered:', event.tag);
 
-    if (event.tag === 'sync-data') {
-        event.waitUntil(syncPendingData());
+    if (event.tag === 'kasa-sync') {
+        event.waitUntil(syncPendingKasaData());
     }
 });
 
-async function syncPendingData() {
+async function syncPendingKasaData() {
+    const db = await openDatabase();
+    const syncQueue = await getFromObjectStore(db, 'syncQueue');
+    const itemsToSync = syncQueue.filter(item => item.tag === 'kasa-sync');
+
+    // To prevent multiple syncs for the same data, we only sync the latest item
+    const latestItem = itemsToSync.sort((a, b) => b.timestamp - a.timestamp)[0];
+    
+    if (!latestItem) return;
+
     try {
-        const db = await openDatabase();
-        const syncQueue = await getFromObjectStore(db, 'syncQueue');
-
-        if (!syncQueue || syncQueue.length === 0) {
-            DEBUG && console.log('[SW] No pending sync data');
-            return;
-        }
-
-        DEBUG && console.log('[SW] Syncing', syncQueue.length, 'pending items');
-
-        let syncedCount = 0;
-        const FETCH_TIMEOUT = 45000;
-        for (const item of syncQueue) {
-            try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
-                const response = await fetch(item.url, {
-                    method: item.method,
-                    headers: item.headers,
-                    body: item.body,
-                    signal: controller.signal
-                });
-                clearTimeout(timeoutId);
-
-                if (response.ok) {
-                    await removeFromSyncQueue(db, item.id);
-                    syncedCount++;
-                    DEBUG && console.log('[SW] Synced item:', item.id);
-                } else {
-                    console.error('[SW] Sync failed for item:', item.id, response.status);
-                }
-            } catch (error) {
-                console.error('[SW] Sync error for item:', item.id, error);
-            }
-        }
-
-        const clients = await self.clients.matchAll();
-        clients.forEach(client => {
-            client.postMessage({
-                type: 'SYNC_COMPLETE',
-                syncedCount: syncedCount,
-                pendingCount: syncQueue.length - syncedCount
-            });
+        const response = await fetch(latestItem.url, {
+            method: latestItem.method,
+            headers: latestItem.headers,
+            body: latestItem.body
         });
 
+        if (response.ok) {
+            // Clear all kasa-sync items from the queue after successful sync
+            const idsToDelete = itemsToSync.map(item => item.id);
+            const tx = db.transaction('syncQueue', 'readwrite');
+            const store = tx.objectStore('syncQueue');
+            for (const id of idsToDelete) {
+                store.delete(id);
+            }
+            await new Promise(r => tx.oncomplete = r);
+            console.log('Kasa sync successful, cleared queue.');
+        } else {
+            console.error('Kasa sync failed with status:', response.status);
+        }
     } catch (error) {
-        console.error('[SW] Background sync error:', error);
+        console.error('Kasa sync fetch failed:', error);
     }
 }
 
