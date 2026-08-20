@@ -191,6 +191,15 @@
         return excelLibsPromise;
     }
 
+    function fetchWithTimeout(url, options, timeoutMs) {
+        timeoutMs = timeoutMs || 45000;
+        var controller = new AbortController();
+        var id = setTimeout(function () { controller.abort(); }, timeoutMs);
+        var opts = Object.assign({}, options || {});
+        opts.signal = controller.signal;
+        return fetch(url, opts).finally(function () { clearTimeout(id); });
+    }
+
     global.sanitizeHTML = sanitizeHTML;
     global.safeAttr = safeAttr;
     global.renderEmptyState = renderEmptyState;
@@ -205,6 +214,7 @@
     global.renderCategoryItem = renderCategoryItem;
     global.renderTransactionHistoryItem = renderTransactionHistoryItem;
     global.ensureExcelLibs = ensureExcelLibs;
+    global.fetchWithTimeout = fetchWithTimeout;
 
     function isIosDevice() {
         var ua = navigator.userAgent || navigator.vendor || window.opera || '';

@@ -76,15 +76,6 @@ function setCurrentDate() {
 
 /* deformatCurrency, formatNumber, formatAmount, formatCurrency → js/utils.js */
 
-/** fetch ile 45 sn timeout; ağ donmasında AbortError fırlatır. */
-function fetchWithTimeout(url, options, timeoutMs) {
-    timeoutMs = timeoutMs || 45000;
-    var controller = new AbortController();
-    var id = setTimeout(function () { controller.abort(); }, timeoutMs);
-    var opts = Object.assign({}, options || {});
-    opts.signal = controller.signal;
-    return fetch(url, opts).finally(function () { clearTimeout(id); });
-}
 
 let allData = {};
 let hasLoadedServerData = false;

@@ -63,34 +63,6 @@ document.addEventListener('visibilitychange', function() {
 if (document.visibilityState === 'visible' && navigator.onLine) syncKasaDataToServer(false);
 });
 
-function sanitizeHTML(str) {
-if (str === null || str === undefined) return '';
-return String(str)
-.replace(/&/g, '&amp;')
-.replace(/</g, '&lt;')
-.replace(/>/g, '&gt;')
-.replace(/"/g, '&quot;')
-.replace(/'/g, '&#39;');
-}
-
-function safeAttr(str) {
-if (str === null || str === undefined) return '';
-return String(str)
-.replace(/&/g, '&amp;')
-.replace(/"/g, '&quot;')
-.replace(/'/g, '&#39;')
-.replace(/</g, '&lt;')
-.replace(/>/g, '&gt;');
-}
-
-function fetchWithTimeout(url, options, timeoutMs) {
-timeoutMs = timeoutMs || 45000;
-var controller = new AbortController();
-var id = setTimeout(function () { controller.abort(); }, timeoutMs);
-var opts = Object.assign({}, options || {});
-opts.signal = controller.signal;
-return fetch(url, opts).finally(function () { clearTimeout(id); });
-}
 
 // ==================== DATA ====================
 function normalizeKasaData(data) {
