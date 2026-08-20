@@ -155,6 +155,31 @@ class IndexedDBStorage {
         }
     }
 
+    async addToSyncQueue(item) {
+        try {
+            await this.initPromise;
+            return new Promise((resolve, reject) => {
+                const transaction = this.db.transaction(['syncQueue'], 'readwrite');
+                const store = transaction.objectStore('syncQueue');
+                // Add timestamp to the item before storing
+                const itemToStore = { ...item, timestamp: new Date().getTime() };
+                const request = store.add(itemToStore);
+
+                request.onsuccess = () => {
+                    logger.log('Added to syncQueue:', itemToStore);
+                    resolve(request.result); // Returns the key of the new object
+                };
+
+                request.onerror = () => {
+                    logger.error('Failed to add to syncQueue:', request.error);
+                    reject(request.error);
+                };
+            });
+        } catch (error) {
+            logger.error('addToSyncQueue error:', error);
+        }
+    }
+
 }
 
 // Hybrid Storage: IndexedDB with localStorage fallback.
@@ -253,6 +278,16 @@ class HybridStorage {
         return this.storage.clear();
     }
 
+    async addToSyncQueue(item) {
+        await this.waitForReady();
+        if (this.useIndexedDB) {
+            return this.storage.addToSyncQueue(item);
+        }
+        // Fallback for localStorage if needed (e.g., store in a special key)
+        // For now, we assume IndexedDB is the primary mechanism for sync.
+        logger.warn('SyncQueue is not supported in localStorage mode.');
+        return Promise.resolve();
+    }
 }
 
 // Migration: localStorage → IndexedDB
