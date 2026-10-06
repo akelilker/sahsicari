@@ -1442,10 +1442,11 @@ button.delete-notif-btn {
         left: 50%;
         right: auto;
         transform: translate(-50%, -50%);
-        width: min(calc(450px - 24px), calc(100vw - 32px));
+        width: min(calc(450px - 24px), calc(100vw - var(--sa-left) - var(--sa-right) - 24px));
         max-width: calc(450px - 24px);
         box-sizing: border-box;
         padding: 0;
+        overflow: visible;
         background: transparent;
         border: none;
         box-shadow: none;
@@ -1456,7 +1457,7 @@ button.delete-notif-btn {
     .person-select-menu.person-select-menu--centered .person-select-search-wrap {
         width: 100%;
         margin-bottom: 10px;
-        padding: 0 2px;
+        padding: 0 8px;
         box-sizing: border-box;
     }
 
@@ -1473,13 +1474,21 @@ button.delete-notif-btn {
         grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 6px;
         max-height: min(65vh, 520px);
-        padding: 5px 0;
+        width: 100%;
+        box-sizing: border-box;
+        padding: 6px 8px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        scrollbar-gutter: stable;
     }
 
     .person-select-menu.person-select-menu--centered .person-select-option {
+        width: auto;
+        min-width: 0;
         min-height: 0;
         margin-bottom: 0;
         padding: 8px 6px;
+        box-sizing: border-box;
         font-size: 0.8em;
         font-weight: 600;
         text-align: center;
@@ -1493,7 +1502,7 @@ button.delete-notif-btn {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        transition: all 0.2s ease;
+        transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
     }
 
     .person-select-menu.person-select-menu--centered .person-select-option:hover,
@@ -1502,7 +1511,7 @@ button.delete-notif-btn {
         border-color: #8fb3ff;
         color: #ffffff;
         text-shadow: 0 0 10px rgba(255, 255, 255, 0.35);
-        transform: scale(1.02);
+        transform: none;
     }
 
     .person-select-menu.person-select-menu--centered .person-select-option.is-selected {
