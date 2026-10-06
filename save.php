@@ -134,6 +134,27 @@ if ($backupFiles) {
     }
 }
 
+// Eski backup_*.json yedekleri (get_data.php fallback); en güncel bir dosya korunur
+$legacyBackupFiles = glob($backupDir . '/backup_*.json');
+if ($legacyBackupFiles) {
+    usort($legacyBackupFiles, function ($a, $b) {
+        $mtimeCompare = (@filemtime($b) ?: 0) <=> (@filemtime($a) ?: 0);
+        if ($mtimeCompare !== 0) {
+            return $mtimeCompare;
+        }
+        return strcmp(basename($b), basename($a));
+    });
+    $newestLegacyBackup = $legacyBackupFiles[0];
+    foreach ($legacyBackupFiles as $dosya) {
+        if ($dosya === $newestLegacyBackup) {
+            continue;
+        }
+        if (@filemtime($dosya) < $otuzGunOnce) {
+            @unlink($dosya);
+        }
+    }
+}
+
 // --- 4) Temp write: önce .tmp dosyasına yaz (ana dosyayı bozmadan)
 $tmpFile = $mainFile . '.tmp';
 if (@file_put_contents($tmpFile, $input, LOCK_EX) === false) {
