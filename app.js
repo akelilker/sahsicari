@@ -275,6 +275,10 @@ async function queueServerSyncPayload(payload) {
             },
             body: JSON.stringify(serverPayload)
         });
+        if ('serviceWorker' in navigator && 'sync' in ServiceWorkerRegistration.prototype) {
+            const registration = await navigator.serviceWorker.ready;
+            await registration.sync.register('sync-data');
+        }
     } catch (error) {
         console.error('Sync queue add failed:', error);
     }
