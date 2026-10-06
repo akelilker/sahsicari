@@ -12,3 +12,59 @@
 
 # Alternatif isim (bazı WAF'lar "load" kelimesini engelliyor):
 # load.php yerine api_load.php kullanmak için app.js içinde URL değiştirilebilir.
+
+# --- Hassas veri ve metadata: doğrudan HTTP erişimini engelle (PHP okuma/yazma etkilenmez) ---
+<IfModule mod_rewrite.c>
+    RewriteRule ^backups/ - [F,L]
+    RewriteRule ^kd_backups/ - [F,L]
+</IfModule>
+
+<Files "veriler.json">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order deny,allow
+        Deny from all
+    </IfModule>
+</Files>
+
+<Files "kd_veriler.json">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order deny,allow
+        Deny from all
+    </IfModule>
+</Files>
+
+<FilesMatch "^\.ftp-deploy-sync-state.*\.json$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order deny,allow
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+<FilesMatch "^(\.gitignore|\.cpanel\.yml)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order deny,allow
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+<FilesMatch "\.md$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order deny,allow
+        Deny from all
+    </IfModule>
+</FilesMatch>
