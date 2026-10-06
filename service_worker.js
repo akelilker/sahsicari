@@ -1,6 +1,6 @@
 // Service Worker — SW_VERSION js/version.js SAHSI_ASSET_VERSION ile aynı olmalı
 const DEBUG = false; // Set to true for development
-const SW_VERSION = '79.10';
+const SW_VERSION = '79.11';
 const CACHE_PREFIX = 'sahsi-hesap-v';
 const CACHE_NAME = `${CACHE_PREFIX}${SW_VERSION}`;
 const APP_SCOPE_URL = self.registration.scope;
@@ -12,16 +12,16 @@ const urlsToCache = [
     'index.html',
     'kasa.html',
     'offline.html',
-    'js/version.js?v=79.10',
+    'js/version.js?v=79.11',
     'storage.js?v=1.0',
-    'js/utils.js?v=79.10',
-    'js/report-exports.js?v=79.10',
+    'js/utils.js?v=79.11',
+    'js/report-exports.js?v=79.11',
     'js/FileSaver.min.js',
     'js/xlsx.bundle.min.js',
-    'style.css?v=79.10',
-    'app.js?v=79.10',
-    'kasa.css?v=79.10',
-    'kasa.js?v=79.10',
+    'style.css?v=79.11',
+    'app.js?v=79.11',
+    'kasa.css?v=79.11',
+    'kasa.js?v=79.11',
     'manifest.json?v=20260719e',
     'manifest.json',
     'favicon.ico?v=20260719e',
@@ -190,8 +190,65 @@ self.addEventListener('sync', (event) => {
 
     if (event.tag === 'kasa-sync') {
         event.waitUntil(syncPendingKasaData());
+    } else if (event.tag === 'sync-data') {
+        event.waitUntil(syncPendingCariData());
     }
 });
+
+function isCariSyncQueueItem(item) {
+    if (!item || typeof item.url !== 'string' || item.tag === 'kasa-sync') {
+        return false;
+    }
+    if (item.url.includes('write_data.php')) {
+        return true;
+    }
+    if (item.url.includes('kd_save.php')) {
+        return false;
+    }
+    return item.url.includes('save.php');
+}
+
+async function syncPendingCariData() {
+    const db = await openDatabase();
+    const syncQueue = await getFromObjectStore(db, 'syncQueue');
+    const itemsToSync = syncQueue.filter(isCariSyncQueueItem);
+
+    if (!itemsToSync.length) {
+        return;
+    }
+
+    const sortedItems = itemsToSync.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+    let syncedCount = 0;
+
+    for (const item of sortedItems) {
+        try {
+            const response = await fetch(item.url, {
+                method: item.method,
+                headers: item.headers,
+                body: item.body
+            });
+
+            if (response.ok) {
+                await removeFromSyncQueue(db, item.id);
+                syncedCount++;
+            } else {
+                DEBUG && console.error('[SW] Cari sync failed with status:', response.status, item.url);
+                break;
+            }
+        } catch (error) {
+            DEBUG && console.error('[SW] Cari sync fetch failed:', error);
+            break;
+        }
+    }
+
+    if (syncedCount > 0) {
+        DEBUG && console.log('[SW] Cari sync successful, cleared', syncedCount, 'queue item(s).');
+        const clients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+        for (const client of clients) {
+            client.postMessage({ type: 'SYNC_COMPLETE', syncedCount });
+        }
+    }
+}
 
 async function syncPendingKasaData() {
     const db = await openDatabase();

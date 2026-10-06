@@ -1,6 +1,6 @@
 /* formatDateTR → js/utils.js */
 /** Önbellek / service worker — js/version.js ile senkron tut */
-const APP_VERSION = (typeof SAHSI_ASSET_VERSION !== 'undefined') ? SAHSI_ASSET_VERSION : '79.09';
+const APP_VERSION = (typeof SAHSI_ASSET_VERSION !== 'undefined') ? SAHSI_ASSET_VERSION : '79.11';
 /** Footer’da görünen sürüm */
 const FOOTER_VERSION = (typeof SAHSI_FOOTER_VERSION !== 'undefined') ? SAHSI_FOOTER_VERSION : '78.34';
 const APP_DEBUG = false;
@@ -275,6 +275,10 @@ async function queueServerSyncPayload(payload) {
             },
             body: JSON.stringify(serverPayload)
         });
+        if ('serviceWorker' in navigator && 'sync' in ServiceWorkerRegistration.prototype) {
+            const registration = await navigator.serviceWorker.ready;
+            await registration.sync.register('sync-data');
+        }
     } catch (error) {
         console.error('Sync queue add failed:', error);
     }
