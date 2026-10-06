@@ -689,6 +689,42 @@ html.ios-pwa .category-item {
     border-color: rgba(98, 0, 234, 0.85);
 }
 
+/* iOS PWA (mobil): status bar altı koyu fade — safe-area boşluğu header ile birleşir; overscroll’da içerik status bar altında kararır */
+@media screen and (max-width: 768px) {
+    html.ios-pwa .container {
+        padding-top: 0;
+    }
+
+    html.ios-pwa .header {
+        padding-top: calc(5px + var(--sa-top));
+        background: linear-gradient(
+            to bottom,
+            #080c16 0%,
+            #080c16 calc(var(--sa-top) + 4px),
+            rgba(10, 16, 30, 0.96) calc(var(--sa-top) + 20px),
+            rgba(10, 16, 30, 0.92) 100%
+        );
+    }
+
+    html.ios-pwa body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: calc(var(--sa-top) + 40px);
+        background: linear-gradient(
+            to bottom,
+            rgba(8, 12, 22, 0.97) 0%,
+            rgba(8, 12, 22, 0.92) var(--sa-top),
+            rgba(8, 12, 22, 0.55) calc(var(--sa-top) + 16px),
+            rgba(8, 12, 22, 0) 100%
+        );
+        z-index: 2100;
+        pointer-events: none;
+    }
+}
+
 /* 2. ANA MİMARİ */
 
 .container {
