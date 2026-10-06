@@ -1542,21 +1542,26 @@ button.delete-notif-btn {
     margin-bottom: 8px;
 }
 
+/* Tek çerçeve: dış .search-box çizilir; input #quickSearchInput ile aynı şeffaf iç alan */
 .person-select-search {
+    flex: 1;
+    min-width: 0;
     width: 100%;
-    height: 34px;
-    padding: 6px 12px;
-    border-radius: 9px;
-    border: 1px solid rgba(66, 165, 245, 0.3);
-    background: rgba(8, 15, 29, 0.88);
+    height: 100%;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    background: transparent;
     color: #e6f4ff;
-    font-size: 13px;
+    font-size: 15px;
+    font-weight: 600;
+    outline: none;
 }
 
 .person-select-search:focus {
     outline: none;
-    border-color: rgba(66, 165, 245, 0.92);
-    box-shadow: 0 0 0 2px rgba(66, 165, 245, 0.14);
+    border: none;
+    box-shadow: none;
 }
 
 .person-select-search::placeholder {
@@ -5779,15 +5784,6 @@ label[for="editDateInput"] {
         background-size: contain;
         background-repeat: no-repeat;
         flex-shrink: 0;
-    }
-
-    /* Kişi seçim popup: iç arama çerçevesini kaldır (dış .search-box korunur) */
-    .person-select-menu .person-select-search,
-    .person-select-menu .person-select-search:focus {
-        border: none;
-        box-shadow: none;
-        background: transparent;
-        outline: none;
     }
 
     /* Kişi seçim popup: isimleri ortala; hover’da yalnızca metin büyür (kutu sabit) */
