@@ -413,6 +413,13 @@ function bindCategorySelectBackdrop(selectEl) {
     selectEl.addEventListener('blur', deactivate);
     selectEl.addEventListener('mousedown', activate);
     selectEl.addEventListener('touchstart', activate, { passive: true });
+    /* Masaüstünde yerel <select> açılır: seçim yapıldıktan sonra odak öğede kalır,
+       bu yüzden blur hiç tetiklenmez ve bulanıklık takılı kalır.
+       Seçim (change) veya ESC ile bulanıklığı burada kaldırıyoruz. */
+    selectEl.addEventListener('change', deactivate);
+    selectEl.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') deactivate();
+    });
 }
 
 function shouldUseCustomCategorySelect() {
