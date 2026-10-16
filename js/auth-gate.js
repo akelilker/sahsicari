@@ -2,6 +2,35 @@
     var pending = null;
     var submitResolve = null;
 
+    var EYE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+    var EYE_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 19c-6.5 0-10-7-10-7a18.4 18.4 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c6.5 0 10 7 10 7a18.5 18.5 0 0 1-2.16 3.19M1 1l22 22"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/></svg>';
+
+    function passwordScore(value) {
+        var score = 0;
+        if (value.length >= 10) score++;
+        if (value.length >= 14) score++;
+        if (/[a-zçğıöşü]/.test(value) && /[A-ZÇĞİÖŞÜ]/.test(value)) score++;
+        if (/\d/.test(value)) score++;
+        if (/[^A-Za-z0-9çğıöşüÇĞİÖŞÜ]/.test(value)) score++;
+        return value.length < 10 ? Math.min(score, 1) : score;
+    }
+
+    function updateStrength() {
+        var bar = byId('authGateStrength');
+        if (!bar) return;
+        var value = byId('authGatePassword').value;
+        var score = passwordScore(value);
+        var colors = ['#d40000', '#d40000', '#f5a623', '#f5a623', '#00e676', '#00e676'];
+        bar.style.width = value ? Math.max(12, score * 20) + '%' : '0';
+        bar.style.background = colors[score];
+    }
+
+    function setMessage(text, isError) {
+        var el = byId('authGateMessage');
+        el.textContent = text || '';
+        el.classList.toggle('is-error', !!isError);
+    }
+
     function byId(id) {
         return document.getElementById(id);
     }
@@ -13,18 +42,32 @@
         wrap.className = 'auth-gate';
         wrap.hidden = true;
         wrap.innerHTML = ''
-            + '<form id="authGateForm" class="auth-gate__card">'
-            + '<h2 id="authGateTitle">Giriş</h2>'
-            + '<p id="authGateMessage"></p>'
+            + '<form id="authGateForm" class="auth-gate__card" novalidate>'
+            + '<div class="auth-gate__head"><h2 id="authGateTitle">Giriş</h2></div>'
+            + '<div class="auth-gate__body">'
+            + '<p id="authGateMessage" aria-live="polite"></p>'
             + '<label class="sr-only" for="authGateUser">Kullanıcı</label>'
             + '<input id="authGateUser" class="sr-only" autocomplete="username" value="sahsicari">'
-            + '<label for="authGatePassword">Parola</label>'
-            + '<input id="authGatePassword" type="password" autocomplete="current-password" required minlength="1">'
-            + '<label id="authGateConfirmLabel" for="authGateConfirm">Parola tekrar</label>'
-            + '<input id="authGateConfirm" type="password" autocomplete="new-password">'
-            + '<button type="submit" id="authGateSubmit">Devam</button>'
-            + '</form>';
+            + '<label class="sr-only" for="authGatePassword">Parola</label>'
+            + '<div class="auth-gate__field"><input id="authGatePassword" type="password" placeholder="Parola" autocomplete="current-password" required>'
+            + '<button type="button" class="auth-gate__eye" aria-label="Parolayı göster" data-target="authGatePassword">' + EYE + '</button>' + '</div>'
+            + '<div class="auth-gate__strength" aria-hidden="true"><span id="authGateStrength"></span></div>'
+            + '<label id="authGateConfirmLabel" class="sr-only" for="authGateConfirm">Parola tekrar</label>'
+            + '<div class="auth-gate__field auth-gate__confirm"><input id="authGateConfirm" type="password" placeholder="Parola tekrar" autocomplete="new-password">'
+            + '<button type="button" class="auth-gate__eye" aria-label="Parolayı göster" data-target="authGateConfirm">' + EYE + '</button>' + '</div>'
+            + '<button type="submit" id="authGateSubmit" class="auth-gate__submit">Devam</button>'
+            + '</div></form>';
         document.body.appendChild(wrap);
+        wrap.querySelectorAll('.auth-gate__eye').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var input = byId(btn.getAttribute('data-target'));
+                var reveal = input.type === 'password';
+                input.type = reveal ? 'text' : 'password';
+                btn.innerHTML = reveal ? EYE_OFF : EYE;
+                btn.setAttribute('aria-label', reveal ? 'Parolayı gizle' : 'Parolayı göster');
+            });
+        });
+        byId('authGatePassword').addEventListener('input', updateStrength);
         byId('authGateForm').addEventListener('submit', onSubmit);
     }
 
@@ -34,13 +77,13 @@
         var setup = mode === 'setup';
         gate.hidden = false;
         gate.setAttribute('data-mode', setup ? 'setup' : 'login');
-        byId('authGateTitle').textContent = setup ? 'Parola belirle' : 'Giriş';
-        byId('authGateConfirm').hidden = !setup;
-        byId('authGateConfirmLabel').hidden = !setup;
+        byId('authGateTitle').textContent = setup ? 'İlk Kurulum' : 'Giriş';
         byId('authGateConfirm').required = setup;
         byId('authGatePassword').value = '';
         byId('authGateConfirm').value = '';
-        byId('authGateMessage').textContent = message || '';
+        setMessage(message);
+        byId('authGatePassword').autocomplete = setup ? 'new-password' : 'current-password';
+        updateStrength();
         byId('authGateSubmit').textContent = setup ? 'Kaydet' : 'Giriş';
         byId('authGatePassword').focus();
     }
@@ -68,6 +111,18 @@
         var password = byId('authGatePassword').value;
         var confirm = byId('authGateConfirm').value;
         var button = byId('authGateSubmit');
+        if (setup && password.length < 10) {
+            setMessage('Parola en az 10 karakter olmalı', true);
+            return;
+        }
+        if (setup && password !== confirm) {
+            setMessage('Parolalar eşleşmiyor', true);
+            return;
+        }
+        if (!password) {
+            setMessage('Parola gerekli', true);
+            return;
+        }
         button.disabled = true;
         try {
             var response = await fetch('auth.php?action=' + (setup ? 'setup' : 'login'), {
@@ -81,7 +136,7 @@
             });
             var data = await response.json().catch(function () { return {}; });
             if (!response.ok) {
-                byId('authGateMessage').textContent = (data && data.message) ? data.message : 'Giriş başarısız';
+                setMessage((data && data.message) ? data.message : 'Giriş başarısız', true);
                 return;
             }
             hide();
@@ -91,7 +146,7 @@
                 resolve({ ok: true });
             }
         } catch (error) {
-            byId('authGateMessage').textContent = 'Sunucuya ulaşılamadı';
+            setMessage('Sunucuya ulaşılamadı', true);
         } finally {
             button.disabled = false;
         }
@@ -108,7 +163,7 @@
                     submitResolve = resolve;
                     show(state.configured ? 'login' : 'setup', state.configured
                         ? 'Sunucu verisi için parola gerekli.'
-                        : 'İlk kurulum: en az 10 karakter. Adres açıksa ilk kaydeden bu parolayı alır; kurulumu hemen tamamla.');
+                        : 'En az 10 karakter');
                 });
             } catch (error) {
                 return { ok: false, offline: true };

@@ -7308,6 +7308,8 @@ input[type="date"]::-webkit-datetime-edit-year-field {
 }
 
 .auth-gate {
+    --auth-green: rgb(var(--green-panel-rgb));
+    --auth-green-light: #00e676;
     position: fixed;
     inset: 0;
     z-index: 1000000;
@@ -7315,43 +7317,147 @@ input[type="date"]::-webkit-datetime-edit-year-field {
     align-items: center;
     justify-content: center;
     padding: 24px;
-    background: rgba(8, 12, 22, 0.72);
+    background: rgba(8, 12, 22, 0.62);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
 }
 
 .auth-gate__card {
-    width: min(420px, 100%);
+    width: min(400px, 100%);
+    overflow: hidden;
+    border-radius: 16px;
+    border: 1px solid var(--white-20);
+    background: var(--modal-bg);
+    color: var(--text-color);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+}
+
+.auth-gate__head {
+    padding: 14px 20px;
+    background: linear-gradient(135deg, rgba(var(--green-panel-rgb), 0.95) 0%, rgba(var(--green-panel-rgb), 0.55) 100%);
+    border-bottom: 1px solid var(--white-15);
+    text-align: center;
+}
+
+.auth-gate__head h2 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #fff;
+}
+
+.auth-gate__body {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    padding: 22px;
-    border-radius: 16px;
-    background: #141c2d;
-    color: #f5f7fb;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+    gap: 12px;
+    padding: 20px 22px 22px;
 }
 
-.auth-gate__card h2 {
-    margin: 0;
-    font-size: 1.25rem;
+.auth-gate__body p {
+    margin: 0 0 4px;
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--white-50);
 }
 
-.auth-gate__card p {
-    margin: 0;
-    line-height: 1.4;
+.auth-gate__body p.is-error {
+    color: #ff6b6b;
 }
 
-.auth-gate__card input {
+.auth-gate__field {
+    position: relative;
+}
+
+.auth-gate__body input {
+    box-sizing: border-box;
+    width: 100%;
     font-size: 16px;
-    padding: 12px;
+    padding: 12px 44px 12px 14px;
     border-radius: 10px;
-    border: 1px solid #c8d4de;
+    border: 1px solid var(--white-15);
+    background: rgba(5, 9, 18, 0.65);
+    color: #fff;
+    outline: none;
+    transition: border-color var(--timing-normal), box-shadow var(--timing-normal);
 }
 
-.auth-gate__card button {
-    min-height: 44px;
+.auth-gate__body input::placeholder {
+    color: var(--white-30);
+}
+
+.auth-gate__body input:focus {
+    border-color: var(--auth-green-light);
+    box-shadow: 0 0 0 3px var(--green-30);
+}
+
+.auth-gate__eye {
+    position: absolute;
+    top: 50%;
+    right: 6px;
+    transform: translateY(-50%);
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    padding: 0;
     border: 0;
-    border-radius: 10px;
-    background: #098a14;
+    background: transparent;
+    color: var(--white-50);
+    cursor: pointer;
+}
+
+.auth-gate__eye:hover {
     color: #fff;
+}
+
+.auth-gate__eye svg {
+    width: 20px;
+    height: 20px;
+}
+
+.auth-gate__strength {
+    height: 4px;
+    border-radius: 2px;
+    background: var(--white-10, rgba(255, 255, 255, 0.1));
+    overflow: hidden;
+    margin-top: -4px;
+}
+
+.auth-gate__strength span {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: var(--expense-red);
+    transition: width var(--timing-normal), background var(--timing-normal);
+}
+
+.auth-gate__submit {
+    margin-top: 6px;
+    min-height: 44px;
+    border-radius: 10px;
+    border: 1.5px solid var(--auth-green-light);
+    background: transparent;
+    color: var(--auth-green-light);
     font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: background var(--timing-normal), color var(--timing-normal);
+}
+
+.auth-gate__submit:hover:not(:disabled) {
+    background: var(--green-30);
+    color: #fff;
+}
+
+.auth-gate__submit:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.auth-gate[data-mode="login"] .auth-gate__confirm,
+.auth-gate[data-mode="login"] .auth-gate__strength {
+    display: none;
 }
