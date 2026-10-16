@@ -7396,7 +7396,7 @@ input[type="date"]::-webkit-datetime-edit-year-field {
 .auth-gate__body input:focus {
     outline: none;
     border-color: #6200ea;
-    box-shadow: 0 0 0 3px var(--tab-purple), 0 0 10px var(--tab-purple);
+    box-shadow: 0 0 0 1px var(--tab-purple), 0 0 10px var(--tab-purple);
 }
 
 .auth-gate__eye {
@@ -7444,7 +7444,7 @@ input[type="date"]::-webkit-datetime-edit-year-field {
     margin-top: 6px;
     min-height: 44px;
     border-radius: 10px;
-    border: 1.5px solid var(--auth-green-light);
+    border: 1px solid var(--auth-green-light);
     background: transparent;
     color: var(--auth-green-light);
     font-weight: 700;
