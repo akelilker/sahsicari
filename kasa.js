@@ -1,5 +1,5 @@
 /* =================================================================
-KASA DEFTERİ JS - v79.13
+KASA DEFTERİ JS - v79.14
 Yerel öncelikli kayıt + bağlantı geri geldiğinde sunucu senkronizasyonu
 ================================================================= */
 
@@ -17,7 +17,7 @@ let historyClickBound = false;
 let kategoriGridClickBound = false;
 let kategoriListClickBound = false;
 const KASA_STORAGE_KEY = 'sahsiKasaDefteriData';
-const KASA_SW_VERSION = (typeof SAHSI_ASSET_VERSION !== 'undefined') ? SAHSI_ASSET_VERSION : '79.13';
+const KASA_SW_VERSION = (typeof SAHSI_ASSET_VERSION !== 'undefined') ? SAHSI_ASSET_VERSION : '79.14';
 let kasaDataRevision = 0;
 let kasaSyncPromise = null;
 let kasaPersistPromise = Promise.resolve();
@@ -74,11 +74,13 @@ const kategoriler = Array.isArray(data.kategoriler)
 
 if (!kategoriler.includes('Kasa')) kategoriler.unshift('Kasa');
 
-return {
+const normalized = {
 baslangicBakiye: Number.isFinite(Number(data.baslangicBakiye)) ? Number(data.baslangicBakiye) : 0,
 kategoriler: [...new Set(kategoriler)],
 islemler: Array.isArray(data.islemler) ? data.islemler : []
 };
+if (typeof data.updatedAt === 'string' && data.updatedAt) normalized.updatedAt = data.updatedAt;
+return normalized;
 }
 
 async function readLocalKasaState() {
@@ -169,6 +171,15 @@ updateAll();
 return;
 }
 
+if (typeof ensureServerAuth === 'function') {
+const auth = await ensureServerAuth();
+if (!auth || !auth.ok) {
+updateKasaServerStatus('offline', localData ? 'Oturum yok · cihazdaki veri' : 'Sunucu girişi gerekli');
+updateAll();
+return;
+}
+}
+
 if (pendingLocalData) {
 updateKasaServerStatus('syncing', 'Cihazdaki değişiklikler eşitleniyor...');
 await syncKasaDataToServer(false);
@@ -200,6 +211,7 @@ updateAll();
 
 async function saveData() {
     kasaDataRevision++;
+    kasaData.updatedAt = new Date().toISOString();
     try {
         await persistKasaDataLocally(true);
         updateAll();
@@ -252,11 +264,15 @@ if (kasaSyncPromise) return kasaSyncPromise;
 
 kasaSyncPromise = (async function() {
 let syncedAnyData = false;
+let authRetried = false;
 
 while (navigator.onLine) {
 await kasaPersistPromise.catch(() => {});
 const localState = await readLocalKasaState();
-if (!localState.pending) break;
+if (!localState.pending) {
+await clearKasaSyncQueueUpTo(Date.now());
+break;
+}
 
 const revisionBeingSynced = localState.revision;
 const localData = localState.data;
@@ -272,6 +288,32 @@ headers: {
 credentials: 'same-origin',
 body: JSON.stringify(localData)
 }, 45000);
+
+if (res.status === 401 || res.status === 503) {
+if (!authRetried && typeof ensureServerAuth === 'function') {
+authRetried = true;
+const auth = await ensureServerAuth(true);
+if (auth && auth.ok) continue;
+}
+throw new Error('Oturum gerekli');
+}
+
+if (res.status === 409) {
+await clearKasaSyncQueueUpTo(Date.now());
+const fresh = await fetchWithTimeout('kd_load.php?t=' + Date.now(), { credentials: 'same-origin' });
+if (fresh.ok) {
+const data = await fresh.json();
+const normalized = normalizeKasaData(data);
+if (normalized) {
+kasaData = normalized;
+kasaDataRevision++;
+await persistKasaDataLocally(false);
+updateAll();
+}
+}
+updateKasaServerStatus('online', 'Sunucudaki kayıt korundu');
+return false;
+}
 
 if (!res.ok) throw new Error('HTTP ' + res.status);
 
@@ -289,6 +331,7 @@ await persistKasaDataLocally(true);
 continue;
 }
 
+await clearKasaSyncQueueUpTo(Date.now());
 updateKasaServerStatus('online', 'Sunucuyla eşitlendi');
 }
 
@@ -304,6 +347,19 @@ kasaSyncPromise = null;
 });
 
 return kasaSyncPromise;
+}
+
+async function clearKasaSyncQueueUpTo(timestampMs) {
+if (!advancedStorage || typeof advancedStorage.getSyncQueue !== 'function') return;
+const items = await advancedStorage.getSyncQueue();
+const ids = (items || []).filter(function(item) {
+if (!item || item.id == null) return false;
+const isKasa = item.tag === 'kasa-sync' || (typeof item.url === 'string' && item.url.includes('kd_save.php') && item.tag !== 'sync-data');
+return isKasa && (item.timestamp || 0) <= timestampMs;
+}).map(function(item) { return item.id; });
+if (ids.length && typeof advancedStorage.deleteSyncQueueIds === 'function') {
+await advancedStorage.deleteSyncQueueIds(ids);
+}
 }
 
 function showKasaSaveNotification(message, result) {

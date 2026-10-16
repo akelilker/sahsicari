@@ -1,6 +1,6 @@
 /* formatDateTR → js/utils.js */
 /** Önbellek / service worker — js/version.js ile senkron tut */
-const APP_VERSION = (typeof SAHSI_ASSET_VERSION !== 'undefined') ? SAHSI_ASSET_VERSION : '79.13';
+const APP_VERSION = (typeof SAHSI_ASSET_VERSION !== 'undefined') ? SAHSI_ASSET_VERSION : '79.14';
 /** Footer’da görünen sürüm */
 const FOOTER_VERSION = (typeof SAHSI_FOOTER_VERSION !== 'undefined') ? SAHSI_FOOTER_VERSION : '78.34';
 const APP_DEBUG = false;
@@ -273,7 +273,8 @@ async function queueServerSyncPayload(payload) {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
             },
-            body: JSON.stringify(serverPayload)
+            body: JSON.stringify(serverPayload),
+            tag: 'sync-data'
         });
         if ('serviceWorker' in navigator && 'sync' in ServiceWorkerRegistration.prototype) {
             const registration = await navigator.serviceWorker.ready;
@@ -284,8 +285,17 @@ async function queueServerSyncPayload(payload) {
     }
 }
 
+function isKasaSyncQueueItem(item) {
+    if (!item || typeof item.url !== 'string') return false;
+    if (item.tag === 'sync-data') return false;
+    return item.tag === 'kasa-sync' || item.url.includes('kd_save.php');
+}
+
 function isServerSyncQueueItem(item) {
-    return !!(item && typeof item.url === 'string' && (item.url.includes('save.php') || item.url.includes('write_data.php')));
+    if (!item || typeof item.url !== 'string') return false;
+    if (isKasaSyncQueueItem(item)) return false;
+    if (item.tag === 'sync-data' || item.url.includes('write_data.php')) return true;
+    return item.url.includes('save.php');
 }
 
 async function clearQueuedServerSyncPayloads(existingDb) {
@@ -1192,6 +1202,12 @@ function saveDataToServer(data, force = false) {
             throw new Error("ANTI-WIPE: Sunucu veri kaybini engelledi.");
         }
 
+        if (response.status === 401 || response.status === 503) {
+            const authError = new Error(response.status === 503 ? 'AUTH_SETUP' : 'AUTH');
+            authError.authRequired = true;
+            throw authError;
+        }
+
         if (!response.ok) {
             let detail = rawText;
             try {
@@ -1212,10 +1228,18 @@ function saveDataToServer(data, force = false) {
         }
     });
 
-    return sendSave(primaryUrl)
+    const sendWithAuth = (url) => sendSave(url).catch(async error => {
+        if (error && error.authRequired && typeof ensureServerAuth === 'function') {
+            const auth = await ensureServerAuth(true);
+            if (auth && auth.ok) return sendSave(url);
+        }
+        throw error;
+    });
+
+    return sendWithAuth(primaryUrl)
         .catch(error => {
             if (String(error && error.message || '').includes('HTTP 403')) {
-                return sendSave(fallbackUrl);
+                return sendWithAuth(fallbackUrl);
             }
             throw error;
         })
@@ -1284,6 +1308,21 @@ async function loadData() {
         hasLoadedServerData = false;
         updateServerStatus('error', 'Çevrimdışı mod, cihazda kayıtlı veri yok');
         return { ok: false, hasPeopleData: false, source: 'offline-empty' };
+    }
+
+    if (typeof ensureServerAuth === 'function') {
+        const auth = await ensureServerAuth();
+        if (!auth || !auth.ok) {
+            if (localData) {
+                allData = localData;
+                hasLoadedServerData = false;
+                updateServerStatus('error', 'Oturum yok · cihazdaki veri');
+                return { ok: true, hasPeopleData: true, source: 'offline-local' };
+            }
+            hasLoadedServerData = false;
+            updateServerStatus('error', 'Sunucu girişi gerekli');
+            return { ok: false, hasPeopleData: false, source: 'auth-required' };
+        }
     }
 
     try {
@@ -4012,14 +4051,13 @@ window.addEventListener('online', async () => {
         try {
             const registration = await navigator.serviceWorker.ready;
             await registration.sync.register('sync-data');
+            await registration.sync.register('kasa-sync');
             APP_DEBUG && console.log('Background sync registered');
         } catch (error) {
             console.error('Background sync registration failed:', error);
-            // Fallback: manual sync
             await manualSync();
         }
     } else {
-        // Browser doesn't support background sync, do manual sync
         await manualSync();
     }
 });
@@ -4031,32 +4069,39 @@ window.addEventListener('offline', async () => {
 });
 
 // Manual sync fallback
+async function postLatestQueuedDocument(db, items) {
+    if (!items.length) return false;
+    const latest = items.slice().sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))[0];
+    const response = await fetchWithTimeout(latest.url, {
+        method: latest.method,
+        headers: latest.headers,
+        body: latest.body,
+        credentials: 'same-origin'
+    }, 45000);
+    if (!response.ok) return false;
+    const cutoff = latest.timestamp || 0;
+    for (const item of items) {
+        if ((item.timestamp || 0) <= cutoff) await removeSyncQueueItem(db, item.id);
+    }
+    return true;
+}
+
 async function manualSync() {
     try {
         const db = await openIndexedDB();
         const syncQueue = await getSyncQueue(db);
+        const kasaItems = syncQueue.filter(isKasaSyncQueueItem);
+        const cariItems = syncQueue.filter(isServerSyncQueueItem);
+        if (!kasaItems.length && !cariItems.length) return;
 
-        if (syncQueue.length > 0) {
-            APP_DEBUG && console.log('Manual sync: processing', syncQueue.length, 'items');
+        let synced = 0;
+        if (await postLatestQueuedDocument(db, cariItems)) synced += 1;
+        if (await postLatestQueuedDocument(db, kasaItems)) synced += 1;
 
-            for (const item of syncQueue) {
-                try {
-                    const response = await fetchWithTimeout(item.url, {
-                        method: item.method,
-                        headers: item.headers,
-                        body: item.body
-                    }, 45000);
-
-                    if (response.ok) {
-                        await removeSyncQueueItem(db, item.id);
-                        APP_DEBUG && console.log('Synced item:', item.id);
-                    }
-                } catch (error) {
-                    console.error('Sync failed for item:', item.id, error);
-                }
-            }
-
-            await showNotification(`${syncQueue.length} değişiklik senkronize edildi`, 'success');
+        if (synced > 0) {
+            await showNotification(`${synced} kayıt senkronize edildi`, 'success');
+        } else {
+            await showNotification('Bekleyen kayıt sunucuya yazılamadı', 'error');
         }
     } catch (error) {
         console.error('Manual sync error:', error);

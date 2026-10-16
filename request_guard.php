@@ -3,7 +3,9 @@
  * request_guard.php – Same-origin koruması (GET ve yazma istekleri).
  * Tüm veri endpoint'leri (get_data, save, kd_load vb.) bu dosyayı require edip
  * enforce_same_origin() çağırır. GET: Origin/Referer yoksa da (PWA, gizlilik) izin
- * verilebilir. Yazma (POST/PUT): Origin veya Referer ile Host eşleşmeli; aksi 403.
+ * verilebilir. Yazma (POST/PUT/PATCH/DELETE): Origin veya Referer host ile eşleşmeli;
+ * ikisi de yoksa Sec-Fetch-Site same-origin/same-site olmalı. Boş başlık veya
+ * Sec-Fetch-Site: none yazmayı geçirmez.
  */
 if (!headers_sent()) {
     header('X-Content-Type-Options: nosniff');
@@ -53,8 +55,8 @@ function hosts_match(string $left, string $right): bool {
  * 1) Host zorunlu; yoksa 400.
  * 2) Origin varsa: Origin host ile Request Host aynı olmalı; değilse 403.
  * 3) Origin yoksa (PWA bazen null gönderir): Referer host ile Host eşleşmeli.
- * 4) İkisi de yoksa: Sec-Fetch-Site same-origin/same-site/none olmalı; sadece GET
- *    isteklerinde Origin/Referer yokluğu tolere edilir (PWA / gizlilik).
+ * 4) İkisi de yoksa: GET tolere edilir. Yazmada Sec-Fetch-Site same-origin veya
+ *    same-site olmak zorundadır; boş başlık ve "none" reddedilir.
  */
 function enforce_same_origin(): void {
     $hostHeader = $_SERVER['HTTP_HOST'] ?? '';
@@ -88,14 +90,15 @@ function enforce_same_origin(): void {
         $originOk = true;
     }
 
-    // Sec-Fetch-Site: only enforce when we couldn't validate via Origin/Referer.
-    // GET: allow without Origin/Referer (PWA, privacy). POST: allow when Sec-Fetch-Site is none (PWA direkt).
-    $secFetchSite = $_SERVER['HTTP_SEC_FETCH_SITE'] ?? '';
+    $secFetchSite = isset($_SERVER['HTTP_SEC_FETCH_SITE']) ? (string) $_SERVER['HTTP_SEC_FETCH_SITE'] : '';
     $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
-    if (!$originOk && $secFetchSite !== '' && !in_array($secFetchSite, ['same-origin', 'same-site', 'none'], true)) {
-        if ($method !== 'GET') {
-            deny_request(403, 'Fetch-site policy violation (Sec-Fetch-Site: ' . $secFetchSite . ')');
+    $isWrite = in_array($method, ['POST', 'PUT', 'PATCH', 'DELETE'], true);
+    if (!$originOk && $isWrite) {
+        if (!in_array($secFetchSite, ['same-origin', 'same-site'], true)) {
+            deny_request(403, 'Yazma istegi reddedildi');
         }
+    } elseif (!$originOk && $secFetchSite !== '' && !in_array($secFetchSite, ['same-origin', 'same-site', 'none'], true)) {
+        deny_request(403, 'Fetch-site policy violation');
     }
 }
 ?>

@@ -9,20 +9,43 @@ Diğer siteler/klasörler etkilenmez.
 
 ## Kurulum (cPanel)
 
-### Seçenek A: cPanel Git (önerilen)
+### Seçenek A: FTP (canlı veri için güvenli yol)
 
-1. cPanel -> `Git Version Control`
-2. Repo path: `/home/karmotor/public_html/sahsicari`
-3. Branch: `main`
-4. `Update from Remote`
-5. `Deploy HEAD Commit`
+GitHub Actions (`.github/workflows/deploy.yml`) kodu FTP ile atar.
+`veriler.json`, `kd_veriler.json`, `auth_config.php` ve yedek JSON'lar exclude'dadır; deploy bunları silmez.
+`backups/.htaccess` ve `kd_backups/.htaccess` kodla birlikte gider.
 
-Bu repo içinde `.cpanel.yml` bulunduğu için deploy görevleri otomatik uygulanır.
+### Seçenek B: cPanel Git — canlı klasörü repo yapma
 
-### Seçenek B: File Manager / manuel kopya
+`.cpanel.yml` yalnız kod dosyalarını `cp` ile kopyalar. Canlı JSON'u silen adım budur diye değil, **git çalışma kopyası canlı klasörün kendisiyse** silinir.
+
+`kd_veriler.json` ve `veriler.json` repodan çıkarıldı. cPanel Git Version Control repo yolu `public_html/sahsicari` ise `Update from Remote` bu dosyaları diskten kaldırır. Yedekler de aynı şekilde gider.
+
+Bunu kullanacaksan:
+
+1. Repo yolunu canlı klasörün **dışına** al (örnek: `/home/karmotor/repositories/sahsicari`).
+2. `.cpanel.yml` içindeki `DEPLOYPATH` canlı klasör kalsın.
+3. `Update from Remote` sonra `Deploy HEAD Commit`.
+4. Canlı klasörde elle duran `veriler.json`, `kd_veriler.json`, `auth_config.php` ve yedek JSON'lara dokunma.
+
+Canlı klasör zaten bir git çalışma kopyasıysa yeni deploy'u oraya çekme. FTP yolunu kullan.
+
+### Seçenek C: File Manager / manuel kopya
 
 - Kod dosyalarını `public_html/sahsicari/` altına kopyala.
 - Veri dosyalarını ezme.
+
+## İlk parola
+
+Veri API'leri oturumsuz cevap vermez. Sunucuda `auth_config.php` yoksa site ilk açılışta parola belirleme ekranı gösterir. Parolayı deploy'dan hemen sonra koy. Adres dışarıdan erişilebiliyorsa ilk kaydeden o parolayı alır.
+
+Shell varsa, web formunu beklemeden:
+
+```bash
+php tools/create-auth-config.php "en-az-10-karakter"
+```
+
+`auth_config.php` repoya ve FTP deploy'una girmez. Dosyayı elle silersen giriş kapanır; yenisini hemen yaz.
 
 ## Kritik Veri Dosyaları (EZME)
 
@@ -30,8 +53,9 @@ Aşağıdakiler canlı veridir, deploy sırasında korunmalıdır:
 
 - `veriler.json`
 - `kd_veriler.json`
-- `backups/`
-- `kd_backups/`
+- `auth_config.php`
+- `backups/*.json`
+- `kd_backups/*.json`
 
 ## .cpanel.yml Notu
 

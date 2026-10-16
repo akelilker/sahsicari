@@ -2,7 +2,7 @@
 /**
  * save.php – Veri kaydetme endpoint.
  * Akış: input validate → anti-wipe kontrolü (force yoksa) → backup → temp write → atomic rename → response.
- * force=true: GET parametresi ile koruma atlanır (yedekten dönüş / bilinçli overwrite).
+ * force=true: oturum açmış istekte anti-wipe atlanır (yedekten dönüş / bilinçli overwrite).
  */
 error_reporting(0);
 ini_set('display_errors', 0);
@@ -17,6 +17,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 require_once __DIR__ . '/request_guard.php';
 enforce_same_origin();
+require_once __DIR__ . '/auth_lib.php';
+require_api_auth();
 
 /** Toplam işlem sayısını hesaplar (kişi başına transactions dizisi). */
 function countPersistedPeople(array $data): int {

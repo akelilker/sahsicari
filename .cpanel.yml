@@ -2,10 +2,12 @@
 deployment: 
   tasks:
     - export DEPLOYPATH=/home/karmotor/public_html/sahsicari
-    - /bin/mkdir -p $DEPLOYPATH
+    - /bin/mkdir -p $DEPLOYPATH/backups $DEPLOYPATH/kd_backups
     - /bin/cp -R icons $DEPLOYPATH/
     - /bin/cp -R js $DEPLOYPATH/
     - /bin/cp index.html kasa.html offline.html $DEPLOYPATH/
     - /bin/cp app.js kasa.js storage.js service_worker.js $DEPLOYPATH/
     - /bin/cp style.css kasa.css manifest.json apple-touch-icon.png favicon.ico og-image.png $DEPLOYPATH/
-    - /bin/cp get_data.php load.php save.php write_data.php request_guard.php kd_load.php kd_save.php .htaccess $DEPLOYPATH/
+    - /bin/cp get_data.php load.php save.php write_data.php request_guard.php kd_load.php kd_save.php auth.php auth_lib.php .htaccess $DEPLOYPATH/
+    - /bin/cp backups/.htaccess $DEPLOYPATH/backups/.htaccess
+    - /bin/cp kd_backups/.htaccess $DEPLOYPATH/kd_backups/.htaccess

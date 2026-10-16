@@ -1,5 +1,9 @@
-backups/
-kd_backups/
+backups/*
+!backups/.htaccess
+kd_backups/*
+!kd_backups/.htaccess
 _archive/
 veriler.json
 kd_veriler.json
+auth_config.php
+auth_attempts.json

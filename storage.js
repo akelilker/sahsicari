@@ -180,6 +180,38 @@ class IndexedDBStorage {
         }
     }
 
+    async getSyncQueue() {
+        try {
+            await this.initPromise;
+            return new Promise((resolve, reject) => {
+                const transaction = this.db.transaction(['syncQueue'], 'readonly');
+                const store = transaction.objectStore('syncQueue');
+                const request = store.getAll();
+                request.onsuccess = () => resolve(request.result || []);
+                request.onerror = () => reject(request.error);
+            });
+        } catch (error) {
+            logger.error('getSyncQueue error:', error);
+            return [];
+        }
+    }
+
+    async deleteSyncQueueIds(ids) {
+        try {
+            await this.initPromise;
+            if (!ids || !ids.length) return;
+            return new Promise((resolve, reject) => {
+                const transaction = this.db.transaction(['syncQueue'], 'readwrite');
+                const store = transaction.objectStore('syncQueue');
+                ids.forEach((id) => store.delete(id));
+                transaction.oncomplete = () => resolve();
+                transaction.onerror = () => reject(transaction.error);
+            });
+        } catch (error) {
+            logger.error('deleteSyncQueueIds error:', error);
+        }
+    }
+
 }
 
 // Hybrid Storage: IndexedDB with localStorage fallback.
@@ -287,6 +319,21 @@ class HybridStorage {
         // For now, we assume IndexedDB is the primary mechanism for sync.
         logger.warn('SyncQueue is not supported in localStorage mode.');
         return Promise.resolve();
+    }
+
+    async getSyncQueue() {
+        await this.waitForReady();
+        if (this.useIndexedDB && this.storage && this.storage.getSyncQueue) {
+            return this.storage.getSyncQueue();
+        }
+        return [];
+    }
+
+    async deleteSyncQueueIds(ids) {
+        await this.waitForReady();
+        if (this.useIndexedDB && this.storage && this.storage.deleteSyncQueueIds) {
+            return this.storage.deleteSyncQueueIds(ids);
+        }
     }
 }
 

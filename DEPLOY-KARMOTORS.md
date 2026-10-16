@@ -17,8 +17,13 @@ Hedef dizin:
 Korunan (sunucuda kalacak) dosyalar:
 - `veriler.json`
 - `kd_veriler.json`
-- `backups/`
-- `kd_backups/`
+- `auth_config.php`
+- `backups/*.json`
+- `kd_backups/*.json`
+
+`backups/.htaccess` ve `kd_backups/.htaccess` kodla birlikte gider. Canlı JSON yedekleri exclude'da kaldığı için silinmez.
+
+cPanel Git ile canlı `public_html/sahsicari` klasörünü repo yolu yapma. `Update from Remote`, repodan silinmiş `kd_veriler.json` / `veriler.json` dosyalarını diskten kaldırır. Ayrıntı: `DEPLOY-SAHSICARI.md`.
 
 ## 2) GitHub Secrets Ekle
 
@@ -50,8 +55,9 @@ Asagidaki 4 secret'i ekle:
 - Veri dosyalari bilerek deploy disinda:
   - `veriler.json`
   - `kd_veriler.json`
-  - `backups/`
-  - `kd_backups/`
+  - `auth_config.php`
+  - `backups/*.json`
+  - `kd_backups/*.json`
 - Bu sayede kod guncellenirken canli veri ezilmez.
 - `dangerous-clean-slate: false` oldugu icin sunucuda tum klasoru silmez.
 

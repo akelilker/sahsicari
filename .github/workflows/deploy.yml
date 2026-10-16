@@ -38,10 +38,13 @@ jobs:
             **/.cursor/**
             node_modules/**
             reports/**
-            backups/**
-            kd_backups/**
+            backups/*.json
+            kd_backups/*.json
             veriler.json
             kd_veriler.json
+            auth_config.php
+            auth_attempts.json
+            tools/**
             .gitignore
             **/*.md
             .DS_Store

@@ -1,27 +1,28 @@
 // Service Worker — SW_VERSION js/version.js SAHSI_ASSET_VERSION ile aynı olmalı
 const DEBUG = false; // Set to true for development
-const SW_VERSION = '79.13';
+const SW_VERSION = '79.14';
 const CACHE_PREFIX = 'sahsi-hesap-v';
 const CACHE_NAME = `${CACHE_PREFIX}${SW_VERSION}`;
 const APP_SCOPE_URL = self.registration.scope;
 const scopedUrl = (relativePath) => new URL(relativePath, APP_SCOPE_URL).toString();
 const APP_SHELL_URL = scopedUrl('index.html');
 const OFFLINE_URL = scopedUrl('offline.html');
-const API_BYPASS_FILES = new Set(['load.php', 'get_data.php', 'save.php', 'write_data.php', 'kd_load.php', 'kd_save.php']);
+const API_BYPASS_FILES = new Set(['load.php', 'get_data.php', 'save.php', 'write_data.php', 'kd_load.php', 'kd_save.php', 'auth.php']);
 const urlsToCache = [
     'index.html',
     'kasa.html',
     'offline.html',
-    'js/version.js?v=79.13',
+    'js/version.js?v=79.14',
     'storage.js?v=1.0',
-    'js/utils.js?v=79.13',
-    'js/report-exports.js?v=79.13',
+    'js/utils.js?v=79.14',
+    'js/auth-gate.js?v=79.14',
+    'js/report-exports.js?v=79.14',
     'js/FileSaver.min.js',
     'js/xlsx.bundle.min.js',
-    'style.css?v=79.13',
-    'app.js?v=79.13',
-    'kasa.css?v=79.13',
-    'kasa.js?v=79.13',
+    'style.css?v=79.14',
+    'app.js?v=79.14',
+    'kasa.css?v=79.14',
+    'kasa.js?v=79.14',
     'manifest.json?v=20260719e',
     'manifest.json',
     'favicon.ico?v=20260719e',
@@ -195,91 +196,78 @@ self.addEventListener('sync', (event) => {
     }
 });
 
+function isKasaSyncQueueItem(item) {
+    if (!item || typeof item.url !== 'string') return false;
+    if (item.tag === 'sync-data') return false;
+    return item.tag === 'kasa-sync' || item.url.includes('kd_save.php');
+}
+
 function isCariSyncQueueItem(item) {
-    if (!item || typeof item.url !== 'string' || item.tag === 'kasa-sync') {
-        return false;
-    }
-    if (item.url.includes('write_data.php')) {
-        return true;
-    }
-    if (item.url.includes('kd_save.php')) {
-        return false;
-    }
+    if (!item || typeof item.url !== 'string' || isKasaSyncQueueItem(item)) return false;
+    if (item.tag === 'sync-data' || item.url.includes('write_data.php')) return true;
     return item.url.includes('save.php');
+}
+
+async function deleteQueueItems(db, items) {
+    if (!items.length) return;
+    const tx = db.transaction('syncQueue', 'readwrite');
+    const store = tx.objectStore('syncQueue');
+    for (const item of items) {
+        if (item && item.id != null) store.delete(item.id);
+    }
+    await new Promise((resolve, reject) => {
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+    });
+}
+
+async function postLatestFullDocument(db, items) {
+    if (!items.length) return false;
+    const latest = items.slice().sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))[0];
+    const response = await fetch(latest.url, {
+        method: latest.method,
+        headers: latest.headers,
+        body: latest.body,
+        credentials: 'same-origin'
+    });
+    const cutoff = latest.timestamp || 0;
+    if (response.status === 409 && typeof latest.url === 'string' && latest.url.includes('kd_save.php')) {
+        await deleteQueueItems(db, items.filter((item) => (item.timestamp || 0) <= cutoff));
+        return false;
+    }
+    if (!response.ok) return false;
+    await deleteQueueItems(db, items.filter((item) => (item.timestamp || 0) <= cutoff));
+    return true;
 }
 
 async function syncPendingCariData() {
     const db = await openDatabase();
     const syncQueue = await getFromObjectStore(db, 'syncQueue');
     const itemsToSync = syncQueue.filter(isCariSyncQueueItem);
+    if (!itemsToSync.length) return;
 
-    if (!itemsToSync.length) {
-        return;
-    }
-
-    const sortedItems = itemsToSync.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-    let syncedCount = 0;
-
-    for (const item of sortedItems) {
-        try {
-            const response = await fetch(item.url, {
-                method: item.method,
-                headers: item.headers,
-                body: item.body
-            });
-
-            if (response.ok) {
-                await removeFromSyncQueue(db, item.id);
-                syncedCount++;
-            } else {
-                DEBUG && console.error('[SW] Cari sync failed with status:', response.status, item.url);
-                break;
-            }
-        } catch (error) {
-            DEBUG && console.error('[SW] Cari sync fetch failed:', error);
-            break;
-        }
-    }
-
-    if (syncedCount > 0) {
-        DEBUG && console.log('[SW] Cari sync successful, cleared', syncedCount, 'queue item(s).');
+    try {
+        const synced = await postLatestFullDocument(db, itemsToSync);
+        if (!synced) return;
         const clients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
         for (const client of clients) {
-            client.postMessage({ type: 'SYNC_COMPLETE', syncedCount });
+            client.postMessage({ type: 'SYNC_COMPLETE', syncedCount: 1 });
         }
+    } catch (error) {
+        DEBUG && console.error('[SW] Cari sync fetch failed:', error);
     }
 }
 
 async function syncPendingKasaData() {
     const db = await openDatabase();
     const syncQueue = await getFromObjectStore(db, 'syncQueue');
-    const itemsToSync = syncQueue.filter(item => item.tag === 'kasa-sync');
-
-    // To prevent multiple syncs for the same data, we only sync the latest item
-    const latestItem = itemsToSync.sort((a, b) => b.timestamp - a.timestamp)[0];
-    
-    if (!latestItem) return;
+    const itemsToSync = syncQueue.filter(isKasaSyncQueueItem);
+    if (!itemsToSync.length) return;
 
     try {
-        const response = await fetch(latestItem.url, {
-            method: latestItem.method,
-            headers: latestItem.headers,
-            body: latestItem.body
-        });
-
-        if (response.ok) {
-            // Clear all kasa-sync items from the queue after successful sync
-            const idsToDelete = itemsToSync.map(item => item.id);
-            const tx = db.transaction('syncQueue', 'readwrite');
-            const store = tx.objectStore('syncQueue');
-            for (const id of idsToDelete) {
-                store.delete(id);
-            }
-            await new Promise(r => tx.oncomplete = r);
-            console.log('Kasa sync successful, cleared queue.');
-        } else {
-            console.error('Kasa sync failed with status:', response.status);
-        }
+        const synced = await postLatestFullDocument(db, itemsToSync);
+        if (synced) console.log('Kasa sync successful, cleared older queue items.');
+        else console.error('Kasa sync failed');
     } catch (error) {
         console.error('Kasa sync fetch failed:', error);
     }

@@ -17,6 +17,8 @@ header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
 
 require_once __DIR__ . '/request_guard.php';
 enforce_same_origin();
+require_once __DIR__ . '/auth_lib.php';
+require_api_auth();
 
 $mainFile = __DIR__ . '/veriler.json';
 $backupDir = __DIR__ . '/backups';
