@@ -7333,19 +7333,25 @@ input[type="date"]::-webkit-datetime-edit-year-field {
 }
 
 .auth-gate__head {
-    padding: 14px 20px;
-    background: linear-gradient(135deg, rgba(var(--green-panel-rgb), 0.95) 0%, rgba(var(--green-panel-rgb), 0.55) 100%);
-    border-bottom: 1px solid var(--white-15);
+    /* Kişi modalı .modal-header ile aynı yeşil → koyu dikey geçiş */
+    background: linear-gradient(to bottom, #2e7d32 0%, #14182a 100%);
+    padding: 6px 12px 0 12px;
+    border-radius: 15px 15px 0 0;
+    border-bottom: none;
     text-align: center;
+    flex-shrink: 0;
+    backdrop-filter: none;
 }
 
 .auth-gate__head h2 {
     margin: 0;
-    font-size: 1.05rem;
-    font-weight: 800;
+    padding: 8px 0 14px;
+    font-size: 1.05em;
+    font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: #fff;
+    color: #f8fafb;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
 }
 
 .auth-gate__body {
@@ -7376,7 +7382,7 @@ input[type="date"]::-webkit-datetime-edit-year-field {
     font-size: 16px;
     padding: 12px 44px 12px 14px;
     border-radius: 10px;
-    border: 1px solid var(--white-15);
+    border: 1px solid var(--tab-purple);
     background: rgba(5, 9, 18, 0.65);
     color: #fff;
     outline: none;
@@ -7388,8 +7394,9 @@ input[type="date"]::-webkit-datetime-edit-year-field {
 }
 
 .auth-gate__body input:focus {
-    border-color: var(--auth-green-light);
-    box-shadow: 0 0 0 3px var(--green-30);
+    outline: none;
+    border-color: #6200ea;
+    box-shadow: 0 0 0 3px var(--tab-purple), 0 0 10px var(--tab-purple);
 }
 
 .auth-gate__eye {
