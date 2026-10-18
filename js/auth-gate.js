@@ -47,7 +47,7 @@
             + '<div class="auth-gate__body">'
             + '<p id="authGateMessage" aria-live="polite"></p>'
             + '<label class="sr-only" for="authGateUser">Kullanıcı</label>'
-            + '<input id="authGateUser" class="sr-only" autocomplete="username" value="sahsicari">'
+            + '<input id="authGateUser" class="sr-only" name="username" type="text" autocomplete="username" value="sahsicari" tabindex="-1" aria-hidden="true">'
             + '<label class="sr-only" for="authGatePassword">Parola</label>'
             + '<div class="auth-gate__field"><input id="authGatePassword" type="password" placeholder="Parola" autocomplete="current-password" required>'
             + '<button type="button" class="auth-gate__eye" aria-label="Parolayı göster" data-target="authGatePassword">' + EYE + '</button>' + '</div>'
