@@ -403,18 +403,6 @@
 .btn-mt-20 {
     margin-top: 20px;
 }
-.sync-help-heading {
-    color: #42a5f5;
-    margin-bottom: 12px;
-}
-.sync-help-list {
-    margin-bottom: 18px;
-    line-height: 1.5;
-}
-.sync-help-footer {
-    text-align: center;
-    margin-top: 18px;
-}
 .quick-form-person-row {
     text-align: center;
     margin-bottom: 15px !important;
@@ -2262,7 +2250,6 @@ overflow: hidden;
 #addPersonModal,
 #personManagementModal,
 #categoryManagementModal,
-#syncHelpModal,
 #generalStatusModal,
 #categoryDetailModal,
 #monthlySummaryModal,
@@ -2470,7 +2457,6 @@ overflow: hidden;
 #addPersonModal .modal-content,
 #personManagementModal .modal-content,
 #categoryManagementModal .modal-content,
-#syncHelpModal .modal-content,
 #generalStatusModal .modal-content,
 #categoryDetailModal .modal-content,
 #monthlySummaryModal .modal-content,

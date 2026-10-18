@@ -102,5 +102,58 @@ if ($action === 'login') {
     exit;
 }
 
+if ($action === 'change-password') {
+    if (!sahsicari_auth_configured()) {
+        http_response_code(503);
+        echo json_encode(['status' => 'error', 'message' => 'Parola henuz tanimli degil', 'configured' => false], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+    if (!sahsicari_is_authenticated()) {
+        http_response_code(401);
+        echo json_encode(['status' => 'error', 'message' => 'Oturum gerekli', 'configured' => true], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+    if (sahsicari_login_locked()) {
+        http_response_code(429);
+        echo json_encode(['status' => 'error', 'message' => 'Cok fazla deneme. 15 dakika sonra tekrar dene.'], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+    $current = isset($body['current']) && is_string($body['current']) ? $body['current'] : '';
+    $password = isset($body['password']) && is_string($body['password']) ? $body['password'] : '';
+    $confirm = isset($body['confirm']) && is_string($body['confirm']) ? $body['confirm'] : '';
+    if (!sahsicari_password_ok($current)) {
+        sahsicari_register_login_failure();
+        http_response_code(401);
+        echo json_encode(['status' => 'error', 'message' => 'Mevcut parola hatali'], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+    if (strlen($password) < 10 || strlen($password) > 200) {
+        http_response_code(400);
+        echo json_encode(['status' => 'error', 'message' => 'Parola en az 10 karakter olmali'], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+    if (!hash_equals($password, $confirm)) {
+        http_response_code(400);
+        echo json_encode(['status' => 'error', 'message' => 'Parolalar eslesmiyor'], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+    if (hash_equals($current, $password)) {
+        http_response_code(400);
+        echo json_encode(['status' => 'error', 'message' => 'Yeni parola mevcut paroladan farkli olmali'], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+    if (!sahsicari_update_auth_password($password)) {
+        http_response_code(500);
+        echo json_encode(['status' => 'error', 'message' => 'Parola kaydedilemedi'], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+    sahsicari_start_session();
+    session_regenerate_id(true);
+    $_SESSION['auth_ok'] = true;
+    $_SESSION['auth_at'] = time();
+    echo json_encode(['status' => 'success', 'message' => 'Parola guncellendi'], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
 http_response_code(404);
 echo json_encode(['status' => 'error', 'message' => 'Bilinmeyen islem'], JSON_UNESCAPED_UNICODE);

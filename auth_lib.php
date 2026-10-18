@@ -154,6 +154,10 @@ function sahsicari_is_authenticated(): bool {
     return !empty($_SESSION['auth_ok']);
 }
 
+function sahsicari_auth_config_export(string $hash): string {
+    return "<?php\nreturn " . var_export(['password_hash' => $hash], true) . ";\n";
+}
+
 function sahsicari_write_auth_config(string $password): bool {
     $path = sahsicari_auth_config_path();
     if (is_file($path)) {
@@ -163,7 +167,7 @@ function sahsicari_write_auth_config(string $password): bool {
     if (!is_string($hash) || $hash === '') {
         return false;
     }
-    $contents = "<?php\nreturn " . var_export(['password_hash' => $hash], true) . ";\n";
+    $contents = sahsicari_auth_config_export($hash);
     $handle = @fopen($path, 'x');
     if ($handle === false) {
         return false;
@@ -172,6 +176,31 @@ function sahsicari_write_auth_config(string $password): bool {
     fclose($handle);
     if ($written === false) {
         @unlink($path);
+        return false;
+    }
+    @chmod($path, 0640);
+    return true;
+}
+
+function sahsicari_update_auth_password(string $password): bool {
+    if (!sahsicari_auth_configured()) {
+        return false;
+    }
+    if ($password === '' || strlen($password) > 200) {
+        return false;
+    }
+    $hash = password_hash($password, PASSWORD_DEFAULT);
+    if (!is_string($hash) || $hash === '') {
+        return false;
+    }
+    $path = sahsicari_auth_config_path();
+    $contents = sahsicari_auth_config_export($hash);
+    $tmp = $path . '.tmp.' . bin2hex(random_bytes(8));
+    if (@file_put_contents($tmp, $contents, LOCK_EX) === false) {
+        return false;
+    }
+    if (!@rename($tmp, $path)) {
+        @unlink($tmp);
         return false;
     }
     @chmod($path, 0640);

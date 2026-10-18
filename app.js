@@ -1,6 +1,6 @@
 /* formatDateTR → js/utils.js */
 /** Önbellek / service worker — js/version.js ile senkron tut */
-const APP_VERSION = (typeof SAHSI_ASSET_VERSION !== 'undefined') ? SAHSI_ASSET_VERSION : '79.17';
+const APP_VERSION = (typeof SAHSI_ASSET_VERSION !== 'undefined') ? SAHSI_ASSET_VERSION : '79.18';
 /** Footer’da görünen sürüm */
 const FOOTER_VERSION = (typeof SAHSI_FOOTER_VERSION !== 'undefined') ? SAHSI_FOOTER_VERSION : '78.34';
 const APP_DEBUG = false;
@@ -731,7 +731,10 @@ function bindMenuEvents() {
             else if (action === 'category-mgmt') showCategoryManagementModal();
             else if (action === 'color-menu') showColorSelectionMenu();
             else if (action === 'server-test') testServerConnection();
-            else if (action === 'sync-help') showSyncHelp();
+            else if (action === 'change-password') {
+                DOM.settingsMenu?.classList.remove(MENU_DROPDOWN_OPEN_CLASS);
+                if (typeof openPasswordChangeModal === 'function') openPasswordChangeModal();
+            }
             else if (action === 'memory-clear') initiateMemoryClear();
         });
     }
@@ -1047,8 +1050,6 @@ function bindModalEvents() {
     if (addCategoryFromManagerBtn) addCategoryFromManagerBtn.addEventListener('click', addCategoryFromManager);
     const generateReportBtn = document.getElementById('generateReportBtn');
     if (generateReportBtn) generateReportBtn.addEventListener('click', () => runReportExport('exportMonthlySummary'));
-    const syncHelpCloseBtn = document.getElementById('syncHelpCloseBtn');
-    if (syncHelpCloseBtn) syncHelpCloseBtn.addEventListener('click', function() { closeCurrentModal(syncHelpCloseBtn); });
     const editGidenBtn = document.getElementById('editGidenBtn');
     if (editGidenBtn) editGidenBtn.addEventListener('click', function() { setEditTransactionType('giden'); });
     const editGelenBtn = document.getElementById('editGelenBtn');
@@ -4629,10 +4630,6 @@ async function processQuickTransaction() {
         isProcessing = false;
         if(btn) { btn.disabled = false; btn.textContent = 'Kaydet'; }
     }
-}
-
-function showSyncHelp() {
-    openModal('syncHelpModal');
 }
 
 let activeContextMenu = null;

@@ -39,7 +39,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png?v=20260719e">
 <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png?v=20260719e">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=20260719e">
-<link rel="stylesheet" href="style.css?v=79.17">
+<link rel="stylesheet" href="style.css?v=79.18">
 
 <title>ŞAHSİ HESAP TAKİBİ</title>
 </head>
@@ -66,7 +66,7 @@
                     <button type="button" class="btn" data-action="category-mgmt">Kategori Yönetimi</button>
                     <button type="button" class="btn" data-action="color-menu">Neon Işık Rengi</button>
                     <button type="button" class="btn btn-server-test" data-action="server-test">Sunucu Testi</button>
-                    <button type="button" class="btn" data-action="sync-help">Rehber</button>
+                    <button type="button" class="btn" data-action="change-password">Güvenlik</button>
                     <button type="button" class="btn btn-memory-clear" data-action="memory-clear">🧹 Bellek Temizle</button>
                 </div>
             </div>
@@ -483,36 +483,6 @@
     </div>
 </div>
 
-<div class="modal" id="syncHelpModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <div class="header-top-row">
-                <h2> ℹ️ Uygulama Rehberi</h2>
-                <button class="close-modal-btn" title="Kapat" type="button">✖</button>
-            </div>
-        </div>
-        <div class="modal-body">
-            <h4 class="sync-help-heading"> 📱 Çevrimdışı Kullanım:</h4>
-            <ol class="sync-help-list">
-                <li>Bu Sayfayı iPhone'da <strong>Safari</strong>'de açın.</li>
-                <li><strong>Paylaş</strong> butonu ➡️  <strong>"Ana Ekrana Ekle"</strong> seçeneğini kullanın.</li>
-                <li>İlk açılıştan sonra internet olmasa da Ana Hesap ve Kasa ekranlarını kullanabilirsiniz.</li>
-            </ol>
-            <h4 class="sync-help-heading"> ⚙️ Veri Yönetimi:</h4>
-            <ol class="sync-help-list">
-                <li>Değişiklikler önce cihazınıza kaydedilir.</li>
-                <li>İnternet bağlantısı geldiğinde bekleyen değişiklikler sunucuya aktarılır.</li>
-                <li><strong>"Genel Durum"</strong> ile özet bilgilerinizi görüntüleyebilirsiniz.</li>
-                <li><strong>"Yedek Al"</strong> ile verilerinizin bir kopyasını indirebilirsiniz.</li>
-                <li><strong>"Yedekten Geri Yükle"</strong> ile indirdiğiniz yedeği sunucuya geri yükleyebilirsiniz.</li>
-            </ol>
-            <div class="sync-help-footer">
-                <button type="button" class="btn btn-cloud" id="syncHelpCloseBtn">Anladım ✅ </button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <div class="modal" id="editTransactionModal">
     <div class="modal-content">
         <div class="modal-header">
@@ -617,10 +587,11 @@
     </div>
 </div>
 
-<script src="js/version.js?v=79.17"></script>
+<script src="js/version.js?v=79.18"></script>
 <script src="storage.js?v=1.0" defer></script>
-<script src="js/utils.js?v=79.17" defer></script>
-<script src="js/auth-gate.js?v=79.17" defer></script>
-<script src="app.js?v=79.17" defer></script>
+<script src="js/utils.js?v=79.18" defer></script>
+<script src="js/auth-gate.js?v=79.18" defer></script>
+<script src="app.js?v=79.18" defer></script>
+<script src="js/auth-password-change.js?v=79.18" defer></script>
 </body>
 </html>
