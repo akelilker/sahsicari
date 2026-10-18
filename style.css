@@ -4651,7 +4651,7 @@ select option {
     padding-right: 2px;
 }
 
-.report-item {
+#generalStatusModal .report-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -4661,24 +4661,46 @@ select option {
     border: none;
     border-radius: 0;
     box-shadow: none;
-    transition: transform 140ms ease, box-shadow 140ms ease, background 140ms ease;
-    will-change: transform;
     position: relative;
 }
 
-.report-item:hover {
-    background: rgba(255, 255, 255, 0.06);
-    transform: translateZ(0) scale(1.012);
-    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
+#generalStatusModal .report-item:hover,
+#generalStatusModal .report-item:focus,
+#generalStatusModal .report-item:active {
+    background: transparent;
+    border: none;
+    outline: none;
+    box-shadow: none;
+    transform: none;
 }
 
-.report-item[data-person-key] {
+#generalStatusModal .report-item[data-person-key] {
     cursor: pointer;
 }
 
-.report-item[data-person-key]:focus-visible {
-    outline: 2px solid rgba(98, 0, 234, 0.45);
-    outline-offset: 2px;
+#generalStatusModal .report-item[data-person-key]:focus-visible {
+    outline: none;
+}
+
+#generalStatusModal .report-name,
+#generalStatusModal .report-val {
+    display: inline-block;
+    transition: transform 150ms ease;
+}
+
+#generalStatusModal .report-name {
+    transform-origin: left center;
+}
+
+#generalStatusModal .report-val {
+    transform-origin: right center;
+}
+
+#generalStatusModal .report-item:hover .report-name,
+#generalStatusModal .report-item:hover .report-val,
+#generalStatusModal .report-item:focus-visible .report-name,
+#generalStatusModal .report-item:focus-visible .report-val {
+    transform: scale(1.06);
 }
 
 .report-name {
