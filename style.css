@@ -548,6 +548,15 @@ body {
     user-select: none;
 }
 
+/* Masaüstü: merkez .container dışındaki yan boşluklar (mobil tam genişlik aynı kalır) */
+@media (min-width: 451px) {
+    html,
+    body {
+        background-color: #070b14;
+        background: linear-gradient(180deg, #070b14 0%, #050910 100%);
+    }
+}
+
 /* iOS PWA pull-down bounce engelleme + footer her zaman görünsün */
 html.ios-pwa {
     overscroll-behavior-y: none;

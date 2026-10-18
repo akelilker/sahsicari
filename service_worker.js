@@ -1,6 +1,6 @@
 // Service Worker — SW_VERSION js/version.js SAHSI_ASSET_VERSION ile aynı olmalı
 const DEBUG = false; // Set to true for development
-const SW_VERSION = '79.23';
+const SW_VERSION = '79.24';
 const CACHE_PREFIX = 'sahsi-hesap-v';
 const CACHE_NAME = `${CACHE_PREFIX}${SW_VERSION}`;
 const APP_SCOPE_URL = self.registration.scope;
@@ -12,17 +12,17 @@ const urlsToCache = [
     'index.html',
     'kasa.html',
     'offline.html',
-    'js/version.js?v=79.23',
+    'js/version.js?v=79.24',
     'storage.js?v=1.0',
-    'js/utils.js?v=79.23',
-    'js/auth-gate.js?v=79.23',
-    'js/report-exports.js?v=79.23',
+    'js/utils.js?v=79.24',
+    'js/auth-gate.js?v=79.24',
+    'js/report-exports.js?v=79.24',
     'js/FileSaver.min.js',
     'js/xlsx.bundle.min.js',
-    'style.css?v=79.23',
-    'app.js?v=79.23',
-    'kasa.css?v=79.23',
-    'kasa.js?v=79.23',
+    'style.css?v=79.24',
+    'app.js?v=79.24',
+    'kasa.css?v=79.24',
+    'kasa.js?v=79.24',
     'manifest.json?v=20260719e',
     'manifest.json',
     'favicon.ico?v=20260719e',
