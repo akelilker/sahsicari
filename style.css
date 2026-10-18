@@ -7340,6 +7340,25 @@ input[type="date"]::-webkit-datetime-edit-year-field {
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
 }
 
+#authPasswordChange .auth-gate__head {
+    text-align: left;
+    padding: 6px 12px 0 12px;
+}
+
+#authPasswordChange .auth-gate__head-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 44px;
+}
+
+#authPasswordChange .auth-gate__head h2 {
+    flex-grow: 1;
+    margin: 0 0 0 30px;
+    padding: 8px 0 10px;
+    text-align: center;
+}
+
 .auth-gate__body {
     display: flex;
     flex-direction: column;

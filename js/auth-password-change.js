@@ -46,8 +46,38 @@
         });
     }
 
+    function bindCloseControls(wrap) {
+        var closeBtn = byId('authChangeCloseBtn');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                hide();
+            });
+        }
+        wrap.addEventListener('click', function (e) {
+            if (e.target === wrap) hide();
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && wrap && !wrap.hidden) hide();
+        });
+    }
+
     function ensureDom() {
-        if (byId('authPasswordChange')) return;
+        var existing = byId('authPasswordChange');
+        if (existing) {
+            if (!byId('authChangeCloseBtn')) {
+                var head = existing.querySelector('.auth-gate__head');
+                if (head) {
+                    head.innerHTML = ''
+                        + '<div class="auth-gate__head-row">'
+                        + '<h2 id="authChangeTitle">Parola Değiştir</h2>'
+                        + '<button type="button" class="close-modal-btn" id="authChangeCloseBtn" title="Kapat" aria-label="Kapat">✖</button>'
+                        + '</div>';
+                    bindCloseControls(existing);
+                }
+            }
+            return;
+        }
         var wrap = document.createElement('div');
         wrap.id = 'authPasswordChange';
         wrap.className = 'auth-gate';
@@ -55,7 +85,11 @@
         wrap.setAttribute('data-mode', 'change');
         wrap.innerHTML = ''
             + '<form id="authPasswordChangeForm" class="auth-gate__card" novalidate>'
-            + '<div class="auth-gate__head"><h2 id="authChangeTitle">Parola Değiştir</h2></div>'
+            + '<div class="auth-gate__head">'
+            + '<div class="auth-gate__head-row">'
+            + '<h2 id="authChangeTitle">Parola Değiştir</h2>'
+            + '<button type="button" class="close-modal-btn" id="authChangeCloseBtn" title="Kapat" aria-label="Kapat">✖</button>'
+            + '</div></div>'
             + '<div class="auth-gate__body">'
             + '<p id="authChangeMessage" aria-live="polite"></p>'
             + '<label class="sr-only" for="authChangeCurrent">Mevcut parola</label>'
