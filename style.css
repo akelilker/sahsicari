@@ -5962,8 +5962,10 @@ label[for="editDateInput"] {
 }
 
 @media screen and (min-width: 769px) {
+    html,
     body {
-        background: #0c1628;
+        background-color: #070b14;
+        background: linear-gradient(180deg, #070b14 0%, #050910 100%);
     }
     .header h1 {
         box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 4px 14px rgba(0, 0, 0, 0.28);
