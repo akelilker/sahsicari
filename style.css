@@ -7359,6 +7359,45 @@ input[type="date"]::-webkit-datetime-edit-year-field {
     text-align: center;
 }
 
+#authPasswordChange .close-modal-btn {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    outline: none;
+    color: var(--modal-close-color);
+    -webkit-text-fill-color: var(--modal-close-color);
+    font-size: 22px;
+    line-height: 1;
+    width: 24px;
+    height: 24px;
+    min-height: 0;
+    padding: 0;
+    margin: 0;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+    transition: color var(--timing-normal), filter var(--timing-normal), box-shadow var(--timing-normal);
+}
+
+#authPasswordChange .close-modal-btn:hover {
+    color: #7c4dff;
+    -webkit-text-fill-color: #7c4dff;
+    filter: brightness(1.12);
+    box-shadow: 0 0 10px var(--tab-purple);
+}
+
+#authPasswordChange .close-modal-btn:focus {
+    outline: none;
+}
+
+#authPasswordChange .close-modal-btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(98, 0, 234, 0.35);
+}
+
 .auth-gate__body {
     display: flex;
     flex-direction: column;
