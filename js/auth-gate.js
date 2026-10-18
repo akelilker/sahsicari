@@ -35,8 +35,35 @@
         return document.getElementById(id);
     }
 
+    function ensureUsernameField() {
+        var form = byId('authGateForm');
+        if (!form) return;
+        var user = byId('authGateUser');
+        var body = form.querySelector('.auth-gate__body');
+        if (!body) return;
+        if (!user) {
+            body.insertAdjacentHTML('afterbegin',
+                '<label class="sr-only" for="authGateUser">Kullanıcı</label>'
+                + '<input id="authGateUser" class="sr-only" name="username" type="text" autocomplete="username" value="sahsicari" tabindex="-1">');
+            return;
+        }
+        if (!form.contains(user)) {
+            body.insertBefore(user, body.firstChild);
+            var label = form.querySelector('label[for="authGateUser"]');
+            if (label && !body.contains(label)) body.insertBefore(label, user);
+        }
+        user.type = 'text';
+        user.name = 'username';
+        user.setAttribute('autocomplete', 'username');
+        user.classList.add('sr-only');
+        user.removeAttribute('aria-hidden');
+    }
+
     function ensureDom() {
-        if (byId('authGate')) return;
+        if (byId('authGate')) {
+            ensureUsernameField();
+            return;
+        }
         var wrap = document.createElement('div');
         wrap.id = 'authGate';
         wrap.className = 'auth-gate';
@@ -47,7 +74,7 @@
             + '<div class="auth-gate__body">'
             + '<p id="authGateMessage" aria-live="polite"></p>'
             + '<label class="sr-only" for="authGateUser">Kullanıcı</label>'
-            + '<input id="authGateUser" class="sr-only" name="username" type="text" autocomplete="username" value="sahsicari" tabindex="-1" aria-hidden="true">'
+            + '<input id="authGateUser" class="sr-only" name="username" type="text" autocomplete="username" value="sahsicari" tabindex="-1">'
             + '<label class="sr-only" for="authGatePassword">Parola</label>'
             + '<div class="auth-gate__field"><input id="authGatePassword" type="password" placeholder="Parola" autocomplete="current-password" required>'
             + '<button type="button" class="auth-gate__eye" aria-label="Parolayı göster" data-target="authGatePassword">' + EYE + '</button>' + '</div>'

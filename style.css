@@ -7446,6 +7446,26 @@ input[type="date"]::-webkit-datetime-edit-year-field {
     box-shadow: 0 0 0 1px var(--tab-purple), 0 0 10px var(--tab-purple);
 }
 
+/* rgba(5,9,18,0.65) over modal card ≈ #0e1524 */
+.auth-gate__body input:-webkit-autofill,
+.auth-gate__body input:-webkit-autofill:hover,
+.auth-gate__body input:-webkit-autofill:focus,
+.auth-gate__body input:autofill {
+    -webkit-text-fill-color: #ffffff;
+    caret-color: #ffffff;
+    border: 1px solid var(--tab-purple);
+    transition: background-color 99999s ease-in-out 0s;
+    -webkit-box-shadow: 0 0 0 1000px #0e1524 inset;
+    box-shadow: 0 0 0 1000px #0e1524 inset;
+}
+
+.auth-gate__body input:-webkit-autofill:focus,
+.auth-gate__body input:autofill:focus {
+    border-color: #6200ea;
+    -webkit-box-shadow: 0 0 0 1000px #0e1524 inset, 0 0 0 1px var(--tab-purple), 0 0 10px var(--tab-purple);
+    box-shadow: 0 0 0 1000px #0e1524 inset, 0 0 0 1px var(--tab-purple), 0 0 10px var(--tab-purple);
+}
+
 .auth-gate__eye {
     position: absolute;
     top: 50%;
