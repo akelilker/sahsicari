@@ -172,6 +172,9 @@
         var gate = byId('authPasswordChange');
         if (gate) gate.hidden = true;
         resetForm();
+        if (typeof global.releaseDropdownMenuUiLock === 'function') {
+            global.releaseDropdownMenuUiLock();
+        }
     }
 
     function open() {

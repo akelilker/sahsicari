@@ -1,6 +1,6 @@
 /* formatDateTR → js/utils.js */
 /** Önbellek / service worker — js/version.js ile senkron tut */
-const APP_VERSION = (typeof SAHSI_ASSET_VERSION !== 'undefined') ? SAHSI_ASSET_VERSION : '79.22';
+const APP_VERSION = (typeof SAHSI_ASSET_VERSION !== 'undefined') ? SAHSI_ASSET_VERSION : '79.23';
 /** Footer’da görünen sürüm */
 const FOOTER_VERSION = (typeof SAHSI_FOOTER_VERSION !== 'undefined') ? SAHSI_FOOTER_VERSION : '78.34';
 const APP_DEBUG = false;
@@ -652,6 +652,17 @@ function closeSettingsAndNotificationMenus() {
     setMenuBackdropActive(false);
 }
 
+/** Ayarlar/bildirim menüsünün blur + tıklama kilidini tamamen kaldırır (parola modalı vb.). */
+function releaseDropdownMenuUiLock() {
+    closeSettingsAndNotificationMenus();
+    DOM.mainAppContainer?.classList.remove('disable-events');
+    document.body.classList.remove('disable-events');
+}
+
+if (typeof window !== 'undefined') {
+    window.releaseDropdownMenuUiLock = releaseDropdownMenuUiLock;
+}
+
 function closeColorSelectionMenuFromUI() {
     document.getElementById('colorSelectionMenu')?.classList.remove(COLOR_MENU_OPEN_CLASS);
 }
@@ -732,7 +743,7 @@ function bindMenuEvents() {
             else if (action === 'color-menu') showColorSelectionMenu();
             else if (action === 'server-test') testServerConnection();
             else if (action === 'change-password') {
-                DOM.settingsMenu?.classList.remove(MENU_DROPDOWN_OPEN_CLASS);
+                releaseDropdownMenuUiLock();
                 if (typeof openPasswordChangeModal === 'function') openPasswordChangeModal();
             }
             else if (action === 'memory-clear') initiateMemoryClear();
