@@ -443,6 +443,9 @@
   --sa-right: env(safe-area-inset-right, 0px);
 
   --bg-dark: #0e1525;
+  /* Masaüstü: merkez .container dışı yan boşluk (modal/menü ile renk kayması olmamalı) */
+  --desktop-outer-bg: #0a1324;
+  --desktop-outer-bg-gradient: linear-gradient(180deg, #0a1324 0%, #091220 100%);
   --modal-bg: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
   --text-color: #e0e0e0;
   --chrome-title-gradient: linear-gradient(to bottom, #78909c 0%, #eceff1 45%, #546e7a 50%, #b0bec5 100%);
@@ -552,8 +555,32 @@ body {
 @media (min-width: 451px) {
     html,
     body {
-        background-color: #070b14;
-        background: linear-gradient(180deg, #070b14 0%, #050910 100%);
+        background-color: var(--desktop-outer-bg);
+        background-image: var(--desktop-outer-bg-gradient);
+    }
+
+    /* Tam ekran modal arka planı yan boşlukları karartıyordu (rgba 10,21,37) */
+    .modal {
+        background-color: transparent;
+        pointer-events: none;
+    }
+
+    .modal .modal-content {
+        pointer-events: auto;
+    }
+
+    .menu-backdrop-overlay.active {
+        background: transparent;
+    }
+
+    .person-select-backdrop:not([hidden]) {
+        background: transparent;
+    }
+
+    .auth-gate {
+        background: transparent;
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
     }
 }
 
@@ -2135,6 +2162,17 @@ overflow: hidden;
 
 .modal.show { display: flex !important; }
 
+@media (min-width: 451px) {
+    .modal {
+        background-color: transparent;
+        pointer-events: none;
+    }
+
+    .modal .modal-content {
+        pointer-events: auto;
+    }
+}
+
 .modal-content {
     background: #0e1525;
     padding: 0;
@@ -3273,6 +3311,19 @@ select option {
     color: #90a4ae;
     margin-top: 2px;
     text-shadow: none;
+}
+
+/* Kişi modalı — Kategori Durumu kartları: sekme alt çizgisiyle aynı mor */
+#personModal .category-item {
+    border: 1px solid #6200ea;
+    box-shadow: inset 0 0 0 1px rgba(98, 0, 234, 0.12), 0 0 10px rgba(98, 0, 234, 0.14);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    #personModal .category-item:hover {
+        border-color: #7c4dff;
+        box-shadow: inset 0 0 0 1px rgba(98, 0, 234, 0.22), 0 0 12px var(--tab-purple);
+    }
 }
 
 #transactionHistory{
@@ -5964,8 +6015,8 @@ label[for="editDateInput"] {
 @media screen and (min-width: 769px) {
     html,
     body {
-        background-color: #070b14;
-        background: linear-gradient(180deg, #070b14 0%, #050910 100%);
+        background-color: var(--desktop-outer-bg);
+        background-image: var(--desktop-outer-bg-gradient);
     }
     .header h1 {
         box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 4px 14px rgba(0, 0, 0, 0.28);
