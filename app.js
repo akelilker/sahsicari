@@ -1,6 +1,6 @@
 /* formatDateTR → js/utils.js */
 /** Önbellek / service worker — js/version.js ile senkron tut */
-const APP_VERSION = (typeof SAHSI_ASSET_VERSION !== 'undefined') ? SAHSI_ASSET_VERSION : '79.24';
+const APP_VERSION = (typeof SAHSI_ASSET_VERSION !== 'undefined') ? SAHSI_ASSET_VERSION : '79.25';
 /** Footer’da görünen sürüm */
 const FOOTER_VERSION = (typeof SAHSI_FOOTER_VERSION !== 'undefined') ? SAHSI_FOOTER_VERSION : '78.34';
 const APP_DEBUG = false;
@@ -97,6 +97,7 @@ let quickPersonSelectedValue = null;
 let quickAllocationDesc = '';
 let quickAllocationCategory = ''; 
 let quickOverlayAmountListenersRegistered = false;
+let returnToGeneralStatusAfterPersonModal = false;
 let currentReportFilterType = 'all';
 let renderReportPreviewDebounced = null;
 
@@ -2209,7 +2210,7 @@ function copySummaryText() {
     doCopy(text);
 }
 
-function openPersonModal(person) {
+function openPersonModal(person, preferredTab) {
     currentPerson = person;
     document.getElementById('modalPersonName').textContent = ` 👤  ${person.toUpperCase()}`;
     
@@ -2224,10 +2225,25 @@ function openPersonModal(person) {
 
     setReportDateDefaults();
 
-    const firstTab = document.querySelector('#personModal .tab-btn');
-    if (firstTab) firstTab.click();
+    if (preferredTab) {
+        const tabBtn = document.querySelector('#personModal .tab-btn[data-tab="' + preferredTab + '"]');
+        if (tabBtn) openTab(null, preferredTab, tabBtn);
+        else {
+            const firstTab = document.querySelector('#personModal .tab-btn');
+            if (firstTab) firstTab.click();
+        }
+    } else {
+        const firstTab = document.querySelector('#personModal .tab-btn');
+        if (firstTab) firstTab.click();
+    }
 
     openModal('personModal');
+}
+
+function openPersonKategoriFromGeneralStatus(personKey) {
+    if (!personKey || !allData[personKey]) return;
+    returnToGeneralStatusAfterPersonModal = true;
+    openPersonModal(personKey, 'kategoriDurumu');
 }
 
 function updatePersonTotalInfo(person) {
@@ -2336,6 +2352,16 @@ function closeCurrentModal(el) {
     if(modal && modal.id === 'personModal') {
         setCategorySelectBackdropActive(false);
         if(DOM.personSelect) DOM.personSelect.value = '';
+        if (returnToGeneralStatusAfterPersonModal) {
+            returnToGeneralStatusAfterPersonModal = false;
+            const generalModal = document.getElementById('generalStatusModal');
+            if (generalModal) {
+                generalModal.classList.add('show');
+                DOM.mainAppContainer?.classList.add('disable-events');
+                document.body.classList.add('disable-events');
+            }
+            return;
+        }
     }
 }
 
@@ -4281,6 +4307,36 @@ document.addEventListener('touchstart', (event) => {
     }
 }, {passive: true});
 
+function bindGeneralStatusReportRowActions() {
+    const root = document.getElementById('reportContent');
+    if (!root || root.dataset.reportActionsBound === '1') return;
+    root.dataset.reportActionsBound = '1';
+    root.addEventListener('click', function (e) {
+        const row = e.target.closest('.report-item[data-person-key]');
+        if (!row) return;
+        const raw = row.getAttribute('data-person-key');
+        if (!raw) return;
+        openPersonKategoriFromGeneralStatus(decodeURIComponent(raw));
+    });
+    root.addEventListener('keydown', function (e) {
+        const row = e.target.closest('.report-item[data-person-key]');
+        if (!row) return;
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        const raw = row.getAttribute('data-person-key');
+        if (!raw) return;
+        openPersonKategoriFromGeneralStatus(decodeURIComponent(raw));
+    });
+}
+
+function renderGeneralStatusPersonRow(personKey, amount, valueClass) {
+    const safeKey = encodeURIComponent(personKey);
+    return '<div class="report-item" role="button" tabindex="0" data-person-key="' + safeKey + '" aria-label="' + sanitizeHTML(personKey) + ' kategori durumu">'
+        + '<span class="report-name">' + sanitizeHTML(personKey) + '</span>'
+        + '<span class="report-val ' + valueClass + '">' + formatAmount(amount) + '</span>'
+        + '</div>';
+}
+
 function showGeneralStatusReport() {
     const debtors = [];
     const creditors = [];
@@ -4311,10 +4367,7 @@ function showGeneralStatusReport() {
     html += '<div class="report-header"><span>Borçlar</span></div>';
     html += '<div class="report-list">';
     creditors.forEach(c => {
-        html += `<div class="report-item">
-            <span class="report-name">${sanitizeHTML(c.name)}</span>
-            <span class="report-val val-red">${formatAmount(c.amount)}</span>
-        </div>`;
+        html += renderGeneralStatusPersonRow(c.name, c.amount, 'val-red');
     });
     if(creditors.length === 0) html += renderEmptyState('Borç yok');
     html += '</div>'; 
@@ -4324,10 +4377,7 @@ function showGeneralStatusReport() {
     html += '<div class="report-header"><span>Alacaklar</span></div>';
     html += '<div class="report-list">';
     debtors.forEach(d => {
-        html += `<div class="report-item">
-            <span class="report-name">${sanitizeHTML(d.name)}</span>
-            <span class="report-val val-green">${formatAmount(d.amount)}</span>
-        </div>`;
+        html += renderGeneralStatusPersonRow(d.name, d.amount, 'val-green');
     });
     if(debtors.length === 0) html += renderEmptyState('Alacak yok');
     html += '</div>'; 
@@ -4373,6 +4423,7 @@ function showGeneralStatusReport() {
     </div>`;
 
     document.getElementById('reportContent').innerHTML = html + statusHtml;
+    bindGeneralStatusReportRowActions();
     const userAgent = navigator.userAgent || navigator.vendor || window.opera;
     const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
     const isPWA = window.matchMedia('(display-mode: standalone)').matches || (window.navigator.standalone === true);

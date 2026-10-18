@@ -4621,6 +4621,15 @@ select option {
     box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
 }
 
+.report-item[data-person-key] {
+    cursor: pointer;
+}
+
+.report-item[data-person-key]:focus-visible {
+    outline: 2px solid rgba(98, 0, 234, 0.45);
+    outline-offset: 2px;
+}
+
 .report-name {
     max-width: 95px;
     font-size: 0.7em;
