@@ -105,10 +105,6 @@ return { data: null, pending: false, revision: 0 };
 }
 }
 
-async function readLocalKasaData() {
-return (await readLocalKasaState()).data;
-}
-
 async function writeKasaDataState(data, markPending, revision) {
 const snapshot = JSON.stringify({
 data: data,

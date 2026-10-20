@@ -68,16 +68,6 @@ scrollbar-width: none;
 display: none;
 }
 
-/* Dönüş kapısı */
-.kasa-donus {
-position: absolute !important;
-top: calc(env(safe-area-inset-top) + 15px);
-left: 10px;
-bottom: auto !important;
-right: auto !important;
-z-index: 4200;
-}
-
 /* ==================== ANA TEMA IŞIKLARINI KAPATMA (SADECE YANLAR) ==================== */
 
 .container::before,

@@ -290,13 +290,3 @@ function getFromObjectStore(db, storeName) {
         request.onerror = () => reject(request.error);
     });
 }
-
-function removeFromSyncQueue(db, itemId) {
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction('syncQueue', 'readwrite');
-        const store = transaction.objectStore('syncQueue');
-        const request = store.delete(itemId);
-        request.onsuccess = () => resolve();
-        request.onerror = () => reject(request.error);
-    });
-}

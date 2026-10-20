@@ -23,12 +23,6 @@ require_api_auth();
 $mainFile = __DIR__ . '/veriler.json';
 $backupDir = __DIR__ . '/backups';
 
-function isValidJsonObjectOrArray(string $text): bool {
-    $decoded = json_decode($text, true);
-    if (json_last_error() !== JSON_ERROR_NONE) return false;
-    return is_array($decoded);
-}
-
 function decodeJsonArray(string $text): ?array {
     $decoded = json_decode($text, true);
     if (json_last_error() !== JSON_ERROR_NONE || !is_array($decoded)) {
