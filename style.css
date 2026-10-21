@@ -1167,7 +1167,7 @@ button.delete-notif-btn {
     display: flex;
     gap: 8px;
     margin-top: 0;
-    margin-bottom: 0px;
+    margin-bottom: 6px;
     align-items: stretch;
     flex-shrink: 0;
     padding-right: 0px;
@@ -1706,7 +1706,7 @@ button.delete-notif-btn {
 
 .quick-access-section {
     margin-top: 0px;
-    margin-bottom: -2px;
+    margin-bottom: 4px;
     padding: 0px 8px 0px 8px;
     border: none;
 }
@@ -6063,7 +6063,31 @@ label[for="editDateInput"] {
     }
     .quick-access-section {
         background: transparent;
-        margin-bottom: 3px; /* Favori kişiler ile Cari Kayıt arası 3px */
+        margin-bottom: 9px; /* Favori kişiler ile Cari Kayıt arası (+6px) */
+    }
+
+    /* Modallar: üst şerit ana çerçeve (header) içinde kalsın */
+    #personModal,
+    #addPersonModal,
+    #personManagementModal,
+    #categoryManagementModal,
+    #generalStatusModal,
+    #categoryDetailModal,
+    #monthlySummaryModal,
+    #editTransactionModal {
+        padding-top: calc(var(--sa-top) + var(--header-h) + 8px);
+    }
+
+    #personModal .modal-content,
+    #addPersonModal .modal-content,
+    #personManagementModal .modal-content,
+    #categoryManagementModal .modal-content,
+    #generalStatusModal .modal-content,
+    #categoryDetailModal .modal-content,
+    #monthlySummaryModal .modal-content,
+    #editTransactionModal .modal-content {
+        height: auto;
+        max-height: calc(100dvh - var(--sa-top) - var(--header-h) - var(--modal-viewport-bottom) - 12px);
     }
     .quick-access-section h3 {
         margin-top: 7px; /* Sık Kullanılanlar metni 5px aşağı */
