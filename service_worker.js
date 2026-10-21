@@ -1,6 +1,6 @@
 // Service Worker — SW_VERSION js/version.js SAHSI_ASSET_VERSION ile aynı olmalı
 const DEBUG = false; // Set to true for development
-const SW_VERSION = '79.34';
+const SW_VERSION = '79.35';
 const CACHE_PREFIX = 'sahsi-hesap-v';
 const CACHE_NAME = `${CACHE_PREFIX}${SW_VERSION}`;
 const APP_SCOPE_URL = self.registration.scope;
@@ -12,18 +12,18 @@ const urlsToCache = [
     'index.html',
     'kasa.html',
     'offline.html',
-    'js/version.js?v=79.34',
+    'js/version.js?v=79.35',
     'storage.js?v=1.0',
-    'js/utils.js?v=79.34',
-    'js/auth-gate.js?v=79.34',
-    'js/auth-password-change.js?v=79.34',
-    'js/report-exports.js?v=79.34',
+    'js/utils.js?v=79.35',
+    'js/auth-gate.js?v=79.35',
+    'js/auth-password-change.js?v=79.35',
+    'js/report-exports.js?v=79.35',
     'js/FileSaver.min.js',
     'js/xlsx.bundle.min.js',
-    'style.css?v=79.34',
-    'app.js?v=79.34',
-    'kasa.css?v=79.34',
-    'kasa.js?v=79.34',
+    'style.css?v=79.35',
+    'app.js?v=79.35',
+    'kasa.css?v=79.35',
+    'kasa.js?v=79.35',
     'manifest.json?v=20260719e',
     'manifest.json',
     'favicon.ico?v=20260719e',

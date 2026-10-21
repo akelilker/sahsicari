@@ -559,14 +559,10 @@ body {
         background-image: var(--desktop-outer-bg-gradient);
     }
 
-    /* Tam ekran modal arka planı yan boşlukları karartıyordu (rgba 10,21,37) */
+    /* Masaüstü: modal tam ekran opak dış arka plan (yan çizgiler / header çerçevesi görünmesin) */
     .modal {
-        background-color: transparent;
-        pointer-events: none;
-    }
-
-    .modal .modal-content {
-        pointer-events: auto;
+        background-color: var(--desktop-outer-bg);
+        background-image: var(--desktop-outer-bg-gradient);
     }
 
     .menu-backdrop-overlay.active {
@@ -2151,12 +2147,8 @@ overflow: hidden;
 
 @media (min-width: 451px) {
     .modal {
-        background-color: transparent;
-        pointer-events: none;
-    }
-
-    .modal .modal-content {
-        pointer-events: auto;
+        background-color: var(--desktop-outer-bg);
+        background-image: var(--desktop-outer-bg-gradient);
     }
 }
 
