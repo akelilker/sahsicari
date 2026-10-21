@@ -582,6 +582,10 @@ body {
         -webkit-backdrop-filter: none;
         backdrop-filter: none;
     }
+
+    .auth-gate::before {
+        display: none;
+    }
 }
 
 /* iOS PWA pull-down bounce engelleme + footer her zaman görünsün */
@@ -7351,9 +7355,26 @@ input[type="date"]::-webkit-datetime-edit-year-field {
     align-items: center;
     justify-content: center;
     padding: 24px;
+    background: transparent;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+}
+
+/* Bulanık tam ekran katmanı — kart/inputların üstünde değil (iOS Safari metin boyama) */
+.auth-gate::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
     background: rgba(8, 12, 22, 0.62);
     -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
+    pointer-events: none;
+}
+
+.auth-gate > .auth-gate__card {
+    position: relative;
+    z-index: 1;
 }
 
 .auth-gate__card {
@@ -7364,6 +7385,8 @@ input[type="date"]::-webkit-datetime-edit-year-field {
     background: var(--modal-bg);
     color: var(--text-color);
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
 }
 
 .auth-gate__head {
@@ -7478,7 +7501,7 @@ input[type="date"]::-webkit-datetime-edit-year-field {
     padding: 12px 44px 12px 14px;
     border-radius: 10px;
     border: 1px solid var(--tab-purple);
-    background: rgba(5, 9, 18, 0.65);
+    background: #0e1524;
     color: #fff;
     outline: none;
     transition: border-color var(--timing-normal), box-shadow var(--timing-normal);
