@@ -6065,30 +6065,6 @@ label[for="editDateInput"] {
         background: transparent;
         margin-bottom: 9px; /* Favori kişiler ile Cari Kayıt arası (+6px) */
     }
-
-    /* Modallar: üst şerit ana çerçeve (header) içinde kalsın */
-    #personModal,
-    #addPersonModal,
-    #personManagementModal,
-    #categoryManagementModal,
-    #generalStatusModal,
-    #categoryDetailModal,
-    #monthlySummaryModal,
-    #editTransactionModal {
-        padding-top: calc(var(--sa-top) + var(--header-h) + 8px);
-    }
-
-    #personModal .modal-content,
-    #addPersonModal .modal-content,
-    #personManagementModal .modal-content,
-    #categoryManagementModal .modal-content,
-    #generalStatusModal .modal-content,
-    #categoryDetailModal .modal-content,
-    #monthlySummaryModal .modal-content,
-    #editTransactionModal .modal-content {
-        height: auto;
-        max-height: calc(100dvh - var(--sa-top) - var(--header-h) - var(--modal-viewport-bottom) - 12px);
-    }
     .quick-access-section h3 {
         margin-top: 7px; /* Sık Kullanılanlar metni 5px aşağı */
     }
