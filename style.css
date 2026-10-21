@@ -582,10 +582,6 @@ body {
         -webkit-backdrop-filter: none;
         backdrop-filter: none;
     }
-
-    .auth-gate::before {
-        display: none;
-    }
 }
 
 /* iOS PWA pull-down bounce engelleme + footer her zaman görünsün */
