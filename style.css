@@ -2116,6 +2116,11 @@ body.modal-open-ios .global-status-bar {
     animation: statusSyncPulse 1s ease-in-out infinite;
 }
 
+#serverStatusText.text-status-loading {
+    color: #00e676;
+    animation: statusSyncPulse 1s ease-in-out infinite;
+}
+
 @keyframes versionEmbed {
     0% { opacity: 1; text-shadow: 0 0 10px rgba(207, 216, 220, 0.8); }
     50% { opacity: 1; text-shadow: 0 0 15px rgba(207, 216, 220, 1); }

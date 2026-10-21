@@ -1,6 +1,6 @@
 /* formatDateTR → js/utils.js */
 /** Önbellek / service worker — js/version.js ile senkron tut */
-const APP_VERSION = (typeof SAHSI_ASSET_VERSION !== 'undefined') ? SAHSI_ASSET_VERSION : '79.30';
+const APP_VERSION = (typeof SAHSI_ASSET_VERSION !== 'undefined') ? SAHSI_ASSET_VERSION : '79.31';
 /** Footer’da görünen sürüm */
 const FOOTER_VERSION = (typeof SAHSI_FOOTER_VERSION !== 'undefined') ? SAHSI_FOOTER_VERSION : '78.34';
 const APP_DEBUG = false;
@@ -1110,7 +1110,7 @@ window.addEventListener('load', async function() {
     bindPageEvents();
     bindModalEvents();
     updateVersionDisplay();
-    updateServerStatus('', '📡 Veriler yükleniyor...');
+    updateServerStatus('loading', '📡 Veriler yükleniyor...');
 
     const glowThemePromise = loadGlowTheme();
     const loadDataPromise = loadData();
@@ -1153,6 +1153,10 @@ function updateServerStatus(type, message) {
     } else if (type === 'error') {
         dot.classList.add('offline');
         text.classList.add('text-offline');
+        text.textContent = safeMessage;
+    } else if (type === 'loading') {
+        dot.classList.add('syncing');
+        text.classList.add('text-status-loading');
         text.textContent = safeMessage;
     } else {
         dot.classList.add('syncing');
