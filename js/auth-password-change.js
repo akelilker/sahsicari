@@ -110,6 +110,15 @@
                 }
             }
             ensureUsernameField(existing);
+            if (!byId('authChangeSavePassword')) {
+                var submitBtn = byId('authChangeSubmit');
+                if (submitBtn) {
+                    submitBtn.insertAdjacentHTML('beforebegin',
+                        '<label class="auth-gate__save-password" for="authChangeSavePassword">'
+                        + '<input type="checkbox" id="authChangeSavePassword" checked>'
+                        + '<span>Parolayı kaydet</span></label>');
+                }
+            }
             bindEyeButtons(existing);
             ensureInteractionHandlers(existing);
             return;
@@ -139,6 +148,9 @@
             + '<label class="sr-only" for="authChangeConfirm">Yeni parola tekrar</label>'
             + '<div class="auth-gate__field"><input id="authChangeConfirm" type="password" placeholder="Yeni parola tekrar" autocomplete="new-password" required>'
             + '<button type="button" class="auth-gate__eye" aria-label="Parolayı göster" data-target="authChangeConfirm">' + EYE + '</button></div>'
+            + '<label class="auth-gate__save-password" for="authChangeSavePassword">'
+            + '<input type="checkbox" id="authChangeSavePassword" checked>'
+            + '<span>Parolayı kaydet</span></label>'
             + '<button type="submit" id="authChangeSubmit" class="auth-gate__submit">Kaydet</button>'
             + '</div></form>';
         document.body.appendChild(wrap);
@@ -148,8 +160,25 @@
         ensureInteractionHandlers(wrap);
     }
 
+    async function storePasswordCredentialIfSupported(password) {
+        if (!password || !window.PasswordCredential || !navigator.credentials || !navigator.credentials.store) {
+            return;
+        }
+        try {
+            var userEl = byId('authChangeUser');
+            var id = (userEl && userEl.value) ? userEl.value : 'sahsicari';
+            await navigator.credentials.store(new PasswordCredential({
+                id: id,
+                password: password,
+                name: id
+            }));
+        } catch (_) {}
+    }
+
     function resetForm() {
         var gate = byId('authPasswordChange');
+        var savePw = byId('authChangeSavePassword');
+        if (savePw) savePw.checked = true;
         ['authChangeCurrent', 'authChangePassword', 'authChangeConfirm'].forEach(function (id) {
             var input = byId(id);
             if (!input) return;
@@ -230,6 +259,10 @@
                 if (msg.indexOf('Cok fazla deneme') === 0) msg = 'Çok fazla deneme. 15 dakika sonra tekrar dene.';
                 setMessage(msg, true);
                 return;
+            }
+            var saveCheckbox = byId('authChangeSavePassword');
+            if (saveCheckbox && saveCheckbox.checked) {
+                await storePasswordCredentialIfSupported(password);
             }
             hide();
             if (typeof global.showNotification === 'function') {
