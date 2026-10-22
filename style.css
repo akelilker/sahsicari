@@ -7374,7 +7374,7 @@ input[type="date"]::-webkit-datetime-edit-year-field {
     width: min(400px, 100%);
     overflow: hidden;
     border-radius: 16px;
-    border: 1px solid var(--white-20);
+    border: 1px solid var(--gray-40);
     background: var(--modal-bg);
     color: var(--text-color);
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
@@ -7600,7 +7600,7 @@ input[type="date"]::-webkit-datetime-edit-year-field {
     display: none;
 }
 
-#authPasswordChange .auth-gate__save-password {
+.auth-gate[data-mode="login"] .auth-gate__save-password {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -7611,12 +7611,17 @@ input[type="date"]::-webkit-datetime-edit-year-field {
     user-select: none;
 }
 
-#authPasswordChange .auth-gate__save-password input {
+.auth-gate[data-mode="login"] .auth-gate__save-password input {
     width: 16px;
     height: 16px;
     margin: 0;
+    padding: 0;
+    border: none;
+    background: transparent;
+    box-shadow: none;
     accent-color: #00e676;
     cursor: pointer;
+    flex-shrink: 0;
 }
 
 /* Mobil (≤450px): kapatma X, parola modalı çerçeveleri, kişi listesi */

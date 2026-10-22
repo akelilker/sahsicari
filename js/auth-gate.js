@@ -4,6 +4,54 @@
 
     var EYE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
     var EYE_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 19c-6.5 0-10-7-10-7a18.4 18.4 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c6.5 0 10 7 10 7a18.5 18.5 0 0 1-2.16 3.19M1 1l22 22"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/></svg>';
+    var SAVE_PASSWORD_KEY = 'sahsicariAuthSavePassword';
+
+    function readSavePasswordPref() {
+        try {
+            return localStorage.getItem(SAVE_PASSWORD_KEY) !== '0';
+        } catch (_) {
+            return true;
+        }
+    }
+
+    function writeSavePasswordPref(checked) {
+        try {
+            localStorage.setItem(SAVE_PASSWORD_KEY, checked ? '1' : '0');
+        } catch (_) {}
+    }
+
+    async function storeLoginPasswordCredential(password) {
+        if (!password || !window.PasswordCredential || !navigator.credentials || !navigator.credentials.store) {
+            return;
+        }
+        try {
+            var userEl = byId('authGateUser');
+            var id = (userEl && userEl.value) ? userEl.value : 'sahsicari';
+            await navigator.credentials.store(new PasswordCredential({
+                id: id,
+                password: password,
+                name: id
+            }));
+        } catch (_) {}
+    }
+
+    function ensureSavePasswordCheckbox() {
+        if (byId('authGateSavePassword')) return;
+        var submit = byId('authGateSubmit');
+        if (!submit) return;
+        submit.insertAdjacentHTML('beforebegin',
+            '<label class="auth-gate__save-password" for="authGateSavePassword">'
+            + '<input type="checkbox" id="authGateSavePassword">'
+            + '<span>Parolayı kaydet</span></label>');
+        var box = byId('authGateSavePassword');
+        if (box && box.dataset.bound !== '1') {
+            box.dataset.bound = '1';
+            box.checked = readSavePasswordPref();
+            box.addEventListener('change', function () {
+                writeSavePasswordPref(box.checked);
+            });
+        }
+    }
 
     function passwordScore(value) {
         var score = 0;
@@ -62,6 +110,7 @@
     function ensureDom() {
         if (byId('authGate')) {
             ensureUsernameField();
+            ensureSavePasswordCheckbox();
             return;
         }
         var wrap = document.createElement('div');
@@ -82,6 +131,9 @@
             + '<label id="authGateConfirmLabel" class="sr-only" for="authGateConfirm">Parola tekrar</label>'
             + '<div class="auth-gate__field auth-gate__confirm"><input id="authGateConfirm" type="password" placeholder="Parola tekrar" autocomplete="new-password">'
             + '<button type="button" class="auth-gate__eye" aria-label="Parolayı göster" data-target="authGateConfirm">' + EYE + '</button>' + '</div>'
+            + '<label class="auth-gate__save-password" for="authGateSavePassword">'
+            + '<input type="checkbox" id="authGateSavePassword">'
+            + '<span>Parolayı kaydet</span></label>'
             + '<button type="submit" id="authGateSubmit" class="auth-gate__submit">Devam</button>'
             + '</div></form>';
         document.body.appendChild(wrap);
@@ -96,6 +148,7 @@
         });
         byId('authGatePassword').addEventListener('input', updateStrength);
         byId('authGateForm').addEventListener('submit', onSubmit);
+        ensureSavePasswordCheckbox();
     }
 
     function show(mode, message) {
@@ -112,6 +165,11 @@
         byId('authGatePassword').autocomplete = setup ? 'new-password' : 'current-password';
         updateStrength();
         byId('authGateSubmit').textContent = setup ? 'Kaydet' : 'Giriş';
+        ensureSavePasswordCheckbox();
+        var saveBox = byId('authGateSavePassword');
+        if (saveBox && !setup) {
+            saveBox.checked = readSavePasswordPref();
+        }
         byId('authGatePassword').focus();
     }
 
@@ -165,6 +223,12 @@
             if (!response.ok) {
                 setMessage((data && data.message) ? data.message : 'Giriş başarısız', true);
                 return;
+            }
+            if (!setup) {
+                var saveLogin = byId('authGateSavePassword');
+                if (saveLogin && saveLogin.checked) {
+                    await storeLoginPasswordCredential(password);
+                }
             }
             hide();
             if (submitResolve) {
