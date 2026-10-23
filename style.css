@@ -2038,39 +2038,56 @@ body.modal-open-ios .global-status-bar {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
     width: 16px;
     height: 16px;
     line-height: 1;
-    transition: color 0.25s ease, text-shadow 0.25s ease, transform 0.25s ease;
+    box-sizing: border-box;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
-
 
 .status-dot.hidden {
+    display: inline-flex;
+}
+
+.status-dot::before {
+    content: '';
+    display: block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    box-sizing: border-box;
+}
+
+.status-dot.online::before {
+    background: #00e676;
+    box-shadow: 0 0 6px rgba(0, 230, 118, 0.55);
+}
+
+.status-dot.offline::before {
+    background: var(--expense-red);
+    box-shadow: 0 0 5px rgba(244, 67, 54, 0.45);
+}
+
+.status-dot.syncing::before {
+    background: #ffea00;
+    box-shadow: 0 0 6px rgba(255, 234, 0, 0.45);
+    animation: statusSyncPulse 1s ease-in-out infinite;
+}
+
+.status-dot.loading {
+    border: 2px solid rgba(0, 230, 118, 0.22);
+    border-top-color: #00e676;
+    border-radius: 50%;
+    animation: statusSpinner 0.7s linear infinite;
+}
+
+.status-dot.loading::before {
     display: none;
 }
-.status-dot::before {
-    content: "🖥";
-    font-size: 13px;
-}
 
-.status-dot.online {
-    color: #00ff00;
-    text-shadow: 0 0 8px rgba(0, 255, 0, 0.5);
-    animation: statusDim 4s forwards;
-    opacity: 1;
-}
-
-.status-dot.offline {
-    color: var(--expense-red);
-    text-shadow: none;
-    animation: statusDim 4s forwards;
-    opacity: 1;
-}
-
-.status-dot.syncing {
-    color: #ffea00;
-    text-shadow: 0 0 8px rgba(255, 234, 0, 0.5);
-    animation: statusSyncPulse 1s ease-in-out infinite;
+@keyframes statusSpinner {
+    to { transform: rotate(360deg); }
 }
 
 @keyframes statusSyncPulse {
@@ -2081,36 +2098,39 @@ body.modal-open-ios .global-status-bar {
 #serverStatusText {
     font-weight: 600;
     text-transform: none;
-    transition: color 0.3s, text-shadow 0.3s;
+    overflow: hidden;
+    white-space: nowrap;
+    max-width: min(52vw, 220px);
+    transition: opacity 0.45s ease, max-width 0.5s ease, color 0.3s, text-shadow 0.3s;
 }
 
-@keyframes statusDim {
-    0% { opacity: 1; }
-    50% { opacity: 1; }
-    100% { opacity: 0.7; }
+#serverStatusText.server-status-text--visible {
+    opacity: 1;
+    max-width: min(52vw, 220px);
+}
+
+#serverStatusText.server-status-text--hidden {
+    opacity: 0;
+    max-width: 0;
+    margin: 0;
+    padding: 0;
 }
 
 #serverStatusText.text-online {
     color: #00FF00;
-    animation: statusDim 4s forwards;
-    opacity: 1;
 }
 
 #serverStatusText.text-offline {
     color: var(--expense-red);
-    animation: statusDim 4s forwards;
-    opacity: 1;
 }
 
 #serverStatusText.text-status-syncing {
     color: #ffea00;
     text-shadow: 0 0 8px rgba(255, 234, 0, 0.45);
-    animation: statusSyncPulse 1s ease-in-out infinite;
 }
 
 #serverStatusText.text-status-loading {
     color: #00e676;
-    animation: statusSyncPulse 1s ease-in-out infinite;
 }
 
 @keyframes versionEmbed {

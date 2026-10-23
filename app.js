@@ -1,6 +1,6 @@
 /* formatDateTR → js/utils.js */
 /** Önbellek / service worker — js/version.js ile senkron tut */
-const APP_VERSION = (typeof SAHSI_ASSET_VERSION !== 'undefined') ? SAHSI_ASSET_VERSION : '79.40';
+const APP_VERSION = (typeof SAHSI_ASSET_VERSION !== 'undefined') ? SAHSI_ASSET_VERSION : '79.41';
 /** Footer’da görünen sürüm */
 const FOOTER_VERSION = (typeof SAHSI_FOOTER_VERSION !== 'undefined') ? SAHSI_FOOTER_VERSION : '78.34';
 const APP_DEBUG = false;
@@ -249,8 +249,6 @@ function syncZeroBalanceToggleText() {
 }
 let saveTimer = null;
 let dataSaveRevision = 0;
-let statusDotHideTimer = null;
-
 function getPersistedPeopleCount(data) {
     if (!data || typeof data !== 'object') return 0;
     return Object.keys(data).filter(key => key !== 'metadata' && data[key] && typeof data[key] === 'object' && !Array.isArray(data[key])).length;
@@ -1130,38 +1128,8 @@ window.addEventListener('load', async function() {
 });
 
 function updateServerStatus(type, message) {
-    const dot = DOM.statusDot;
-    const text = DOM.serverStatusText;
-    if (!dot || !text) return;
-    const safeMessage = (typeof message === 'string' && message.trim()) ? message : 'Sistem hazir';
-
-    if (statusDotHideTimer) {
-        clearTimeout(statusDotHideTimer);
-        statusDotHideTimer = null;
-    }
-    
-    dot.className = 'status-dot';
-    text.className = '';
-
-    if (type === 'success') {
-        dot.classList.add('online');
-        text.classList.add('text-online');
-        text.textContent = safeMessage;
-        statusDotHideTimer = setTimeout(() => {
-            if (DOM.statusDot) DOM.statusDot.classList.add('hidden');
-        }, 10000);
-    } else if (type === 'error') {
-        dot.classList.add('offline');
-        text.classList.add('text-offline');
-        text.textContent = safeMessage;
-    } else if (type === 'loading') {
-        dot.classList.add('syncing');
-        text.classList.add('text-status-loading');
-        text.textContent = safeMessage;
-    } else {
-        dot.classList.add('syncing');
-        text.classList.add('text-status-syncing');
-        text.textContent = safeMessage;
+    if (typeof applyFooterServerStatus === 'function') {
+        applyFooterServerStatus(DOM.statusDot, DOM.serverStatusText, type, message);
     }
 }
 

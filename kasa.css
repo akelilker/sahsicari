@@ -676,20 +676,14 @@ gap: 6px !important;
 }
 
 .status-dot {
-width: 6px !important;
-height: 6px !important;
+width: 16px !important;
+height: 16px !important;
+display: inline-flex !important;
+}
+
+.status-dot.loading {
+background: transparent !important;
 border-radius: 50% !important;
-display: inline-block !important;
-}
-
-.status-dot.online {
-background: #00e676 !important;
-box-shadow: 0 0 6px rgba(0, 230, 118, 0.6) !important;
-}
-
-.status-dot.offline {
-background: var(--expense-red) !important;
-box-shadow: 0 0 6px var(--red-60) !important;
 }
 
 .text-online {

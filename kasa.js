@@ -1,5 +1,5 @@
 /* =================================================================
-KASA DEFTERİ JS - v79.40
+KASA DEFTERİ JS - v79.41
 Yerel öncelikli kayıt + bağlantı geri geldiğinde sunucu senkronizasyonu
 ================================================================= */
 
@@ -17,7 +17,7 @@ let historyClickBound = false;
 let kategoriGridClickBound = false;
 let kategoriListClickBound = false;
 const KASA_STORAGE_KEY = 'sahsiKasaDefteriData';
-const KASA_SW_VERSION = (typeof SAHSI_ASSET_VERSION !== 'undefined') ? SAHSI_ASSET_VERSION : '79.40';
+const KASA_SW_VERSION = (typeof SAHSI_ASSET_VERSION !== 'undefined') ? SAHSI_ASSET_VERSION : '79.41';
 let kasaDataRevision = 0;
 let kasaSyncPromise = null;
 let kasaPersistPromise = Promise.resolve();
@@ -129,25 +129,14 @@ return persistOperation;
 }
 
 function updateKasaServerStatus(type, message) {
-const dot = document.getElementById('statusDot');
-const text = document.getElementById('serverStatusText');
-if (!dot || !text) return;
-
-dot.className = 'status-dot';
-text.className = '';
-
-if (type === 'online') {
-dot.classList.add('online');
-text.classList.add('text-online');
-} else if (type === 'syncing') {
-dot.classList.add('syncing');
-text.classList.add('text-status-syncing');
-} else {
-dot.classList.add('offline');
-text.classList.add('text-offline');
+if (typeof applyFooterServerStatus === 'function') {
+applyFooterServerStatus(
+document.getElementById('statusDot'),
+document.getElementById('serverStatusText'),
+type,
+message
+);
 }
-
-text.textContent = message;
 }
 
 async function loadData() {

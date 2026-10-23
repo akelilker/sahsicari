@@ -236,8 +236,55 @@
         if (document.body) document.body.classList.add('ios-pwa');
     }
 
+    var footerStatusTextHideTimer = null;
+    var FOOTER_STATUS_TEXT_VISIBLE_MS = 3000;
+
+    function applyFooterServerStatus(dot, text, type, message) {
+        if (!dot || !text) return;
+        var safeMessage = (typeof message === 'string' && message.trim()) ? message.trim() : 'Sistem hazır';
+
+        if (footerStatusTextHideTimer) {
+            clearTimeout(footerStatusTextHideTimer);
+            footerStatusTextHideTimer = null;
+        }
+
+        dot.className = 'status-dot';
+        text.className = '';
+
+        if (type === 'success' || type === 'online') {
+            dot.classList.add('online');
+            text.classList.add('text-online');
+        } else if (type === 'error' || type === 'offline') {
+            dot.classList.add('offline');
+            text.classList.add('text-offline');
+        } else if (type === 'loading') {
+            dot.classList.add('loading');
+            text.classList.add('text-status-loading');
+        } else {
+            dot.classList.add('syncing');
+            text.classList.add('text-status-syncing');
+        }
+
+        dot.setAttribute('role', 'status');
+        dot.setAttribute('aria-label', safeMessage);
+        dot.setAttribute('title', safeMessage);
+
+        text.textContent = safeMessage;
+        text.setAttribute('aria-hidden', 'false');
+        text.classList.remove('server-status-text--hidden');
+        text.classList.add('server-status-text--visible');
+
+        footerStatusTextHideTimer = setTimeout(function () {
+            text.classList.remove('server-status-text--visible');
+            text.classList.add('server-status-text--hidden');
+            text.setAttribute('aria-hidden', 'true');
+            footerStatusTextHideTimer = null;
+        }, FOOTER_STATUS_TEXT_VISIBLE_MS);
+    }
+
     global.isIosDevice = isIosDevice;
     global.isStandalonePwa = isStandalonePwa;
     global.isIosStandalonePwa = isIosStandalonePwa;
     global.applyIosPwaClass = applyIosPwaClass;
+    global.applyFooterServerStatus = applyFooterServerStatus;
 })(typeof window !== 'undefined' ? window : this);
