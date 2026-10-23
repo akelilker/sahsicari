@@ -42,7 +42,7 @@
         submit.insertAdjacentHTML('beforebegin',
             '<label class="auth-gate__save-password" for="authGateSavePassword">'
             + '<input type="checkbox" id="authGateSavePassword">'
-            + '<span>Parolayı kaydet</span></label>');
+            + '<span>Beni hatırla</span></label>');
         var box = byId('authGateSavePassword');
         if (box && box.dataset.bound !== '1') {
             box.dataset.bound = '1';
@@ -133,7 +133,7 @@
             + '<button type="button" class="auth-gate__eye" aria-label="Parolayı göster" data-target="authGateConfirm">' + EYE + '</button>' + '</div>'
             + '<label class="auth-gate__save-password" for="authGateSavePassword">'
             + '<input type="checkbox" id="authGateSavePassword">'
-            + '<span>Parolayı kaydet</span></label>'
+            + '<span>Beni hatırla</span></label>'
             + '<button type="submit" id="authGateSubmit" class="auth-gate__submit">Devam</button>'
             + '</div></form>';
         document.body.appendChild(wrap);

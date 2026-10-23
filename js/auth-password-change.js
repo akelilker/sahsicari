@@ -104,7 +104,7 @@
                 if (head) {
                     head.innerHTML = ''
                         + '<div class="auth-gate__head-row">'
-                        + '<h2 id="authChangeTitle">Parola Değiştir</h2>'
+                        + '<h2 id="authChangeTitle">Parola İşlemleri</h2>'
                         + '<button type="button" class="close-modal-btn" id="authChangeCloseBtn" title="Kapat" aria-label="Kapat">✖</button>'
                         + '</div>';
                 }
@@ -125,7 +125,7 @@
             + '<form id="authPasswordChangeForm" class="auth-gate__card" novalidate>'
             + '<div class="auth-gate__head">'
             + '<div class="auth-gate__head-row">'
-            + '<h2 id="authChangeTitle">Parola Değiştir</h2>'
+            + '<h2 id="authChangeTitle">Parola İşlemleri</h2>'
             + '<button type="button" class="close-modal-btn" id="authChangeCloseBtn" title="Kapat" aria-label="Kapat">✖</button>'
             + '</div></div>'
             + '<div class="auth-gate__body">'
