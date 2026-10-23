@@ -7677,4 +7677,22 @@ input[type="date"]::-webkit-datetime-edit-year-field {
         border-color: rgba(102, 187, 106, 0.55);
         background: rgba(14, 21, 37, 0.95);
     }
+
+    #categoryDetailModal .category-detail-toolbar {
+        align-items: flex-end;
+    }
+
+    .category-detail-date-group {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 3px;
+    }
+
+    .category-detail-date-group label {
+        margin-bottom: 0;
+    }
+
+    .category-detail-excel-btn {
+        align-self: flex-end;
+    }
 }
