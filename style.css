@@ -2027,11 +2027,19 @@ body.modal-open-ios .global-status-bar {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    min-width: 0;
+}
+.status-bar-inner > .version {
+    flex: 0 0 auto;
+    white-space: nowrap;
 }
 .status {
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    flex: 1 1 auto;
+    min-width: 0;
+    justify-content: flex-end;
 }
 
 .status-dot {
@@ -2100,17 +2108,23 @@ body.modal-open-ios .global-status-bar {
     text-transform: none;
     overflow: hidden;
     white-space: nowrap;
+    min-width: 0;
+    flex: 0 1 auto;
     max-width: min(52vw, 220px);
-    transition: opacity 0.45s ease, max-width 0.5s ease, color 0.3s, text-shadow 0.3s;
+    transition: opacity 0.45s ease, max-width 0.5s ease, flex-basis 0.5s ease, color 0.3s, text-shadow 0.3s;
 }
 
 #serverStatusText.server-status-text--visible {
     opacity: 1;
+    flex: 0 1 auto;
     max-width: min(52vw, 220px);
 }
 
 #serverStatusText.server-status-text--hidden {
     opacity: 0;
+    flex: 0 0 0;
+    width: 0;
+    min-width: 0;
     max-width: 0;
     margin: 0;
     padding: 0;
