@@ -7732,6 +7732,67 @@ input[type="date"]::-webkit-datetime-edit-year-field {
     flex-shrink: 0;
 }
 
+/* Ana ekran (index) mobil tipografi — yalnızca ≤768px, modallar / kasa / masaüstü hariç */
+@media screen and (max-width: 768px) {
+    #mainAppContainer > .header .header h1 .title-text {
+        font-size: 23px;
+        letter-spacing: 2px;
+    }
+
+    #mainAppContainer > .header #settingsIcon,
+    #mainAppContainer > .header #notificationIcon {
+        font-size: 30px;
+    }
+
+    #mainAppContainer .content-scroll-wrapper .summary-card h3 {
+        font-size: 16px;
+    }
+
+    #mainAppContainer .content-scroll-wrapper .summary-card p {
+        font-size: 12px;
+    }
+
+    #mainAppContainer .content-scroll-wrapper .quick-access-section-heading {
+        font-size: 14px;
+    }
+
+    #mainAppContainer .content-scroll-wrapper .q-icon svg {
+        width: 40px;
+        height: 40px;
+    }
+
+    #mainAppContainer .content-scroll-wrapper .q-name {
+        font-size: 14px;
+    }
+
+    #mainAppContainer .content-scroll-wrapper .debt-status-section h3 {
+        font-size: 16px;
+    }
+
+    #mainAppContainer .content-scroll-wrapper .control-panel h3 {
+        font-size: 16px;
+    }
+
+    #mainAppContainer .content-scroll-wrapper #addPersonBtn {
+        width: 30px;
+        height: 30px;
+        min-width: 30px;
+        font-size: 30px;
+        line-height: 1;
+    }
+
+    #mainAppContainer .content-scroll-wrapper .control-panel .general-status-btn,
+    #mainAppContainer .content-scroll-wrapper .control-panel .control-panel-grid .btn,
+    #mainAppContainer .content-scroll-wrapper .control-panel .file-upload-btn {
+        font-size: 13px;
+    }
+
+    #mainAppContainer > .global-status-bar #statusDot::before {
+        width: 11px;
+        height: 11px;
+    }
+}
+
 /* Mobil (≤450px): kapatma X, parola modalı çerçeveleri, kişi listesi */
 @media screen and (max-width: 450px) {
     .modal-header .close-modal-btn,
