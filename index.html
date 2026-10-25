@@ -39,7 +39,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png?v=20260719e">
 <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png?v=20260719e">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=20260719e">
-<link rel="stylesheet" href="style.css?v=79.42">
+<link rel="stylesheet" href="style.css?v=79.43">
 
 <title>ŞAHSİ HESAP TAKİBİ</title>
 </head>
@@ -478,6 +478,10 @@
                 <label for="summaryMonthSelect">Ay</label>
                 <select id="summaryMonthSelect"></select>
             </div>
+            <div id="monthlySummaryPreview" class="monthly-summary-preview" hidden>
+                <div id="monthlySummaryTotals" class="monthly-summary-totals" aria-live="polite"></div>
+                <div id="monthlySummaryTableWrap" class="monthly-summary-table-wrap"></div>
+            </div>
             <button type="button" class="btn btn-success btn-mt-20" id="generateReportBtn">Rapor Oluştur</button>
         </div>
     </div>
@@ -587,11 +591,11 @@
     </div>
 </div>
 
-<script src="js/version.js?v=79.42"></script>
+<script src="js/version.js?v=79.43"></script>
 <script src="storage.js?v=1.0" defer></script>
-<script src="js/utils.js?v=79.42" defer></script>
-<script src="js/auth-gate.js?v=79.42" defer></script>
-<script src="app.js?v=79.42" defer></script>
-<script src="js/auth-password-change.js?v=79.42" defer></script>
+<script src="js/utils.js?v=79.43" defer></script>
+<script src="js/auth-gate.js?v=79.43" defer></script>
+<script src="app.js?v=79.43" defer></script>
+<script src="js/auth-password-change.js?v=79.43" defer></script>
 </body>
 </html>

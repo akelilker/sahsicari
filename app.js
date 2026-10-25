@@ -1,6 +1,6 @@
 /* formatDateTR → js/utils.js */
 /** Önbellek / service worker — js/version.js ile senkron tut */
-const APP_VERSION = (typeof SAHSI_ASSET_VERSION !== 'undefined') ? SAHSI_ASSET_VERSION : '79.42';
+const APP_VERSION = (typeof SAHSI_ASSET_VERSION !== 'undefined') ? SAHSI_ASSET_VERSION : '79.43';
 /** Footer’da görünen sürüm */
 const FOOTER_VERSION = (typeof SAHSI_FOOTER_VERSION !== 'undefined') ? SAHSI_FOOTER_VERSION : '78.34';
 const APP_DEBUG = false;
@@ -3813,28 +3813,156 @@ function renderReportPreview() {
     listContainer.innerHTML = html;
 }
 
+function getMonthlyReportBounds(year, monthIndex) {
+    const y = parseInt(year, 10);
+    const m = parseInt(monthIndex, 10);
+    const startDate = new Date(y, m, 1);
+    const endDate = new Date(y, m + 1, 0);
+    endDate.setHours(23, 59, 59, 999);
+    return { startDate, endDate };
+}
+
+function parseTransactionDateForMonthlyReport(txDate) {
+    if (txDate === null || txDate === undefined || txDate === '') return null;
+    const str = String(txDate).trim();
+    const ymd = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (ymd && (str.length === 10 || str.charAt(10) === 'T')) {
+        const y = parseInt(ymd[1], 10);
+        const mo = parseInt(ymd[2], 10) - 1;
+        const day = parseInt(ymd[3], 10);
+        const local = new Date(y, mo, day, 12, 0, 0, 0);
+        return isNaN(local.getTime()) ? null : local;
+    }
+    const d = new Date(txDate);
+    return isNaN(d.getTime()) ? null : d;
+}
+
+function filterTransactionsForMonthlyReport(transactions, year, monthIndex) {
+    const bounds = getMonthlyReportBounds(year, monthIndex);
+    return transactions.filter(function (t) {
+        const d = parseTransactionDateForMonthlyReport(t.date);
+        if (!d) return false;
+        return d >= bounds.startDate && d <= bounds.endDate;
+    });
+}
+
+function countMonthlyReportTransactions(person, year, monthIndex) {
+    return filterTransactionsForMonthlyReport(getAllTransactionsForPerson(person), year, monthIndex).length;
+}
+
+function populateSummaryMonthSelect(person, year, mSel) {
+    if (!mSel) return;
+    mSel.innerHTML = '';
+    for (let mi = 0; mi < 12; mi++) {
+        const count = countMonthlyReportTransactions(person, year, mi);
+        const label = months[mi] + (count === 0 ? ' (0 işlem)' : '');
+        const opt = new Option(label, String(mi));
+        if (count === 0) opt.className = 'monthly-summary-month-option--empty';
+        mSel.add(opt);
+    }
+}
+
+function populateSummaryYearSelect(person, ySel) {
+    if (!ySel) return;
+    ySel.innerHTML = '';
+    const years = [];
+    Object.keys(allData[person]).forEach(function (y) {
+        if (!isNaN(y)) years.push(y);
+    });
+    years.sort(function (a, b) { return parseInt(b, 10) - parseInt(a, 10); });
+    years.forEach(function (y) { ySel.add(new Option(y, y)); });
+}
+
+function renderMonthlySummaryPreview(person, year, monthIndex) {
+    const preview = document.getElementById('monthlySummaryPreview');
+    const totalsEl = document.getElementById('monthlySummaryTotals');
+    const tableWrap = document.getElementById('monthlySummaryTableWrap');
+    if (!preview || !totalsEl || !tableWrap || !person) return;
+
+    if (!year || monthIndex === '' || monthIndex === null || monthIndex === undefined) {
+        preview.hidden = true;
+        totalsEl.innerHTML = '';
+        tableWrap.innerHTML = '';
+        return;
+    }
+
+    const monthlyTxs = filterTransactionsForMonthlyReport(getAllTransactionsForPerson(person), year, monthIndex)
+        .sort(function (a, b) {
+            const da = parseTransactionDateForMonthlyReport(a.date);
+            const db = parseTransactionDateForMonthlyReport(b.date);
+            return (da ? da.getTime() : 0) - (db ? db.getTime() : 0);
+        });
+
+    let totalGelen = 0;
+    let totalGiden = 0;
+    monthlyTxs.forEach(function (t) {
+        const amt = Math.abs(Number(t.amount)) || 0;
+        if (t.type === 'gelen') totalGelen += amt;
+        else if (t.type === 'giden') totalGiden += amt;
+    });
+    const net = totalGelen - totalGiden;
+    const netClass = net > 0.01 ? 'monthly-summary-totals-item--gelen' : (net < -0.01 ? 'monthly-summary-totals-item--giden' : 'monthly-summary-totals-item--net');
+
+    totalsEl.innerHTML =
+        '<span class="monthly-summary-totals-item monthly-summary-totals-item--gelen">Toplam Gelen: ' + sanitizeHTML(formatAmount(totalGelen)) + '</span>' +
+        '<span class="monthly-summary-totals-item monthly-summary-totals-item--giden">Toplam Giden: ' + sanitizeHTML(formatAmount(totalGiden)) + '</span>' +
+        '<span class="monthly-summary-totals-item ' + netClass + '">Net: ' + sanitizeHTML(formatAmount(net)) + '</span>';
+
+    if (monthlyTxs.length === 0) {
+        tableWrap.innerHTML = '<p class="monthly-summary-empty">' + sanitizeHTML('Bu ay işlem yok.') + '</p>';
+    } else {
+        let rows = '';
+        monthlyTxs.forEach(function (t) {
+            const d = parseTransactionDateForMonthlyReport(t.date);
+            const dateStr = d ? formatDateTR(d) : '';
+            const cat = t.category ? sanitizeHTML(String(t.category)) : '';
+            rows += '<tr>' +
+                '<td>' + sanitizeHTML(dateStr) + '</td>' +
+                '<td class="val-gelen">' + (t.type === 'gelen' ? sanitizeHTML(formatNumber(t.amount)) : '') + '</td>' +
+                '<td class="val-giden">' + (t.type === 'giden' ? sanitizeHTML(formatNumber(t.amount)) : '') + '</td>' +
+                '<td>' + sanitizeHTML(t.description || '') + '</td>' +
+                '<td>' + cat + '</td>' +
+                '</tr>';
+        });
+        tableWrap.innerHTML =
+            '<table class="detail-table">' +
+            '<thead><tr><th>Tarih</th><th>Gelen</th><th>Giden</th><th>Açıklama</th><th>Kategori</th></tr></thead>' +
+            '<tbody>' + rows + '</tbody></table>';
+    }
+
+    preview.hidden = false;
+}
+
 function showMonthlySummaryModal() {
     const person = currentPerson;
     if (!person) return showNotification(VALIDATION_MSG.selectPerson, 'error');
-    
+
     const ySel = document.getElementById('summaryYearSelect');
     const mSel = document.getElementById('summaryMonthSelect');
-    if(!ySel || !mSel) return;
-    
-    ySel.innerHTML = ''; mSel.innerHTML = '';
-    const dates = {};
-    Object.keys(allData[person]).forEach(y => {
-        if(!isNaN(y)) {
-            dates[y] = new Set();
-            Object.keys(allData[person][y]).forEach(m => dates[y].add(months.indexOf(m)));
+    if (!ySel || !mSel) return;
+
+    populateSummaryYearSelect(person, ySel);
+    if (ySel.options.length === 0) {
+        ySel.add(new Option(String(new Date().getFullYear()), String(new Date().getFullYear())));
+    }
+
+    const onYearChange = function () {
+        populateSummaryMonthSelect(person, ySel.value, mSel);
+        const now = new Date();
+        if (parseInt(ySel.value, 10) === now.getFullYear()) {
+            mSel.value = String(now.getMonth());
+        } else {
+            mSel.selectedIndex = 0;
         }
-    });
-    Object.keys(dates).sort((a,b)=>b-a).forEach(y => ySel.add(new Option(y,y)));
-    ySel.onchange = () => {
-        mSel.innerHTML = '';
-        Array.from(dates[ySel.value]||[]).sort((a,b)=>a-b).forEach(m => mSel.add(new Option(months[m], m)));
+        renderMonthlySummaryPreview(person, ySel.value, mSel.value);
     };
-    if(ySel.options.length > 0) ySel.onchange();
+
+    ySel.onchange = onYearChange;
+    mSel.onchange = function () {
+        renderMonthlySummaryPreview(person, ySel.value, mSel.value);
+    };
+
+    onYearChange();
     openModal('monthlySummaryModal');
 }
 
