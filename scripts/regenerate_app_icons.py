@@ -6,13 +6,13 @@ import struct
 import zlib
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFilter
+from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parents[1]
 MASTER = ROOT / "icons" / "app-icon-source-512.png"
 
+# Original ₺ underline purple — solid frame only, no glow/bevel
 PURPLE = (172, 30, 254, 255)
-PURPLE_GLOW = (174, 34, 255, 255)
 
 
 def is_purple(r: int, g: int, b: int, a: int) -> bool:
@@ -45,7 +45,7 @@ def remove_purple_underline(im: Image.Image) -> Image.Image:
 
 
 def draw_purple_frame(im: Image.Image, size: int) -> Image.Image:
-    """Inset rounded purple stroke; scales with icon size."""
+    """Inset rounded stroke: one solid purple outline, no glow or gradient."""
     scale = size / 512.0
     inset = max(3, int(round(56 * scale)))
     stroke = max(2, int(round(12 * scale)))
@@ -56,22 +56,15 @@ def draw_purple_frame(im: Image.Image, size: int) -> Image.Image:
     x0, y0 = inset, inset
     x1, y1 = size - inset - 1, size - inset - 1
 
-    for i in range(stroke):
-        draw.rounded_rectangle(
-            [x0 + i, y0 + i, x1 - i, y1 - i],
-            radius=max(2, radius - i),
-            outline=PURPLE,
-            width=1,
-        )
-
-    # Soft outer glow (matches underline feel)
-    glow = layer.filter(ImageFilter.GaussianBlur(radius=max(1, int(round(2 * scale)))))
-    glow = Image.blend(Image.new("RGBA", im.size, (0, 0, 0, 0)), glow, alpha=0.45)
+    draw.rounded_rectangle(
+        [x0, y0, x1, y1],
+        radius=radius,
+        outline=PURPLE,
+        width=stroke,
+    )
 
     base = im.convert("RGBA")
-    base = Image.alpha_composite(base, glow)
-    base = Image.alpha_composite(base, layer)
-    return base
+    return Image.alpha_composite(base, layer)
 
 
 def build_master() -> Image.Image:

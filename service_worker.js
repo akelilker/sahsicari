@@ -24,17 +24,17 @@ const urlsToCache = [
     'app.js?v=79.46',
     'kasa.css?v=79.46',
     'kasa.js?v=79.46',
-    'manifest.json?v=20261101a',
+    'manifest.json?v=20261101b',
     'manifest.json',
-    'favicon.ico?v=20261101a',
-    'apple-touch-icon.png?v=20261101a',
+    'favicon.ico?v=20261101b',
+    'apple-touch-icon.png?v=20261101b',
     'og-image.png?v=20260719e',
     // PWA Icons (referenced in manifest.json)
-    'icons/android-chrome-192x192.png?v=20261101a',
-    'icons/android-chrome-512x512.png?v=20261101a',
-    'icons/maskable-512x512.png?v=20261101a',
-    'icons/favicon-32x32.png?v=20261101a',
-    'icons/favicon-16x16.png?v=20261101a'
+    'icons/android-chrome-192x192.png?v=20261101b',
+    'icons/android-chrome-512x512.png?v=20261101b',
+    'icons/maskable-512x512.png?v=20261101b',
+    'icons/favicon-32x32.png?v=20261101b',
+    'icons/favicon-16x16.png?v=20261101b'
 ].map(scopedUrl);
 
 function isVersionedUrl(url) {
