@@ -1,6 +1,6 @@
 // Service Worker — SW_VERSION js/version.js SAHSI_ASSET_VERSION ile aynı olmalı
 const DEBUG = false; // Set to true for development
-const SW_VERSION = '79.44';
+const SW_VERSION = '79.45';
 const CACHE_PREFIX = 'sahsi-hesap-v';
 const CACHE_NAME = `${CACHE_PREFIX}${SW_VERSION}`;
 const APP_SCOPE_URL = self.registration.scope;
@@ -12,29 +12,29 @@ const urlsToCache = [
     'index.html',
     'kasa.html',
     'offline.html',
-    'js/version.js?v=79.44',
+    'js/version.js?v=79.45',
     'storage.js?v=1.0',
-    'js/utils.js?v=79.44',
-    'js/auth-gate.js?v=79.44',
-    'js/auth-password-change.js?v=79.44',
-    'js/report-exports.js?v=79.44',
+    'js/utils.js?v=79.45',
+    'js/auth-gate.js?v=79.45',
+    'js/auth-password-change.js?v=79.45',
+    'js/report-exports.js?v=79.45',
     'js/FileSaver.min.js',
     'js/xlsx.bundle.min.js',
-    'style.css?v=79.44',
-    'app.js?v=79.44',
-    'kasa.css?v=79.44',
-    'kasa.js?v=79.44',
-    'manifest.json?v=20260719e',
+    'style.css?v=79.45',
+    'app.js?v=79.45',
+    'kasa.css?v=79.45',
+    'kasa.js?v=79.45',
+    'manifest.json?v=20261101a',
     'manifest.json',
-    'favicon.ico?v=20260719e',
-    'apple-touch-icon.png?v=20260719e',
+    'favicon.ico?v=20261101a',
+    'apple-touch-icon.png?v=20261101a',
     'og-image.png?v=20260719e',
     // PWA Icons (referenced in manifest.json)
-    'icons/android-chrome-192x192.png?v=20260719e',
-    'icons/android-chrome-512x512.png?v=20260719e',
-    'icons/maskable-512x512.png?v=20260719e',
-    'icons/favicon-32x32.png?v=20260719e',
-    'icons/favicon-16x16.png?v=20260719e'
+    'icons/android-chrome-192x192.png?v=20261101a',
+    'icons/android-chrome-512x512.png?v=20261101a',
+    'icons/maskable-512x512.png?v=20261101a',
+    'icons/favicon-32x32.png?v=20261101a',
+    'icons/favicon-16x16.png?v=20261101a'
 ].map(scopedUrl);
 
 function isVersionedUrl(url) {
