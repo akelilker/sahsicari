@@ -328,6 +328,31 @@ font-size: 0.9em;
 }
 
 /* ==================== YENİ HISTORY TASARIMI (ORİJİNAL) ==================== */
+.kasa-history-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 6px;
+    padding: 0 2px 0 5px;
+    min-width: 0;
+    flex-shrink: 0;
+}
+
+.kasa-history-header-row .transaction-history-title {
+    margin: 0;
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.kasa-modal-content .kasa-history-header-row .category-detail-excel-btn {
+    flex: 0 0 auto;
+    align-self: center;
+}
+
 #transactionHistory {
 background: rgba(17, 20, 30, 0.86) !important;
 border: 1px solid rgba(149, 117, 205, 0.18) !important;

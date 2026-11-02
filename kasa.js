@@ -1,5 +1,5 @@
 /* =================================================================
-KASA DEFTERİ JS - v79.46
+KASA DEFTERİ JS - v79.47
 Yerel öncelikli kayıt + bağlantı geri geldiğinde sunucu senkronizasyonu
 ================================================================= */
 
@@ -17,7 +17,7 @@ let historyClickBound = false;
 let kategoriGridClickBound = false;
 let kategoriListClickBound = false;
 const KASA_STORAGE_KEY = 'sahsiKasaDefteriData';
-const KASA_SW_VERSION = (typeof SAHSI_ASSET_VERSION !== 'undefined') ? SAHSI_ASSET_VERSION : '79.46';
+const KASA_SW_VERSION = (typeof SAHSI_ASSET_VERSION !== 'undefined') ? SAHSI_ASSET_VERSION : '79.47';
 let kasaDataRevision = 0;
 let kasaSyncPromise = null;
 let kasaPersistPromise = Promise.resolve();
@@ -398,7 +398,12 @@ if (islemler.length === 0) {
 
 let html = `
     <div id="transactionHistory">
-        <h3 style="color:#b0bec5; font-size:0.95em; margin-bottom:10px; padding-left:5px;">Son İşlemler</h3>
+        <div class="kasa-history-header-row">
+            <h4 class="transaction-history-title">Son İşlemler</h4>
+            <button type="button" class="category-detail-excel-btn" id="kasaHistoryExcelBtn" title="Excel İndir" aria-label="Excel İndir">
+                <span class="excel-mini-icon" aria-hidden="true"></span>
+            </button>
+        </div>
 `;
 
 html += islemler.map(i => `
@@ -436,6 +441,13 @@ if (historyClickBound) return;
 const container = document.getElementById('historyContainer');
 if (!container) return;
 container.addEventListener('click', function(e) {
+    if (e.target.closest('#kasaHistoryExcelBtn')) {
+        e.stopPropagation();
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        exportKasaIslemGecmisiExcel();
+        return;
+    }
     const historyItem = e.target.closest('.history-item');
     if (historyItem && historyItem.dataset.islemId) {
         e.stopPropagation();
@@ -904,6 +916,94 @@ XLSX.utils.book_append_sheet(wb, ws, "Kategori Detay");
 XLSX.writeFile(wb, `Kasa_${kategoriAdi}_Rapor.xlsx`);
 showNotification('Excel indirildi! ✅');
 
+}
+
+function exportKasaIslemGecmisiExcel() {
+if (kasaData.islemler.length === 0) return showNotification('Dışa aktarılacak işlem yok!', 'error');
+
+ensureExcelLibs().then(function() {
+exportKasaIslemGecmisiExcelInner();
+}).catch(function() {
+showNotification('Excel kütüphanesi yüklenemedi', 'error');
+});
+}
+
+function exportKasaIslemGecmisiExcelInner() {
+const headerStyle = {
+    font: { bold: true, color: { rgb: "FFFFFF" } },
+    fill: { fgColor: { rgb: "424242" } },
+    alignment: { horizontal: "center", vertical: "center" },
+    border: { top: { style: "thin" }, bottom: { style: "thin" }, left: { style: "thin" }, right: { style: "thin" } }
+};
+const cellStyle = {
+    border: { top: { style: "thin", color: { rgb: "CCCCCC" } }, bottom: { style: "thin", color: { rgb: "CCCCCC" } }, left: { style: "thin", color: { rgb: "CCCCCC" } }, right: { style: "thin", color: { rgb: "CCCCCC" } } },
+    alignment: { vertical: "center" }
+};
+const boldCell = { ...cellStyle, font: { bold: true } };
+const numStyle = { ...cellStyle, numFmt: "#,##0.00" };
+const boldNum = { ...boldCell, numFmt: "#,##0.00" };
+
+const islemler = [...kasaData.islemler].sort((a, b) => new Date(b.tarih) - new Date(a.tarih));
+
+let toplamGiris = 0;
+let toplamCikis = 0;
+kasaData.islemler.forEach(function(i) {
+    if (i.tip === 'giris') toplamGiris += i.tutar;
+    else toplamCikis += i.tutar;
+});
+const bakiye = kasaData.baslangicBakiye + toplamGiris - toplamCikis;
+
+const data = [];
+data.push([
+    { v: "Tarih", s: headerStyle },
+    { v: "Tür", s: headerStyle },
+    { v: "Kategori", s: headerStyle },
+    { v: "Açıklama", s: headerStyle },
+    { v: "Tutar", s: headerStyle }
+]);
+
+islemler.forEach(function(i) {
+    data.push([
+        { v: formatDate(i.tarih), s: cellStyle },
+        { v: i.tip === 'giris' ? 'Gelen' : 'Giden', s: cellStyle },
+        { v: i.kategori || '', s: cellStyle },
+        { v: i.aciklama || '', s: cellStyle },
+        { v: i.tutar, t: 'n', s: numStyle }
+    ]);
+});
+
+data.push([]);
+data.push([
+    { v: "Toplam Giriş", s: boldCell },
+    { v: "", s: cellStyle },
+    { v: "", s: cellStyle },
+    { v: "", s: cellStyle },
+    { v: toplamGiris, t: 'n', s: boldNum }
+]);
+data.push([
+    { v: "Toplam Çıkış", s: boldCell },
+    { v: "", s: cellStyle },
+    { v: "", s: cellStyle },
+    { v: "", s: cellStyle },
+    { v: toplamCikis, t: 'n', s: boldNum }
+]);
+data.push([
+    { v: "Bakiye", s: boldCell },
+    { v: "", s: cellStyle },
+    { v: "", s: cellStyle },
+    { v: "", s: cellStyle },
+    { v: bakiye, t: 'n', s: boldNum }
+]);
+
+const ws = XLSX.utils.aoa_to_sheet(data);
+ws['!cols'] = [{ wch: 12 }, { wch: 10 }, { wch: 22 }, { wch: 36 }, { wch: 14 }];
+
+const wb = XLSX.utils.book_new();
+XLSX.utils.book_append_sheet(wb, ws, "İşlem Geçmişi");
+
+const fileDate = new Date().toISOString().split('T')[0];
+XLSX.writeFile(wb, 'Kasa_Islem_Gecmisi_' + fileDate + '.xlsx');
+showNotification('Excel indirildi! ✅');
 }
 
 // ==================== BAKİYE ====================
